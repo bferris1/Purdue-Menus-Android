@@ -1,0 +1,16 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--<SwitchPreference
+        android:defaultValue="true"
+        android:key="@string/key_show_vegetarian"
+        android:summaryOff="@string/preference_vegetarian_summary_off"
+        android:summaryOn="@string/preference_vegetarian_summary_on"
+        android:title="@string/preference_title_show_vegetarian_icons"/>-->
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="show_serving_times"
+        android:title="@string/pref_show_serving_times"/>
+
+
+</PreferenceScreen>

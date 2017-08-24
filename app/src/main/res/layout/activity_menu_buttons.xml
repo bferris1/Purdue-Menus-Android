@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.menu.MenuActivity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/main_toolbar"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        android:layout_marginRight="0dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="0dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="0dp"/>
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/menu_tab_layout_buttons"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_gravity="top"
+        android:layout_marginTop="0dp"
+        android:background="?attr/colorPrimary"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/main_toolbar"
+        app:tabMode="scrollable"/>
+
+    <Button
+        android:id="@+id/button_breakfast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="0dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginStart="32dp"
+        android:drawableTop="@drawable/ic_coffee_cup"
+        android:text="@string/breakfast"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toBottomOf="@+id/button_lunch"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+
+    <Button
+        android:id="@+id/button_lunch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/lunch"
+        app:layout_constraintLeft_toRightOf="@+id/button_breakfast"
+        app:layout_constraintRight_toLeftOf="@+id/button_dinner"
+        app:layout_constraintTop_toBottomOf="@+id/menu_tab_layout_buttons"
+        app:layout_constraintHorizontal_bias="0.5"/>
+
+    <Button
+        android:id="@+id/button_dinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="32dp"
+        android:text="@string/dinner"
+        app:layout_constraintBottom_toBottomOf="@+id/button_lunch"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginEnd="32dp"/>
+
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/menu_view_pager"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_lunch"
+        app:layout_constraintVertical_bias="0.0"
+        tools:context="com.moufee.purduemenus.ui.menu.MenuActivity"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintHorizontal_bias="1.0">
+
+
+    </android.support.v4.view.ViewPager>
+
+</android.support.constraint.ConstraintLayout>

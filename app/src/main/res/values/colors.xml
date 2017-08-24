@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#ffc107</color>
+    <color name="colorPrimaryDark">#ffa000</color>
+    <color name="colorPrimaryLight">#fff350</color>
+    <color name="colorSecondary">#455a64</color>
+    <color name="colorSecondaryDark">#1c313a</color>
+    <color name="colorSecondaryLight">#718792</color>
+    <color name="colorTextPrimary">#000000</color>
+    <color name="colorTextSecondary">#FFFFFF</color>
+    <color name="colorAccent">#ffc400</color>
+
+    <color name="purdueGold">#b1810b</color>
+    <color name="purdueGoldLight">#e7b044</color>
+    <color name="purdueGoldDark">#7d5500</color>
+    <color name="purdueSecondary">#212121</color>
+    <color name="purdueSecondaryDark">#000000</color>
+    <color name="purdueSecondaryLight">#484848</color>
+
+    <color name="darkGrey">#616161</color>
+    <color name="purdueDarkGold">#986d07</color>
+    <color name="purdueGoldMaterial">#9e9d24</color>
+    <color name="colorAccentMaterial">#ffab40</color>
+    <color name="purdueDarkGoldMaterial">#827717</color>
+    <color name="vegetarian_green">#c8e6c9</color>
+    <color name="accent_grey">#e0e0e0</color>
+</resources>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lunch">déjeuner</string>
+    <string name="today">Aujourd\'hui</string>
+    <string name="yesterday">Hier</string>
+    <string name="tomorrow">Demain</string>
+    <string name="dinner">dîner</string>
+    <string name="breakfast">petit-déjeuner</string>
+    <string name="title_menu">Menu</string>
+    <string name="next_day_button_description">Jour Suivant</string>
+    <string name="not_serving">Ne Sert Pas</string>
+    <string name="action_settings">Paramètres</string>
+    <string name="title_settings">Paramètres</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="previous_day_button_description">Jour Précédent</string>
+    <string name="description_favorite_button">préféré</string>
+    <string name="description_vegetarian_icon">Indicateur végétarien</string>
+    <string name="title_activity_settings">Paramètres</string>
+    <string name="preference_title_show_vegetarian_icons">Afficher des icônes végétariennes</string>
+    <string name="preference_vegetarian_summary_off">Les icônes végétariennes ne sont pas affichées.</string>
+    <string name="preference_vegetarian_summary_on">Les icônes végétariennes sont affichées.</string>
+    <string name="pref_header_general">Général</string>
+    <string name="action_send_feedback">Envoyer des commentaires</string>
+    <string name="action_login">s\'inscrire</string>
+    <string name="action_sign_in_short">s\'inscrire</string>
+    <string name="error_incorrect_password">Le mot de passe n\'est pas correct</string>
+    <string name="error_invalid_email">L\'adresse e-mail n\'est pas correcte</string>
+    <string name="error_invalid_password">Le mot de passe est trop court</string>
+    <string name="error_field_required">Ce champ est requis</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">mot de passe</string>
+    <string name="title_activity_login">Inscrivez-vous</string>
+    <string name="data_unavailable">Indisponible</string>
+    <string name="network_error_message">Il y a eu une erreur de réseau</string>
+    <string name="pref_show_serving_times">Montrer les temps de service</string>
+</resources>

@@ -1,0 +1,45 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorSecondary</item>
+    </style>
+
+    <style name="PurdueTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/purdueGold</item>
+        <item name="colorPrimaryDark">@color/purdueGoldDark</item>
+        <item name="colorAccent">@color/purdueSecondary</item>
+    </style>
+
+    <style name="AppTheme.ActionBar">
+        <item name="windowActionBar">true</item>
+        <item name="windowNoTitle">false</item>
+    </style>
+
+    <style name="PurdueTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+    <style name="PurdueTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+    <style name="PurdueTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+
+    <style name="RecyclerViewHeader" parent="Base.TextAppearance.AppCompat.Medium">
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+    <style name="MealButton">
+        <item name="android:textSize">10sp</item>
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:selectable">true</item>
+    </style>
+
+
+</resources>

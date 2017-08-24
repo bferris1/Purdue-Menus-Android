@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_menu_coordinator_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.menu.MenuActivity">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/main_toolbar"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:background="?attr/colorPrimary"
+            android:elevation="4dp"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/actionBarTheme"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/menu_tab_layout_buttons"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_gravity="top"
+            android:background="?attr/colorPrimary"
+            android:elevation="4dp"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/main_toolbar"
+            app:tabMode="scrollable"/>
+
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/date_picker_layout"
+            android:layout_width="0dp"
+            android:layout_height="55dp"
+            android:background="?attr/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent">
+
+            <ImageButton
+                android:id="@+id/button_next_day"
+                style="?attr/borderlessButtonStyle"
+                android:layout_width="50dp"
+                android:layout_height="0dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginRight="16dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/next_day_button_description"
+                android:src="@drawable/ic_keyboard_arrow_right_black_24dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <TextView
+                android:id="@+id/date_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@+id/button_previous_day"
+                app:layout_constraintRight_toLeftOf="@+id/button_next_day"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Today"/>
+
+            <ImageButton
+                android:id="@+id/button_previous_day"
+                android:layout_width="50dp"
+                android:layout_height="0dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/previous_day_button_description"
+                android:src="@drawable/ic_keyboard_arrow_left_black_24dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+        </android.support.constraint.ConstraintLayout>
+
+        <include
+            android:id="@+id/loading_indicator_view"
+            style="?android:attr/progressBarStyle"
+            layout="@layout/loading_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/date_picker_layout"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout"/>
+
+        <TextView
+            android:id="@+id/meal_time_text_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:elevation="1dp"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp"
+            android:text="11:00 AM - 2:00 PM"
+            android:textAlignment="center"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+            tools:text="11:00 AM - 2:00 PM"/>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/menu_view_pager"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/date_picker_layout"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/meal_time_text_view"
+            tools:context="com.moufee.purduemenus.ui.menu.MenuActivity">
+
+
+        </android.support.v4.view.ViewPager>
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:elevation="2dp"
+            android:orientation="horizontal"
+            android:paddingBottom="8dp"
+            android:paddingEnd="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingStart="16dp"
+            android:paddingTop="16dp"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/menu_tab_layout_buttons">
+
+            <Button
+                android:id="@+id/button_breakfast"
+                style="@style/MealButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/ic_coffee_state"
+                android:text="@string/breakfast"
+                tools:text="Breakfast"
+                />
+
+            <Button
+                android:id="@+id/button_lunch"
+                style="@style/MealButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/ic_pizza_state"
+                android:padding="0dp"
+                android:text="@string/lunch"
+                tools:text="Lunch"/>
+
+            <Button
+                android:id="@+id/button_late_lunch"
+                style="@style/MealButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawablePadding="0dp"
+                android:drawableTop="@drawable/ic_food_apple_state"
+                android:includeFontPadding="false"
+                android:padding="0dp"
+                android:text="@string/late_lunch"
+                android:visibility="gone"
+                tools:text="Late Lunch"
+                tools:visibility="visible"/>
+
+            <Button
+                android:id="@+id/button_dinner"
+                style="@style/MealButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/ic_hamburger_state"
+                android:text="@string/dinner"
+                tools:text="Dinner"/>
+        </LinearLayout>
+
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.design.widget.CoordinatorLayout>
