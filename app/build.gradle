@@ -7,8 +7,8 @@ android {
         applicationId "com.moufee.purduemenus"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 11
-        versionName "1.0.0-beta11"
+        versionCode 12
+        versionName "1.0.0-beta12"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = false
     }
@@ -35,8 +35,6 @@ dependencies {
     })
     compile "com.android.support:appcompat-v7:$support_version"
     compile "com.android.support:design:$support_version"
-//        compile "com.android.support:support-vector-drawable:25.3.1"
-    //    compile "com.android.support:preference-v14:25.3.1"
     compile "com.android.support.constraint:constraint-layout:1.0.2"
     compile "com.android.support:support-v4:$support_version"
     compile "com.android.support:recyclerview-v7:$support_version"
@@ -44,7 +42,6 @@ dependencies {
     compile "com.google.dagger:dagger:$dagger_version"
     compile "com.google.dagger:dagger-android:$dagger_version"
     compile "com.google.dagger:dagger-android-support:$dagger_version"
-//    androidTestCompile "com.google.code.findbugs:jsr305:3.0.1"
     annotationProcessor "com.google.dagger:dagger-android-processor:$dagger_version"
     annotationProcessor "com.google.dagger:dagger-compiler:$dagger_version"
 
