@@ -243,16 +243,17 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: oncreate called");
-//        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-//                .detectAll()  // or .detectAll() for all detectable problems
-//                .permitDiskReads()
-//                .penaltyLog()
-//                .build());
-//        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-//                .detectAll()
-//                .penaltyLog()
-////                .penaltyDeath()
-//                .build());
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                .detectAll()  // or .detectAll() for all detectable problems
+                .permitDiskReads()
+                .penaltyLog()
+                .build());
+        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                .detectLeakedSqlLiteObjects()
+                .detectLeakedClosableObjects()
+                .penaltyLog()
+//                .penaltyDeath()
+                .build());
         super.onCreate(savedInstanceState);
 
 
@@ -316,37 +317,25 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
         mBreakfastButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                mMealIndex = 0;
                 mViewModel.setSelectedMealIndex(0);
-//                updateButtons();
-//                mViewPager.getAdapter().notifyDataSetChanged();
             }
         });
         mLunchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                mMealIndex = 1;
                 mViewModel.setSelectedMealIndex(1);
-//                updateButtons();
-//                mViewPager.getAdapter().notifyDataSetChanged();
             }
         });
         mLateLunchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                mMealIndex = 2;
                 mViewModel.setSelectedMealIndex(2);
-//                updateButtons();
-//                mViewPager.getAdapter().notifyDataSetChanged();
             }
         });
         mDinnerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                mMealIndex = 3;
                 mViewModel.setSelectedMealIndex(3);
-//                updateButtons();
-//                mViewPager.getAdapter().notifyDataSetChanged();
             }
         });
         mNextDayButton.setOnClickListener(new View.OnClickListener() {

@@ -16,15 +16,15 @@ import retrofit2.Response;
  * Created by Ben on 13/08/2017.
  */
 
-public abstract class MyNetworkBoundResource<ResultType, RequestType> {
+public abstract class NetworkBoundResource<ResultType, RequestType> {
 
     private final MediatorLiveData<Resource<ResultType>> result = new MediatorLiveData<>();
 
 
-    MyNetworkBoundResource() {
+    NetworkBoundResource() {
         //initialize result to an empty resource of the correct type with loading status
         result.setValue(Resource.<ResultType>loading(null));
-        //get from file (or database?)
+        //get from local source
         final LiveData<ResultType> localSource = loadFromFile();
         result.addSource(localSource, new Observer<ResultType>() {
             @Override
