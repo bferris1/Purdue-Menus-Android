@@ -5,9 +5,12 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.moufee.purduemenus.MenusApp;
 import com.moufee.purduemenus.api.Webservice;
-import com.moufee.purduemenus.di.AppModule;
+import com.moufee.purduemenus.di.AppComponent;
+import com.moufee.purduemenus.di.DaggerAppComponent;
 import com.moufee.purduemenus.util.Resource;
 
 import org.joda.time.DateTime;
@@ -26,6 +29,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -42,12 +47,15 @@ public class UpdateMenuTask implements Runnable {
     private DateTime mMenuDate;
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd");
     private static final String TAG = "UpdateMenuTask";
-    private Webservice mWebservice = AppModule.getWebservice();
+    @Inject Webservice mWebservice;
+    @Inject Gson mGson;
 
     public UpdateMenuTask(MutableLiveData<Resource<FullDayMenu>> menu, Context context, DateTime date) {
         mFullMenu = menu;
         mContext = context;
         mMenuDate = date;
+        MenusApp app = (MenusApp) context.getApplicationContext();
+        app.getAppComponent().inject(this);
     }
 
     @Override
@@ -94,21 +102,30 @@ public class UpdateMenuTask implements Runnable {
     private ArrayList<DiningCourtMenu> getMenusFromFile(String formattedDate){
         File filesDir = mContext.getCacheDir();
         File sourceFile = new File(filesDir, formattedDate + ".json");
+        ArrayList<DiningCourtMenu> result;
         if (!sourceFile.exists())
             return null;
-        FileReader sourceReader;
+        FileReader sourceReader = null;
         try {
             sourceReader = new FileReader(sourceFile);
-        } catch (FileNotFoundException e) {
+            Type type = new TypeToken<ArrayList<DiningCourtMenu>>(){}.getType();
+            result =  mGson.fromJson(sourceReader, type);
+        } catch (Exception e) {
+                try {
+                    if (sourceReader != null)
+                    sourceReader.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
             return null;
         }
-        Type type = new TypeToken<ArrayList<DiningCourtMenu>>(){}.getType();
-        ArrayList<DiningCourtMenu> result =  AppModule.getGson().fromJson(sourceReader, type);
+
         try {
             sourceReader.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, "getMenusFromFile: ", e);
         }
+
         return result;
     }
 
@@ -116,7 +133,7 @@ public class UpdateMenuTask implements Runnable {
         File filesDir = mContext.getCacheDir();
         File outputFile = new File(filesDir, filename);
         FileWriter writer = new FileWriter(outputFile);
-        String json = AppModule.getGson().toJson(menus);
+        String json = mGson.toJson(menus);
         writer.write(json);
         writer.close();
     }
@@ -135,13 +152,13 @@ public class UpdateMenuTask implements Runnable {
         for (final String diningCourt : diningCourts) {
             Call<DiningCourtMenu> menuCall = mWebservice.getMenu(diningCourt, dateString);
             //// TODO: 20/08/2017 restructure so callbacks don't run on ui thread
-            Response<DiningCourtMenu> response = menuCall.execute();
-            if (response.isSuccessful())
-                tempMenusList.add(response.body());
-            /*menuCall.enqueue(new Callback<DiningCourtMenu>() {
+//            Response<DiningCourtMenu> response = menuCall.execute();
+//            if (response.isSuccessful())
+//                tempMenusList.add(response.body());
+            menuCall.enqueue(new Callback<DiningCourtMenu>() {
                 @Override
                 public void onResponse(@NonNull Call<DiningCourtMenu> call, @NonNull Response<DiningCourtMenu> response) {
-                    Log.d(TAG, "onResponse: Success");
+//                    Log.d(TAG, "onResponse: Success");
                     if (response.isSuccessful())
                         tempMenusList.add(response.body());
 
@@ -179,26 +196,26 @@ public class UpdateMenuTask implements Runnable {
                     else
                         mFullMenu.postValue(Resource.<FullDayMenu>error(t.getMessage(), null));
                 }
-            });*/
-
-
-        }
-        if (tempMenusList.size() == diningCourts.size()) {
-            Collections.sort(tempMenusList, new Comparator<DiningCourtMenu>() {
-                @Override
-                public int compare(DiningCourtMenu o1, DiningCourtMenu o2) {
-                    if (o1 == null || o2 == null)
-                        return 0;
-                    if (diningCourts.indexOf(o1.getLocation()) < diningCourts.indexOf(o2.getLocation()))
-                        return -1;
-                    if (diningCourts.indexOf(o1.getLocation()) < diningCourts.indexOf(o2.getLocation()))
-                        return 1;
-                    return 0;
-                }
             });
-            mFullMenu.postValue(Resource.success(new FullDayMenu(tempMenusList, mMenuDate, hasLateLunch(tempMenusList))));
-            //save to json
-            saveMenuToFile(dateString + ".json", tempMenusList);
+
+
         }
+//        if (tempMenusList.size() == diningCourts.size()) {
+//            Collections.sort(tempMenusList, new Comparator<DiningCourtMenu>() {
+//                @Override
+//                public int compare(DiningCourtMenu o1, DiningCourtMenu o2) {
+//                    if (o1 == null || o2 == null)
+//                        return 0;
+//                    if (diningCourts.indexOf(o1.getLocation()) < diningCourts.indexOf(o2.getLocation()))
+//                        return -1;
+//                    if (diningCourts.indexOf(o1.getLocation()) < diningCourts.indexOf(o2.getLocation()))
+//                        return 1;
+//                    return 0;
+//                }
+//            });
+//            mFullMenu.postValue(Resource.success(new FullDayMenu(tempMenusList, mMenuDate, hasLateLunch(tempMenusList))));
+//            //save to json
+//            saveMenuToFile(dateString + ".json", tempMenusList);
+//        }
     }
 }

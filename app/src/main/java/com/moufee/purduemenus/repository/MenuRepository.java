@@ -6,14 +6,10 @@ import android.content.Context;
 
 import com.moufee.purduemenus.menus.UpdateMenuTask;
 import com.moufee.purduemenus.util.Resource;
-import com.moufee.purduemenus.api.Webservice;
-import com.moufee.purduemenus.di.AppModule;
 import com.moufee.purduemenus.menus.FullDayMenu;
 
 import org.joda.time.DateTime;
 
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 
 /**
  * Created by Ben on 22/07/2017.
@@ -22,7 +18,7 @@ import java.util.Locale;
  * Creates threads to retrieve and process menu data
  */
 
-//todo: dagger dependency injection?
+//todo (in progress): dagger dependency injection?
 
 public class MenuRepository {
 

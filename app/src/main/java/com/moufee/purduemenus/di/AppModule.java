@@ -9,6 +9,10 @@ import com.moufee.purduemenus.api.Webservice;
 
 import org.joda.time.LocalTime;
 
+import javax.inject.Singleton;
+
+import dagger.Module;
+import dagger.Provides;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -17,58 +21,29 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * Created by Ben on 28/07/2017.
  * The Dagger App Module, Provides dependencies for injection
  * Update: not using dagger for initial release
- * todo: use dagger
+ * in progress: use dagger
  */
 
-
-public class AppModule {
-
-    static Webservice sWebservice;
-    static Gson sGson;
-    static OkHttpClient sHttpClient;
-    static AppExecutors sAppExecutors;
-
-    public static Webservice getWebservice(){
-        if (sWebservice == null)
-            sWebservice = provideWebService();
-        return sWebservice;
-    }
-
-    public static Gson getGson(){
-        if (sGson == null)
-            sGson = provideGson();
-        return sGson;
-    }
-
-    public static OkHttpClient getHttpClient(){
-        if (sHttpClient == null)
-            sHttpClient = provideHttpClient();
-        return sHttpClient;
-    }
-
-    public static AppExecutors getAppExecutors(){
-        if (sAppExecutors == null)
-            sAppExecutors = new AppExecutors();
-        return sAppExecutors;
-    }
-
-    private static Webservice provideWebService(){
-        Gson gson = getGson();
-
+@Module
+class AppModule {
+    @Singleton @Provides
+     Webservice provideWebService(AppExecutors executors, Gson gson){
         return new Retrofit.Builder()
                 .baseUrl("https://api.hfs.purdue.edu")
                 .addConverterFactory(GsonConverterFactory.create(gson))
+                .callbackExecutor(executors.diskIO())
                 .build()
                 .create(Webservice.class);
     }
-
-    private static Gson provideGson(){
+    @Singleton @Provides
+     Gson provideGson(){
         return new GsonBuilder()
                 .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
                 .registerTypeAdapter(LocalTime.class, new LocalTimeTypeConverter())
                 .create();
     }
-    private static OkHttpClient provideHttpClient(){
+    @Singleton @Provides
+     OkHttpClient provideHttpClient(){
         //todo: restore cookies or not?
         return new OkHttpClient();
     }

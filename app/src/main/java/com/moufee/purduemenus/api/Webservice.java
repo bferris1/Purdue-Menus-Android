@@ -2,6 +2,8 @@ package com.moufee.purduemenus.api;
 
 import com.moufee.purduemenus.menus.DiningCourtMenu;
 
+import javax.inject.Singleton;
+
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;

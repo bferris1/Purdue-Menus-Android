@@ -25,6 +25,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -80,7 +81,13 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
     private DateTimeFormatter mTimeFormatter = DateTimeFormat.shortTime();
     private ViewPager.OnPageChangeListener mOnPageChangeListener;
     private SharedPreferences mSharedPreferences;
-    private Boolean showServingTimes = true;
+    private SharedPreferences.OnSharedPreferenceChangeListener mSharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            if (key.equals(SettingsActivity.KEY_PREF_SHOW_SERVING_TIMES))
+            updateServingTime();
+        }
+    };
 
     private final LifecycleRegistry mRegistry = new LifecycleRegistry(this);
 
@@ -197,20 +204,20 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
      */
     private int getCurrentMealIndex(){
         DateTime now = new DateTime();
-        if (now.getHourOfDay() <= 10)
+        if (now.getHourOfDay() <= 9)
             return 0;
-        else if (now.getHourOfDay() <= 14)
+        else if (now.getHourOfDay() <= 13)
             return 1;
         else if (now.getHourOfDay() <= 16)
             return 2;
-        else if (now.getHourOfDay() <= 22 )
+        else if (now.getHourOfDay() <= 21 )
             return 3;
         else
             return 0;
     }
 
     private void updateServingTime(){
-        if (!showServingTimes){
+        if (!mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_SHOW_SERVING_TIMES,true)){
             mMealTimeTextView.setVisibility(View.GONE);
             return;
         }
@@ -235,16 +242,17 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                .detectAll()  // or .detectAll() for all detectable problems
-                .permitDiskReads()
-                .penaltyLog()
-                .build());
-        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                .detectAll()
-                .penaltyLog()
-//                .penaltyDeath()
-                .build());
+        Log.d(TAG, "onCreate: oncreate called");
+//        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+//                .detectAll()  // or .detectAll() for all detectable problems
+//                .permitDiskReads()
+//                .penaltyLog()
+//                .build());
+//        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+//                .detectAll()
+//                .penaltyLog()
+////                .penaltyDeath()
+//                .build());
         super.onCreate(savedInstanceState);
 
 
@@ -255,6 +263,8 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
         mViewModel = ViewModelProviders.of(this).get(DailyMenuViewModel.class);
         mViewModel.init(new DateTime(), getCurrentMealIndex());
         setListeners();
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mSharedPreferences.registerOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.menu_tab_layout_buttons);
 
@@ -389,10 +399,27 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause: ");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart: ");
+    }
+
+    @Override
+    protected void onStop() {
+        Log.d(TAG, "onStop: ");
+        super.onStop();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
-        showServingTimes = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(SettingsActivity.KEY_PREF_SHOW_SERVING_TIMES,true);
-        updateServingTime();
+            Log.d(TAG, "onResume: ");
     }
 
     @Override
@@ -421,8 +448,10 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
 
     @Override
     protected void onDestroy() {
+        Log.d(TAG, "onDestroy: ");
         unregisterReceiver(mNetworkReceiver);
         mViewPager.removeOnPageChangeListener(mOnPageChangeListener);
+        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
         super.onDestroy();
     }
 

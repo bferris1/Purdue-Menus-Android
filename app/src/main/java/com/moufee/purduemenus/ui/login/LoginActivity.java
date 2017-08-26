@@ -28,7 +28,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.moufee.purduemenus.R;
-import com.moufee.purduemenus.di.AppModule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -277,7 +276,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
 
             try {
-                OkHttpClient httpClient = AppModule.getHttpClient();
+                OkHttpClient httpClient = new OkHttpClient();
                 Headers loginHeaders = new Headers.Builder()
                         .add("User-Agent","Purdue Menus Android/2.1")
                         .add("Accept-Encoding","gzip")
