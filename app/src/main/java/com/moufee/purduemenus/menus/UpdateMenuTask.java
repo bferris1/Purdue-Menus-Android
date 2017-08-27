@@ -2,6 +2,8 @@ package com.moufee.purduemenus.menus;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -47,13 +49,16 @@ public class UpdateMenuTask implements Runnable {
     private DateTime mMenuDate;
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd");
     private static final String TAG = "UpdateMenuTask";
+    private boolean mFetchedFromFile = false;
     @Inject Webservice mWebservice;
     @Inject Gson mGson;
+    ConnectivityManager mConnectivityManager;
 
     public UpdateMenuTask(MutableLiveData<Resource<FullDayMenu>> menu, Context context, DateTime date) {
         mFullMenu = menu;
         mContext = context;
         mMenuDate = date;
+        mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         MenusApp app = (MenusApp) context.getApplicationContext();
         app.getAppComponent().inject(this);
     }
@@ -63,22 +68,14 @@ public class UpdateMenuTask implements Runnable {
 //        mFullMenu.postValue(Resource.<FullDayMenu>loading(null));
         ArrayList<DiningCourtMenu> fileMenus = getMenusFromFile(DATE_TIME_FORMATTER.print(mMenuDate));
         if (fileMenus!=null){
+            mFetchedFromFile = true;
             mFullMenu.postValue(Resource.success(new FullDayMenu(fileMenus, mMenuDate, hasLateLunch(fileMenus))));
             Log.d(TAG, "getFullMenu: Read from file!");
         }else{
             mFullMenu.postValue(Resource.<FullDayMenu>loading(null));
         }
         if (fileMenus == null || shouldFetch()){
-            try {
-                fetchFromNetwork();
-            } catch (IOException e) {
-//                e.printStackTrace();
-                Log.e(TAG, "onFailure: Network error", e);
-                if (fileMenus != null)
-                    mFullMenu.postValue(Resource.error("Network Error", new FullDayMenu(fileMenus, mMenuDate, hasLateLunch(fileMenus))));
-                else
-                    mFullMenu.postValue(Resource.<FullDayMenu>error(e.getMessage(), null));
-            }
+            fetchFromNetwork();
         }
     }
 
@@ -138,7 +135,15 @@ public class UpdateMenuTask implements Runnable {
         writer.close();
     }
 
-    private void fetchFromNetwork() throws IOException {
+    private void fetchFromNetwork() {
+        NetworkInfo networkInfo = mConnectivityManager.getActiveNetworkInfo();
+        if (networkInfo == null || !networkInfo.isConnected()){
+            if (mFetchedFromFile)
+                return;
+            else
+                mFullMenu.postValue(Resource.<FullDayMenu>error("Not connected to network", null));
+            return;
+        }
         final ArrayList<String> diningCourts = new ArrayList<>(6);
         diningCourts.add("Earhart");
         diningCourts.add("Ford");
