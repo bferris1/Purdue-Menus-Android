@@ -103,23 +103,32 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
 
     }
 
-    //todo: locale order
+    //todo: locale order? and possible efficiency improvements/streamlining
     private String getFriendlyDateFormat(DateTime dateTime){
         String pattern;
+        final int HINT_START_HOUR = 22; // the hour at which day hints will be shown (e.g. after 10pm)
+        final int HINT_END_HOUR = 4; //the hour in the morning after which hints will not be displayed
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
             pattern = DateFormat.getBestDateTimePattern(Locale.getDefault(),"EEEE MMMMM dd");
         } else pattern = "EEEE MMMMM dd";
         DateTimeFormatter format = DateTimeFormat.forPattern(pattern).withLocale(Locale.getDefault());
+        DateTimeFormatter dayFormat = DateTimeFormat.forPattern(" (E)").withLocale(Locale.getDefault());
         DateTime now = new DateTime();
+        boolean showDayHints = now.getHourOfDay() >= HINT_START_HOUR || now.getHourOfDay() <= HINT_END_HOUR;
+        String dayString = showDayHints ? dayFormat.print(now) : "";
         Interval today = new Interval(now.withTimeAtStartOfDay(),now.plusDays(1).withTimeAtStartOfDay());
         if (today.contains(dateTime))
-            return getString(R.string.today);
+            return getString(R.string.today) + dayString;
         Interval tomorrow = new Interval(now.plusDays(1).withTimeAtStartOfDay(), now.plusDays(2).withTimeAtStartOfDay());
-        if (tomorrow.contains(dateTime))
-            return getString(R.string.tomorrow);
+        if (tomorrow.contains(dateTime)) {
+            dayString = showDayHints ? dayFormat.print(now.plusDays(1)) : "";
+            return getString(R.string.tomorrow) + dayString;
+        }
         Interval yesterday = new Interval(now.plusDays(-1).withTimeAtStartOfDay(), now.withTimeAtStartOfDay());
-        if (yesterday.contains(dateTime))
-            return getString(R.string.yesterday);
+        if (yesterday.contains(dateTime)) {
+            dayString = showDayHints ? dayFormat.print(now.plusDays(-1)) : "";
+            return getString(R.string.yesterday) + dayString;
+        }
         return format.print(dateTime);
     }
 
@@ -243,17 +252,6 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: oncreate called");
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                .detectAll()  // or .detectAll() for all detectable problems
-                .permitDiskReads()
-                .penaltyLog()
-                .build());
-        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                .detectLeakedSqlLiteObjects()
-                .detectLeakedClosableObjects()
-                .penaltyLog()
-//                .penaltyDeath()
-                .build());
         super.onCreate(savedInstanceState);
 
 
@@ -264,6 +262,7 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
         mViewModel = ViewModelProviders.of(this).get(DailyMenuViewModel.class);
         mViewModel.init(new DateTime(), getCurrentMealIndex());
         setListeners();
+
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mSharedPreferences.registerOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
 
@@ -307,11 +306,6 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
         //receive network status updates, to trigger data update when connectivity is reestablished
         //todo: integrate with Lifecycle
         registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-
-
-
-
-
 
 
         mBreakfastButton.setOnClickListener(new View.OnClickListener() {

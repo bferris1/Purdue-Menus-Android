@@ -39,7 +39,6 @@ public class DailyMenuViewModel extends AndroidViewModel {
         super(application);
         this.mMenuRepository = MenuRepository.get();
         mSelectedMealIndex.setValue(0);
-//        this.showVegetarianIcons = PreferenceManager.getDefaultSharedPreferences(this.getApplication()).getBoolean(getApplication().getString(R.string.key_show_vegetarian),true);
     }
 
     public void init(DateTime date, int selectedMealIndex){
