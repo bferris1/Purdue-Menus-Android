@@ -12,7 +12,6 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -99,7 +98,7 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
     }
 
     @Override
-    public void onListFragmentInteraction(DiningCourtMenu.MenuItem item) {
+    public void onListFragmentInteraction(com.moufee.purduemenus.menus.MenuItem item) {
 
     }
 

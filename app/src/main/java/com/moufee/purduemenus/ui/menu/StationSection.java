@@ -1,11 +1,16 @@
 package com.moufee.purduemenus.ui.menu;
 
+import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.moufee.purduemenus.R;
+import com.moufee.purduemenus.databinding.FragmentMenuitemBinding;
 import com.moufee.purduemenus.menus.DiningCourtMenu;
+import com.moufee.purduemenus.menus.MenuItem;
 
 
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionParameters;
@@ -45,19 +50,20 @@ public class StationSection extends StatelessSection {
 
     @Override
     public RecyclerView.ViewHolder getItemViewHolder(View view) {
-        return new MenuItemHolder(view);
+        return null;
+//        return new MenuItemHolder(view);
     }
 
     @Override
     public void onBindItemViewHolder(RecyclerView.ViewHolder holder, int position) {
         MenuItemHolder itemHolder = (MenuItemHolder) holder;
         itemHolder.mItem = mStation.getItems().get(position);
-        if (itemHolder.mItem.isVegetarian())
-            itemHolder.mVegetarianIcon.setVisibility(View.VISIBLE);
-        else
-            itemHolder.mVegetarianIcon.setVisibility(View.GONE);
+        itemHolder.menuitemBinding.setMenuItem(new MenuItem("asdf"));
+//        if (itemHolder.mItem.isVegetarian())
+//            itemHolder.mVegetarianIcon.setVisibility(View.VISIBLE);
+//        else
+//            itemHolder.mVegetarianIcon.setVisibility(View.GONE);
 
-        itemHolder.mItemNameTextView.setText(mStation.getItems().get(position).getName());
 
     }
 
