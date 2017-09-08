@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.databinding.FragmentMenuitemBinding;
+import com.moufee.purduemenus.databinding.StationHeaderBinding;
 import com.moufee.purduemenus.ui.menu.MenuItemHolder;
 
 import java.util.List;
@@ -38,12 +39,13 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType == VIEW_TYPE_HEADER){
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.station_header, parent, false);
-            return new StationHeaderViewHolder(view);
-        }
         LayoutInflater layoutInflater =
                 LayoutInflater.from(parent.getContext());
+        if (viewType == VIEW_TYPE_HEADER){
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.station_header, parent, false);
+            StationHeaderBinding binding = StationHeaderBinding.inflate(layoutInflater, parent, false);
+            return new StationHeaderViewHolder(binding);
+        }
         FragmentMenuitemBinding itemBinding =
                 FragmentMenuitemBinding.inflate(layoutInflater, parent, false);
         return new MenuItemHolder(itemBinding);
@@ -52,8 +54,8 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder.getItemViewType() == VIEW_TYPE_HEADER && holder instanceof StationHeaderViewHolder){
-            ((StationHeaderViewHolder) holder).stationName
-                    .setText(stations.get(getSectionIndex(position)).getName());
+            StationHeaderViewHolder stationHolder = (StationHeaderViewHolder) holder;
+            stationHolder.bind(stations.get(getSectionIndex(position)));
         }else {
             MenuItemHolder itemHolder = (MenuItemHolder) holder;
             itemHolder.bind(getMenuItemForPosition(position));
@@ -101,11 +103,16 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     private class StationHeaderViewHolder extends RecyclerView.ViewHolder {
 
-        private final TextView stationName;
+        private StationHeaderBinding binding;
 
-        StationHeaderViewHolder(View view) {
-            super(view);
-            stationName = (TextView) view.findViewById(R.id.station_name_text_view);
+        StationHeaderViewHolder(StationHeaderBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+
+        private void bind(DiningCourtMenu.Station station){
+            binding.setStation(station);
+            binding.executePendingBindings();
         }
     }
 }
