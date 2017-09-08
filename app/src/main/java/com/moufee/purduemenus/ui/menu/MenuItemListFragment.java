@@ -22,8 +22,6 @@ import org.joda.time.DateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
-
 /**
  * A Fragment that contains a list of menu items for one Meal at one Dining Court
  * <p/>
