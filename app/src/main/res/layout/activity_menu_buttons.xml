@@ -22,7 +22,7 @@
         android:layout_marginTop="0dp"/>
 
     <android.support.design.widget.TabLayout
-        android:id="@+id/menu_tab_layout_buttons"
+        android:id="@+id/menu_tab_layout"
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:layout_gravity="top"
@@ -59,7 +59,7 @@
         android:text="@string/lunch"
         app:layout_constraintLeft_toRightOf="@+id/button_breakfast"
         app:layout_constraintRight_toLeftOf="@+id/button_dinner"
-        app:layout_constraintTop_toBottomOf="@+id/menu_tab_layout_buttons"
+        app:layout_constraintTop_toBottomOf="@+id/menu_tab_layout"
         app:layout_constraintHorizontal_bias="0.5"/>
 
     <Button

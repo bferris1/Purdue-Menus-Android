@@ -33,8 +33,6 @@ public class DailyMenuViewModel extends AndroidViewModel {
         }
     });
 
-//    private final MutableLiveData<DiningCourtMenu.Meal> mSelectedMeal = new MutableLiveData<>();
-
     public DailyMenuViewModel(Application application) {
         super(application);
         this.mMenuRepository = MenuRepository.get();
@@ -84,5 +82,8 @@ public class DailyMenuViewModel extends AndroidViewModel {
     public void previousDay(){
         if (mCurrentDate.getValue() != null)
             mCurrentDate.setValue(mCurrentDate.getValue().plusDays(-1));
+    }
+    public void currentDay(){
+        mCurrentDate.setValue(new DateTime());
     }
 }

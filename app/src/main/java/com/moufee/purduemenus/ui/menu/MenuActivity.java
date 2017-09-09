@@ -9,9 +9,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.databinding.DataBindingUtil;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -21,7 +23,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -29,15 +30,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.TextView;
 
-import com.moufee.purduemenus.ui.login.LoginActivity;
 import com.moufee.purduemenus.R;
+import com.moufee.purduemenus.databinding.ActivityMenuDatePickerTimeBinding;
 import com.moufee.purduemenus.menus.DailyMenuViewModel;
 import com.moufee.purduemenus.menus.DiningCourtMenu;
 import com.moufee.purduemenus.menus.FullDayMenu;
+import com.moufee.purduemenus.ui.login.LoginActivity;
 import com.moufee.purduemenus.ui.settings.SettingsActivity;
 import com.moufee.purduemenus.util.Resource;
 
@@ -49,32 +48,13 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.util.Locale;
 
-import butterknife.BindView;
-import butterknife.BindViews;
-import butterknife.ButterKnife;
-
 public class MenuActivity extends AppCompatActivity implements LifecycleRegistryOwner, MenuItemListFragment.OnListFragmentInteractionListener {
 
-//    private ViewPager mViewPager;
-    @BindView(R.id.menu_view_pager) ViewPager mViewPager;
+//    @BindView(R.id.menu_view_pager) ViewPager mViewPager;
     private FullDayMenu mFullDayMenu;
     private static String TAG = "MENU_ACTIVITY";
-    private static final String MEAL_INDEX_KEY = "com.moufee.purduemenus.mealindex";
-//    private int mMealIndex = 0;
 
-    @BindView(R.id.button_breakfast) Button mBreakfastButton;
-    @BindView(R.id.button_lunch) Button mLunchButton;
-    @BindView(R.id.button_late_lunch) Button mLateLunchButton;
-    @BindView(R.id.button_dinner) Button mDinnerButton;
-    @BindViews({R.id.button_breakfast, R.id.button_lunch, R.id.button_late_lunch, R.id.button_dinner}) Button[] mMealButtons;
-
-    @BindView(R.id.date_text_view) TextView mDateTextView;
-    @BindView(R.id.meal_time_text_view) TextView mMealTimeTextView;
-    @BindView(R.id.loading_indicator_view) View mLoadingView;
-
-    @BindView(R.id.button_previous_day) ImageButton mPrevDayButton;
-    @BindView(R.id.button_next_day) ImageButton mNextDayButton;
-
+    private ActivityMenuDatePickerTimeBinding mBinding;
     private DailyMenuViewModel mViewModel;
     private NetworkReceiver mNetworkReceiver = new NetworkReceiver();
     private DateTimeFormatter mTimeFormatter = DateTimeFormat.shortTime();
@@ -132,20 +112,20 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
     }
 
     private void setListeners(){
-        //done: find a cleaner way of doing this?, perhaps restructure the ViewModel
         mViewModel.getCurrentDate().observe(this, new Observer<DateTime>() {
             @Override
             public void onChanged(@Nullable DateTime dateTime) {
                 if (dateTime != null)
-                    mDateTextView.setText(getFriendlyDateFormat(dateTime));
+                    mBinding.dateTextView.setText(getFriendlyDateFormat(dateTime));
             }
         });
         mViewModel.getSelectedMealIndex().observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(@Nullable Integer integer) {
                 if (integer != null) {
-                    updateButtons(integer);
-                    mViewPager.getAdapter().notifyDataSetChanged();
+                    mBinding.setSelectedMealIndex(integer);
+                    mBinding.menuViewPager.getAdapter().notifyDataSetChanged();
+                    updateServingTime();
                 }
             }
         });
@@ -153,29 +133,31 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
         mViewModel.getFullMenu().observe(this, new Observer<Resource<FullDayMenu>>() {
             @Override
             public void onChanged(@Nullable Resource<FullDayMenu> fullDayMenuResource) {
+                mBinding.setMenusResource(fullDayMenuResource == null ? null: fullDayMenuResource);
                 //done: loading state
                 if (fullDayMenuResource != null){
                     switch (fullDayMenuResource.status){
                         case SUCCESS:
                             mFullDayMenu = fullDayMenuResource.data;
-                            mViewPager.getAdapter().notifyDataSetChanged();
+                            mBinding.setMenu(fullDayMenuResource.data);
+                            mBinding.menuViewPager.getAdapter().notifyDataSetChanged();
                             updateLateLunch();
                             updateServingTime();
-                            mLoadingView.setVisibility(View.GONE);
-                            mViewPager.setVisibility(View.VISIBLE);
+//                            mBinding.loadingIndicatorView.getRootView().setVisibility(View.GONE);
+//                            mViewPager.setVisibility(View.VISIBLE);
                             break;
                         case LOADING:
-                            mViewPager.setVisibility(View.INVISIBLE);
-                            mLoadingView.setVisibility(View.VISIBLE);
+//                            mViewPager.setVisibility(View.INVISIBLE);
+//                            mBinding.loadingIndicatorView.getRootView().setVisibility(View.VISIBLE);
                             break;
                         case ERROR:
-                            mLoadingView.setVisibility(View.GONE);
+//                            mBinding.loadingIndicatorView.getRootView().setVisibility(View.GONE);
                             if (fullDayMenuResource.data != null){
-                                mViewPager.setVisibility(View.VISIBLE);
-                                mViewPager.getAdapter().notifyDataSetChanged();
+//                                mViewPager.setVisibility(View.VISIBLE);
+                                mBinding.menuViewPager.getAdapter().notifyDataSetChanged();
                             } else {
-                                Snackbar.make(findViewById(R.id.activity_menu_coordinator_layout), getString(R.string.network_error_message), Snackbar.LENGTH_SHORT).show();
-                                mViewPager.setVisibility(View.GONE);
+                                Snackbar.make(mBinding.activityMenuCoordinatorLayout, getString(R.string.network_error_message), Snackbar.LENGTH_SHORT).show();
+                                mBinding.menuViewPager.setVisibility(View.GONE);
                             }
                             break;
                     }
@@ -185,26 +167,9 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
     }
 
     private void updateLateLunch(){
-        if (mFullDayMenu.isLateLunchServed())
-            mLateLunchButton.setVisibility(View.VISIBLE);
-        else {
-            mLateLunchButton.setVisibility(View.GONE);
-            if (mViewModel.getSelectedMealIndex().getValue() == 2) {
+            if (!mFullDayMenu.isLateLunchServed() && mViewModel.getSelectedMealIndex().getValue() == 2) {
                 mViewModel.setSelectedMealIndex(1);
-                updateButtons(1);
-            }
         }
-    }
-
-    private void updateButtons(int selectedIndex){
-        for (int i = 0; i < mMealButtons.length; i++) {
-            Button button = mMealButtons[i];
-            if (i == selectedIndex)
-                button.setSelected(true);
-            else
-                button.setSelected(false);
-        }
-        updateServingTime();
     }
 
     /**
@@ -226,52 +191,53 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
 
     private void updateServingTime(){
         if (!mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_SHOW_SERVING_TIMES,true)){
-            mMealTimeTextView.setVisibility(View.GONE);
+            mBinding.mealTimeTextView.setVisibility(View.GONE);
             return;
         }
         LocalTime startTime;
         LocalTime endTime;
         String timeString;
         try {
-            int diningCourtIndex = mViewPager.getCurrentItem();
+            int diningCourtIndex = mBinding.menuViewPager.getCurrentItem();
             DiningCourtMenu.Hours hours = mViewModel.getFullMenu().getValue().data.getMenu(diningCourtIndex).getMeal(mViewModel.getSelectedMealIndex().getValue()).getHours();
             startTime = hours.getStartTime();
             endTime = hours.getEndTime();
             timeString = mTimeFormatter.print(startTime) + " - " + mTimeFormatter.print(endTime);
         } catch (Exception e) {
 //            e.printStackTrace();
-            mMealTimeTextView.setText("");
-            mMealTimeTextView.setVisibility(View.GONE);
+            mBinding.mealTimeTextView.setText("");
+            mBinding.mealTimeTextView.setVisibility(View.GONE);
             return;
         }
-        mMealTimeTextView.setText(timeString);
-        mMealTimeTextView.setVisibility(View.VISIBLE);
+        mBinding.mealTimeTextView.setText(timeString);
+        mBinding.mealTimeTextView.setVisibility(View.VISIBLE);
     }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: oncreate called");
         super.onCreate(savedInstanceState);
 
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_menu_date_picker_time);
+        mBinding.setSelectedMealIndex(0);
 
-
-        setContentView(R.layout.activity_menu_date_picker_time);
-
-        ButterKnife.bind(this);
         mViewModel = ViewModelProviders.of(this).get(DailyMenuViewModel.class);
         mViewModel.init(new DateTime(), getCurrentMealIndex());
+        mBinding.setViewModel(mViewModel);
         setListeners();
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mSharedPreferences.registerOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.menu_tab_layout_buttons);
+        TabLayout tabLayout = (TabLayout) mBinding.menuTabLayout;
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        Toolbar toolbar = (Toolbar) mBinding.mainToolbar;
         setSupportActionBar(toolbar);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-        mViewPager.setAdapter(new FragmentStatePagerAdapter(fragmentManager) {
+        mBinding.menuViewPager.setAdapter(new FragmentStatePagerAdapter(fragmentManager) {
             @Override
             public Fragment getItem(int position) {
                 int mealIndex = mViewModel.getSelectedMealIndex().getValue();
@@ -300,55 +266,11 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
             }
         });
 
-        tabLayout.setupWithViewPager(mViewPager);
+        tabLayout.setupWithViewPager(mBinding.menuViewPager);
 
         //receive network status updates, to trigger data update when connectivity is reestablished
         //todo: integrate with Lifecycle
         registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-
-
-        mBreakfastButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mViewModel.setSelectedMealIndex(0);
-            }
-        });
-        mLunchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mViewModel.setSelectedMealIndex(1);
-            }
-        });
-        mLateLunchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mViewModel.setSelectedMealIndex(2);
-            }
-        });
-        mDinnerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mViewModel.setSelectedMealIndex(3);
-            }
-        });
-        mNextDayButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mViewModel.nextDay();
-            }
-        });
-        mPrevDayButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mViewModel.previousDay();
-            }
-        });
-        mDateTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mViewModel.setDate(new DateTime());
-            }
-        });
 
 
         mOnPageChangeListener = new ViewPager.OnPageChangeListener() {
@@ -367,7 +289,7 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
 
             }
         };
-        mViewPager.addOnPageChangeListener(mOnPageChangeListener);
+        mBinding.menuViewPager.addOnPageChangeListener(mOnPageChangeListener);
 
 
 
@@ -432,7 +354,7 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
     protected void onDestroy() {
         Log.d(TAG, "onDestroy: ");
         unregisterReceiver(mNetworkReceiver);
-        mViewPager.removeOnPageChangeListener(mOnPageChangeListener);
+        mBinding.menuViewPager.removeOnPageChangeListener(mOnPageChangeListener);
         mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
         super.onDestroy();
     }

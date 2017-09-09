@@ -42,7 +42,6 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
         LayoutInflater layoutInflater =
                 LayoutInflater.from(parent.getContext());
         if (viewType == VIEW_TYPE_HEADER){
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.station_header, parent, false);
             StationHeaderBinding binding = StationHeaderBinding.inflate(layoutInflater, parent, false);
             return new StationHeaderViewHolder(binding);
         }
