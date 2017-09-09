@@ -219,6 +219,7 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: oncreate called");
         super.onCreate(savedInstanceState);
+        setTitle(getString(R.string.app_name));
 
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_menu_date_picker_time);
         mBinding.setSelectedMealIndex(0);
