@@ -253,6 +253,7 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: oncreate called");
         super.onCreate(savedInstanceState);
+        setTitle(getString(R.string.app_name));
 
 
 
