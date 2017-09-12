@@ -14,14 +14,18 @@ The current priorities for development are:
     - improved thread managment for background operations (Executors, etc)
     - deciding if data should be refreshed from network after a cache hit
     - possibly storing data in a [different format](http://objectbox.io) (i.e. not in json files)
+    - improved exception handling for network/JSON parsing exceptions
 2. Improving the program structure
     - implementing dependency injection
+    - writing tests for individual components
     - possibly converting menus classes to POJOs
     - moving view-related data to ViewModel
     - implementing [Android Data Binding](https://developer.android.com/topic/libraries/data-binding/index.html)
 3. Implementing the favorites sytem
     1. Login (store credentials) and retrieve favorites
-    2. Store favorites locally in a suitable data structure (Room database?)
+    2. Store favorites locally in a suitable format (Room database?)
     3. Add/remove favorites locally
     4. Persist favorites between local storage and the menus API
 4. Updating data periodically in the background
+    - Sending notifications when selected notifications are served
+    - Allow users to specify notification times
