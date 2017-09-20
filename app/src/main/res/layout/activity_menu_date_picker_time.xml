@@ -10,7 +10,7 @@
         <import type="com.moufee.purduemenus.util.Status"/>
         <variable
             name="selectedMealIndex"
-            type="Integer"/>
+            type="int"/>
         <variable
             name="viewModel"
             type="com.moufee.purduemenus.menus.DailyMenuViewModel"/>
@@ -20,6 +20,9 @@
         <variable
             name="menu"
             type="FullDayMenu"/>
+        <variable
+            name="showServingTimes"
+            type="boolean"/>
 
 
     </data>
@@ -140,6 +143,7 @@
                 android:paddingBottom="8dp"
                 android:paddingTop="8dp"
                 android:textAlignment="center"
+                app:visibleGone="@{showServingTimes}"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
@@ -150,7 +154,7 @@
                 android:id="@+id/menu_view_pager"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                app:visibleGone="@{menusResource.status == Status.SUCCESS}"
+                app:visibleGone="@{menusResource.data != null}"
                 app:layout_constraintBottom_toTopOf="@+id/date_picker_layout"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -189,6 +193,7 @@
                     android:text="@string/breakfast"
                     app:selected="@{selectedMealIndex == 0}"
                     android:onClick="@{() -> viewModel.setSelectedMealIndex(0)}"
+                    android:enabled="@{menusResource.data != null}"
                     tools:text="Breakfast"
                     />
 
@@ -200,6 +205,7 @@
                     android:layout_weight="1"
                     android:drawableTop="@drawable/ic_pizza_state"
                     android:padding="0dp"
+                    android:enabled="@{menusResource.data != null}"
                     android:text="@string/lunch"
                     app:selected="@{selectedMealIndex == 1}"
                     android:onClick="@{() -> viewModel.setSelectedMealIndex(1)}"
@@ -220,6 +226,7 @@
                     tools:text="Late Lunch"
                     app:selected="@{selectedMealIndex == 2}"
                     android:onClick="@{() -> viewModel.setSelectedMealIndex(2)}"
+                    android:enabled="@{menusResource.data != null}"
                     tools:visibility="visible"/>
 
                 <Button
@@ -232,6 +239,7 @@
                     android:text="@string/dinner"
                     app:selected="@{selectedMealIndex == 3}"
                     android:onClick="@{() -> viewModel.setSelectedMealIndex(3)}"
+                    android:enabled="@{menusResource.data != null}"
                     tools:text="Dinner"/>
             </LinearLayout>
 

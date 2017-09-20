@@ -50,7 +50,6 @@ import java.util.Locale;
 
 public class MenuActivity extends AppCompatActivity implements LifecycleRegistryOwner, MenuItemListFragment.OnListFragmentInteractionListener {
 
-//    @BindView(R.id.menu_view_pager) ViewPager mViewPager;
     private FullDayMenu mFullDayMenu;
     private static String TAG = "MENU_ACTIVITY";
 
@@ -143,17 +142,11 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
                             mBinding.menuViewPager.getAdapter().notifyDataSetChanged();
                             updateLateLunch();
                             updateServingTime();
-//                            mBinding.loadingIndicatorView.getRootView().setVisibility(View.GONE);
-//                            mViewPager.setVisibility(View.VISIBLE);
                             break;
                         case LOADING:
-//                            mViewPager.setVisibility(View.INVISIBLE);
-//                            mBinding.loadingIndicatorView.getRootView().setVisibility(View.VISIBLE);
                             break;
                         case ERROR:
-//                            mBinding.loadingIndicatorView.getRootView().setVisibility(View.GONE);
                             if (fullDayMenuResource.data != null){
-//                                mViewPager.setVisibility(View.VISIBLE);
                                 mBinding.menuViewPager.getAdapter().notifyDataSetChanged();
                             } else {
                                 Snackbar.make(mBinding.activityMenuCoordinatorLayout, getString(R.string.network_error_message), Snackbar.LENGTH_SHORT).show();
@@ -190,10 +183,9 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
     }
 
     private void updateServingTime(){
-        if (!mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_SHOW_SERVING_TIMES,true)){
-            mBinding.mealTimeTextView.setVisibility(View.GONE);
-            return;
-        }
+        boolean showServingTimes = mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_SHOW_SERVING_TIMES,true);
+        mBinding.setShowServingTimes(showServingTimes);
+
         LocalTime startTime;
         LocalTime endTime;
         String timeString;
@@ -204,13 +196,10 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
             endTime = hours.getEndTime();
             timeString = mTimeFormatter.print(startTime) + " - " + mTimeFormatter.print(endTime);
         } catch (Exception e) {
-//            e.printStackTrace();
             mBinding.mealTimeTextView.setText("");
-            mBinding.mealTimeTextView.setVisibility(View.GONE);
             return;
         }
         mBinding.mealTimeTextView.setText(timeString);
-        mBinding.mealTimeTextView.setVisibility(View.VISIBLE);
     }
 
 
@@ -227,14 +216,14 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
         mViewModel = ViewModelProviders.of(this).get(DailyMenuViewModel.class);
         mViewModel.init(new DateTime(), getCurrentMealIndex());
         mBinding.setViewModel(mViewModel);
-        setListeners();
+
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mSharedPreferences.registerOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
 
-        TabLayout tabLayout = (TabLayout) mBinding.menuTabLayout;
+        TabLayout tabLayout = mBinding.menuTabLayout;
 
-        Toolbar toolbar = (Toolbar) mBinding.mainToolbar;
+        Toolbar toolbar = mBinding.mainToolbar;
         setSupportActionBar(toolbar);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -268,6 +257,8 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
         });
 
         tabLayout.setupWithViewPager(mBinding.menuViewPager);
+
+        setListeners();
 
         //receive network status updates, to trigger data update when connectivity is reestablished
         //todo: integrate with Lifecycle
