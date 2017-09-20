@@ -15,6 +15,7 @@ import com.moufee.purduemenus.util.SingleFragmentActivity;
 
 public class SettingsActivity extends SingleFragmentActivity {
     public static final String KEY_PREF_SHOW_SERVING_TIMES = "show_serving_times";
+    public static final String KEY_PREF_USE_NIGHT_MODE = "use_night_mode";
 
     public static Intent getIntent(Context packageContext){
         return new Intent(packageContext, SettingsActivity.class);

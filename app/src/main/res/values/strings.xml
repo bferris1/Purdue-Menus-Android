@@ -43,6 +43,7 @@
     <string name="action_login">Sign In</string>
     <string name="network_error_message">There was an error retrieving the menu.</string>
     <string name="pref_show_serving_times">Show Serving Times</string>
+    <string name="use_night_mode">Use Night Mode</string>
 
 
 </resources>

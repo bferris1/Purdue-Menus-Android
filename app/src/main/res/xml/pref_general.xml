@@ -12,5 +12,10 @@
         android:key="show_serving_times"
         android:title="@string/pref_show_serving_times"/>
 
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="use_night_mode"
+        android:title="@string/use_night_mode"/>
+
 
 </PreferenceScreen>

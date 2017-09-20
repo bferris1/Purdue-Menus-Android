@@ -138,17 +138,17 @@
                 android:id="@+id/meal_time_text_view"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:background="@android:color/white"
+                android:background="?android:attr/colorBackground"
                 android:elevation="1dp"
                 android:paddingBottom="8dp"
                 android:paddingTop="8dp"
                 android:textAlignment="center"
-                app:visibleGone="@{showServingTimes}"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-                tools:text="11:00 AM - 2:00 PM"/>
+                app:visibleGone="@{showServingTimes}"
+                tools:text="11:00 AM - 2:00 PM" />
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/menu_view_pager"
@@ -169,7 +169,7 @@
                 android:id="@+id/linearLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:background="@android:color/white"
+                android:background="?android:attr/colorBackground"
                 android:elevation="2dp"
                 android:orientation="horizontal"
                 android:paddingBottom="8dp"
@@ -187,60 +187,59 @@
                     android:id="@+id/button_breakfast"
                     style="@style/MealButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:drawableTop="@drawable/ic_coffee_state"
+                    android:enabled="@{menusResource.data != null}"
+                    android:onClick="@{() -> viewModel.setSelectedMealIndex(0)}"
                     android:text="@string/breakfast"
                     app:selected="@{selectedMealIndex == 0}"
-                    android:onClick="@{() -> viewModel.setSelectedMealIndex(0)}"
-                    android:enabled="@{menusResource.data != null}"
-                    tools:text="Breakfast"
-                    />
+                    tools:text="Breakfast" />
 
                 <Button
                     android:id="@+id/button_lunch"
                     style="@style/MealButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:drawableTop="@drawable/ic_pizza_state"
-                    android:padding="0dp"
                     android:enabled="@{menusResource.data != null}"
+                    android:onClick="@{() -> viewModel.setSelectedMealIndex(1)}"
+                    android:padding="0dp"
                     android:text="@string/lunch"
                     app:selected="@{selectedMealIndex == 1}"
-                    android:onClick="@{() -> viewModel.setSelectedMealIndex(1)}"
-                    tools:text="Lunch"/>
+                    tools:text="Lunch" />
 
                 <Button
                     android:id="@+id/button_late_lunch"
                     style="@style/MealButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:drawablePadding="0dp"
                     android:drawableTop="@drawable/ic_food_apple_state"
+                    android:enabled="@{menusResource.data != null}"
                     android:includeFontPadding="false"
+                    android:onClick="@{() -> viewModel.setSelectedMealIndex(2)}"
                     android:padding="0dp"
                     android:text="@string/late_lunch"
+                    app:selected="@{selectedMealIndex == 2}"
                     app:visibleGone="@{menu.isLateLunchServed}"
                     tools:text="Late Lunch"
-                    app:selected="@{selectedMealIndex == 2}"
-                    android:onClick="@{() -> viewModel.setSelectedMealIndex(2)}"
-                    android:enabled="@{menusResource.data != null}"
-                    tools:visibility="visible"/>
+                    tools:visibility="visible" />
 
                 <Button
                     android:id="@+id/button_dinner"
                     style="@style/MealButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:drawableTop="@drawable/ic_hamburger_state"
+                    android:enabled="@{menusResource.data != null}"
+                    android:onClick="@{() -> viewModel.setSelectedMealIndex(3)}"
                     android:text="@string/dinner"
                     app:selected="@{selectedMealIndex == 3}"
-                    android:onClick="@{() -> viewModel.setSelectedMealIndex(3)}"
-                    android:enabled="@{menusResource.data != null}"
-                    tools:text="Dinner"/>
+                    tools:text="Dinner" />
             </LinearLayout>
 
         </android.support.constraint.ConstraintLayout>

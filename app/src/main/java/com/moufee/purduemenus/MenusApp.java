@@ -1,6 +1,7 @@
 package com.moufee.purduemenus;
 
 import android.app.Application;
+import android.support.v7.app.AppCompatDelegate;
 
 import com.moufee.purduemenus.di.AppComponent;
 import com.moufee.purduemenus.di.DaggerAppComponent;
@@ -10,6 +11,10 @@ import com.moufee.purduemenus.di.DaggerAppComponent;
  */
 
 public class MenusApp extends Application {
+
+    static {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
+    }
 
     private AppComponent mAppComponent;
     @Override
