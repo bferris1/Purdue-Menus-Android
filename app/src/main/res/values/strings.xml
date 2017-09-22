@@ -32,6 +32,27 @@
     <string name="action_send_feedback">Send Feedback</string>
     <string name="title_activity_login">Sign in</string>
 
+    <string name="pref_night_mode_off">mode_off</string>
+    <string name="pref_night_mode_on">mode_on</string>
+    <string name="pref_night_mode_auto">mode_auto</string>
+
+    <string name="off">Off</string>
+    <string name="auto">Auto</string>
+    <string name="on">On</string>
+
+
+    <string-array name="pref_nightMode_entries">
+        <item>@string/off</item>
+        <item>@string/auto</item>
+        <item>@string/on</item>
+    </string-array>
+    <string-array name="pref_nightMode_values">
+        <item>@string/pref_night_mode_off</item>
+        <item>@string/pref_night_mode_auto</item>
+        <item>@string/pref_night_mode_on</item>
+    </string-array>
+
+
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
@@ -43,7 +64,6 @@
     <string name="action_login">Sign In</string>
     <string name="network_error_message">There was an error retrieving the menu.</string>
     <string name="pref_show_serving_times">Show Serving Times</string>
-    <string name="use_night_mode">Use Night Mode</string>
 
 
 </resources>

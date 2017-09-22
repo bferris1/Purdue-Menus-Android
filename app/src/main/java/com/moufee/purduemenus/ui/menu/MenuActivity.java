@@ -23,6 +23,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -38,6 +39,7 @@ import com.moufee.purduemenus.menus.DiningCourtMenu;
 import com.moufee.purduemenus.menus.FullDayMenu;
 import com.moufee.purduemenus.ui.login.LoginActivity;
 import com.moufee.purduemenus.ui.settings.SettingsActivity;
+import com.moufee.purduemenus.ui.settings.SettingsFragment;
 import com.moufee.purduemenus.util.Resource;
 
 import org.joda.time.DateTime;
@@ -63,7 +65,9 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             if (key.equals(SettingsActivity.KEY_PREF_SHOW_SERVING_TIMES))
-            updateServingTime();
+                updateServingTime();
+            else if (key.equals(SettingsFragment.KEY_PREF_USE_NIGHT_MODE))
+                recreate();
         }
     };
 

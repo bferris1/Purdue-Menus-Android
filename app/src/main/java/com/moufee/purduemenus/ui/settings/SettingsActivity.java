@@ -4,8 +4,6 @@ package com.moufee.purduemenus.ui.settings;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.app.NavUtils;
-import android.view.MenuItem;
 
 import com.moufee.purduemenus.util.SingleFragmentActivity;
 
@@ -15,7 +13,17 @@ import com.moufee.purduemenus.util.SingleFragmentActivity;
 
 public class SettingsActivity extends SingleFragmentActivity {
     public static final String KEY_PREF_SHOW_SERVING_TIMES = "show_serving_times";
-    public static final String KEY_PREF_USE_NIGHT_MODE = "use_night_mode";
+
+
+    @Override
+    public void recreate() {
+        finish();
+        overridePendingTransition(android.R.anim.fade_in,
+                android.R.anim.fade_out);
+        startActivity(getIntent());
+        overridePendingTransition(android.R.anim.fade_in,
+                android.R.anim.fade_out);
+    }
 
     public static Intent getIntent(Context packageContext){
         return new Intent(packageContext, SettingsActivity.class);
