@@ -10,7 +10,7 @@ import android.support.annotation.Keep;
 public class MenuItem {
     private String id;
     private String name;
-    private Boolean isVegetarian;
+    private boolean isVegetarian;
 
     public MenuItem(String name) {
         this.name = name;
@@ -21,7 +21,7 @@ public class MenuItem {
         return name;
     }
 
-    public Boolean isVegetarian() {
+    public boolean isVegetarian() {
         return isVegetarian;
     }
 
