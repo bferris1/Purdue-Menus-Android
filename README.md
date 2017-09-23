@@ -27,5 +27,5 @@ The current priorities for development are:
     3. Add/remove favorites locally
     4. Persist favorites between local storage and the menus API
 4. Updating data periodically in the background
-    - Sending notifications when selected notifications are served
+    - Sending notifications when selected items are served
     - Allow users to specify notification times
