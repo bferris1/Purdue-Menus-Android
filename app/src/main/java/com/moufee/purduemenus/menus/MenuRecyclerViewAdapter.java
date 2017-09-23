@@ -2,11 +2,8 @@ package com.moufee.purduemenus.menus;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.databinding.FragmentMenuitemBinding;
 import com.moufee.purduemenus.databinding.StationHeaderBinding;
 import com.moufee.purduemenus.ui.menu.MenuItemHolder;

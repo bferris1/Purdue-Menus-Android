@@ -1,6 +1,8 @@
 package com.moufee.purduemenus.di;
 
 import com.moufee.purduemenus.menus.UpdateMenuTask;
+import com.moufee.purduemenus.ui.menu.MenuActivity;
+import com.moufee.purduemenus.ui.settings.SettingsActivity;
 
 import javax.inject.Singleton;
 
@@ -16,4 +18,6 @@ public interface AppComponent {
 
 
     void inject(UpdateMenuTask task);
+    void inject(MenuActivity menuActivity);
+    void inject(SettingsActivity settingsActivity);
 }

@@ -9,12 +9,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.databinding.DataBindingUtil;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import android.os.StrictMode;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -23,15 +24,14 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.moufee.purduemenus.MenusApp;
 import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.databinding.ActivityMenuDatePickerTimeBinding;
 import com.moufee.purduemenus.menus.DailyMenuViewModel;
@@ -40,15 +40,17 @@ import com.moufee.purduemenus.menus.FullDayMenu;
 import com.moufee.purduemenus.ui.login.LoginActivity;
 import com.moufee.purduemenus.ui.settings.SettingsActivity;
 import com.moufee.purduemenus.ui.settings.SettingsFragment;
+import com.moufee.purduemenus.util.DateTimeHelper;
 import com.moufee.purduemenus.util.Resource;
 
 import org.joda.time.DateTime;
-import org.joda.time.Interval;
 import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.util.Locale;
+
+import javax.inject.Inject;
 
 public class MenuActivity extends AppCompatActivity implements LifecycleRegistryOwner, MenuItemListFragment.OnListFragmentInteractionListener {
 
@@ -60,7 +62,7 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
     private NetworkReceiver mNetworkReceiver = new NetworkReceiver();
     private DateTimeFormatter mTimeFormatter = DateTimeFormat.shortTime();
     private ViewPager.OnPageChangeListener mOnPageChangeListener;
-    private SharedPreferences mSharedPreferences;
+    @Inject SharedPreferences mSharedPreferences;
     private SharedPreferences.OnSharedPreferenceChangeListener mSharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
@@ -85,41 +87,13 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
 
     }
 
-    //todo: locale order? and possible efficiency improvements/streamlining
-    private String getFriendlyDateFormat(DateTime dateTime){
-        String pattern;
-        final int HINT_START_HOUR = 22; // the hour at which day hints will be shown (e.g. after 10pm)
-        final int HINT_END_HOUR = 4; //the hour in the morning after which hints will not be displayed
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            pattern = DateFormat.getBestDateTimePattern(Locale.getDefault(),"EEEE MMMMM dd");
-        } else pattern = "EEEE MMMMM dd";
-        DateTimeFormatter format = DateTimeFormat.forPattern(pattern).withLocale(Locale.getDefault());
-        DateTimeFormatter dayFormat = DateTimeFormat.forPattern(" (E)").withLocale(Locale.getDefault());
-        DateTime now = new DateTime();
-        boolean showDayHints = now.getHourOfDay() >= HINT_START_HOUR || now.getHourOfDay() <= HINT_END_HOUR;
-        String dayString = showDayHints ? dayFormat.print(now) : "";
-        Interval today = new Interval(now.withTimeAtStartOfDay(),now.plusDays(1).withTimeAtStartOfDay());
-        if (today.contains(dateTime))
-            return getString(R.string.today) + dayString;
-        Interval tomorrow = new Interval(now.plusDays(1).withTimeAtStartOfDay(), now.plusDays(2).withTimeAtStartOfDay());
-        if (tomorrow.contains(dateTime)) {
-            dayString = showDayHints ? dayFormat.print(now.plusDays(1)) : "";
-            return getString(R.string.tomorrow) + dayString;
-        }
-        Interval yesterday = new Interval(now.plusDays(-1).withTimeAtStartOfDay(), now.withTimeAtStartOfDay());
-        if (yesterday.contains(dateTime)) {
-            dayString = showDayHints ? dayFormat.print(now.plusDays(-1)) : "";
-            return getString(R.string.yesterday) + dayString;
-        }
-        return format.print(dateTime);
-    }
 
     private void setListeners(){
         mViewModel.getCurrentDate().observe(this, new Observer<DateTime>() {
             @Override
             public void onChanged(@Nullable DateTime dateTime) {
                 if (dateTime != null)
-                    mBinding.dateTextView.setText(getFriendlyDateFormat(dateTime));
+                    mBinding.dateTextView.setText(DateTimeHelper.getFriendlyDateFormat(dateTime, Locale.getDefault(), getApplicationContext()));
             }
         });
         mViewModel.getSelectedMealIndex().observe(this, new Observer<Integer>() {
@@ -169,23 +143,6 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
         }
     }
 
-    /**
-     * Initializes the UI to default values based on current time
-     */
-    private int getCurrentMealIndex(){
-        DateTime now = new DateTime();
-        if (now.getHourOfDay() <= 9)
-            return 0;
-        else if (now.getHourOfDay() <= 13)
-            return 1;
-        else if (now.getHourOfDay() <= 16)
-            return 2;
-        else if (now.getHourOfDay() <= 21 )
-            return 3;
-        else
-            return 0;
-    }
-
     private void updateServingTime(){
         boolean showServingTimes = mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_SHOW_SERVING_TIMES,true);
         mBinding.setShowServingTimes(showServingTimes);
@@ -207,22 +164,28 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
     }
 
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.d(TAG, "onConfigurationChanged: ");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: oncreate called");
         super.onCreate(savedInstanceState);
+        MenusApp app = (MenusApp) getApplication();
+        app.getAppComponent().inject(this);
         setTitle(getString(R.string.app_name));
 
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_menu_date_picker_time);
         mBinding.setSelectedMealIndex(0);
 
         mViewModel = ViewModelProviders.of(this).get(DailyMenuViewModel.class);
-        mViewModel.init(new DateTime(), getCurrentMealIndex());
+        mViewModel.init(new DateTime(), DateTimeHelper.getCurrentMealIndex());
         mBinding.setViewModel(mViewModel);
 
 
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mSharedPreferences.registerOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
 
         TabLayout tabLayout = mBinding.menuTabLayout;
@@ -298,29 +261,6 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
         return super.onCreateOptionsMenu(menu);
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d(TAG, "onPause: ");
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.d(TAG, "onStart: ");
-    }
-
-    @Override
-    protected void onStop() {
-        Log.d(TAG, "onStop: ");
-        super.onStop();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-            Log.d(TAG, "onResume: ");
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

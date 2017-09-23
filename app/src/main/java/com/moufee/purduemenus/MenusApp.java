@@ -5,6 +5,7 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatDelegate;
 
 import com.moufee.purduemenus.di.AppComponent;
+import com.moufee.purduemenus.di.AppModule;
 import com.moufee.purduemenus.di.DaggerAppComponent;
 import com.moufee.purduemenus.ui.settings.SettingsFragment;
 
@@ -32,7 +33,7 @@ public class MenusApp extends Application {
                 break;
         }
         super.onCreate();
-        mAppComponent = DaggerAppComponent.create();
+        mAppComponent = DaggerAppComponent.builder().appModule(new AppModule(this)).build();
     }
 
     public AppComponent getAppComponent(){
