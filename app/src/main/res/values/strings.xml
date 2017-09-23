@@ -32,9 +32,9 @@
     <string name="action_send_feedback">Send Feedback</string>
     <string name="title_activity_login">Sign in</string>
 
-    <string name="pref_night_mode_off">mode_off</string>
-    <string name="pref_night_mode_on">mode_on</string>
-    <string name="pref_night_mode_auto">mode_auto</string>
+    <string name="pref_night_mode_off" translatable="false">mode_off</string>
+    <string name="pref_night_mode_on" translatable="false">mode_on</string>
+    <string name="pref_night_mode_auto" translatable="false">mode_auto</string>
 
     <string name="off">Off</string>
     <string name="auto">Auto</string>
