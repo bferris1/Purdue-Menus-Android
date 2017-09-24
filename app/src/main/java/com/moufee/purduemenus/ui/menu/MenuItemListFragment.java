@@ -30,7 +30,6 @@ import java.util.List;
  */
 public class MenuItemListFragment extends Fragment {
 
-    private static final String ARG_COLUMN_COUNT = "column-count";
     private static final String ARG_DINING_COURT_INDEX = "dining-court-index";
     private static final String ARG_MEAL_INDEX = "meal-index";
     private static final String TAG = "MENU_ITEM_LIST_FRAGMENT";
@@ -41,8 +40,6 @@ public class MenuItemListFragment extends Fragment {
     private List<DiningCourtMenu.Station> mStations;
     private OnListFragmentInteractionListener mListener;
     private RecyclerView mMenuItemRecyclerView;
-//    private MenuItemAdapter mAdapter;
-//    private SectionedRecyclerViewAdapter mSectionAdapter;
     private MenuRecyclerViewAdapter mDataBoundAdapter;
     private DailyMenuViewModel mViewModel;
 
@@ -60,7 +57,6 @@ public class MenuItemListFragment extends Fragment {
         Bundle args = new Bundle();
         args.putInt(ARG_DINING_COURT_INDEX, diningCourtIndex);
         args.putInt(ARG_MEAL_INDEX, mealIndex);
-//        args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
         return fragment;
     }
@@ -80,10 +76,6 @@ public class MenuItemListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_menuitem_list, container, false);
         mViewModel = ViewModelProviders.of(getActivity()).get(DailyMenuViewModel.class);
-
-        //todo: remove this?
-        if (mViewModel.getFullMenu() == null)
-        mViewModel.init(new DateTime(), 0);
 
         // Set the adapter
         if (view instanceof RecyclerView) {
@@ -146,7 +138,7 @@ public class MenuItemListFragment extends Fragment {
             mDataBoundAdapter.setStations(mStations);
             mMenuItemRecyclerView.setAdapter(mDataBoundAdapter);
         }else {
-//            mAdapter.setStations(stations);
+            mDataBoundAdapter.setStations(mStations);
             mDataBoundAdapter.notifyDataSetChanged();
         }
 

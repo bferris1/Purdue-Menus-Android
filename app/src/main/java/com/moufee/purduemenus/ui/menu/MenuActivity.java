@@ -68,7 +68,7 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             if (key.equals(SettingsActivity.KEY_PREF_SHOW_SERVING_TIMES))
                 updateServingTime();
-            else if (key.equals(SettingsFragment.KEY_PREF_USE_NIGHT_MODE))
+            else if (key.equals(SettingsActivity.KEY_PREF_USE_NIGHT_MODE))
                 recreate();
         }
     };
@@ -182,7 +182,8 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
         mBinding.setSelectedMealIndex(0);
 
         mViewModel = ViewModelProviders.of(this).get(DailyMenuViewModel.class);
-        mViewModel.init(new DateTime(), DateTimeHelper.getCurrentMealIndex());
+        mViewModel.setDate(new DateTime());
+        mViewModel.setSelectedMealIndex(DateTimeHelper.getCurrentMealIndex());
         mBinding.setViewModel(mViewModel);
 
 

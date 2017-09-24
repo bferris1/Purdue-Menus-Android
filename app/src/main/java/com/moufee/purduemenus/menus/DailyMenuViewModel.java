@@ -41,12 +41,6 @@ public class DailyMenuViewModel extends AndroidViewModel {
         mSelectedMealIndex.setValue(0);
     }
 
-    public void init(DateTime date, int selectedMealIndex){
-        if (mCurrentDate.getValue() == null)
-            mCurrentDate.setValue(date);
-        mSelectedMealIndex.setValue(selectedMealIndex);
-    }
-
     public boolean showVegetarianIcons() {
         return showVegetarianIcons;
     }
