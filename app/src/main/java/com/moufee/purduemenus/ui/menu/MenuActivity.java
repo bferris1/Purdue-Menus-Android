@@ -52,7 +52,7 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
-public class MenuActivity extends AppCompatActivity implements LifecycleRegistryOwner, MenuItemListFragment.OnListFragmentInteractionListener {
+public class MenuActivity extends AppCompatActivity implements MenuItemListFragment.OnListFragmentInteractionListener {
 
     private FullDayMenu mFullDayMenu;
     private static String TAG = "MENU_ACTIVITY";
@@ -73,14 +73,6 @@ public class MenuActivity extends AppCompatActivity implements LifecycleRegistry
         }
     };
 
-    private final LifecycleRegistry mRegistry = new LifecycleRegistry(this);
-
-
-
-    @Override
-    public LifecycleRegistry getLifecycle() {
-        return mRegistry;
-    }
 
     @Override
     public void onListFragmentInteraction(com.moufee.purduemenus.menus.MenuItem item) {
