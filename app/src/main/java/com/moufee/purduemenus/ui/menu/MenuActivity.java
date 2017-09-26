@@ -54,10 +54,10 @@ import javax.inject.Inject;
 
 public class MenuActivity extends AppCompatActivity implements MenuItemListFragment.OnListFragmentInteractionListener {
 
-    private FullDayMenu mFullDayMenu;
     private static String TAG = "MENU_ACTIVITY";
 
     private ActivityMenuDatePickerTimeBinding mBinding;
+    private MenuPagerAdapter mMenuPagerAdapter;
     private DailyMenuViewModel mViewModel;
     private NetworkReceiver mNetworkReceiver = new NetworkReceiver();
     private DateTimeFormatter mTimeFormatter = DateTimeFormat.shortTime();
@@ -90,10 +90,10 @@ public class MenuActivity extends AppCompatActivity implements MenuItemListFragm
         });
         mViewModel.getSelectedMealIndex().observe(this, new Observer<Integer>() {
             @Override
-            public void onChanged(@Nullable Integer integer) {
-                if (integer != null) {
-                    mBinding.setSelectedMealIndex(integer);
-                    mBinding.menuViewPager.getAdapter().notifyDataSetChanged();
+            public void onChanged(@Nullable Integer newMealIndex) {
+                if (newMealIndex != null) {
+                    mBinding.setSelectedMealIndex(newMealIndex);
+                    mMenuPagerAdapter.setMealIndex(newMealIndex);
                     updateServingTime();
                 }
             }
@@ -107,17 +107,17 @@ public class MenuActivity extends AppCompatActivity implements MenuItemListFragm
                 if (fullDayMenuResource != null){
                     switch (fullDayMenuResource.status){
                         case SUCCESS:
-                            mFullDayMenu = fullDayMenuResource.data;
                             mBinding.setMenu(fullDayMenuResource.data);
-                            mBinding.menuViewPager.getAdapter().notifyDataSetChanged();
-                            updateLateLunch();
+                            if (fullDayMenuResource.data != null)
+                                mMenuPagerAdapter.setMenus(fullDayMenuResource.data.getMenus());
+                            updateLateLunch(fullDayMenuResource.data.isLateLunchServed());
                             updateServingTime();
                             break;
                         case LOADING:
                             break;
                         case ERROR:
                             if (fullDayMenuResource.data != null){
-                                mBinding.menuViewPager.getAdapter().notifyDataSetChanged();
+                                mMenuPagerAdapter.setMenus(fullDayMenuResource.data.getMenus());
                             } else {
                                 Snackbar.make(mBinding.activityMenuCoordinatorLayout, getString(R.string.network_error_message), Snackbar.LENGTH_SHORT).show();
                                 mBinding.menuViewPager.setVisibility(View.GONE);
@@ -129,8 +129,8 @@ public class MenuActivity extends AppCompatActivity implements MenuItemListFragm
         });
     }
 
-    private void updateLateLunch(){
-            if (!mFullDayMenu.isLateLunchServed() && mViewModel.getSelectedMealIndex().getValue() == 2) {
+    private void updateLateLunch(boolean isLateLunchServed){
+            if (mViewModel.getSelectedMealIndex().getValue() == 2 && !isLateLunchServed) {
                 mViewModel.setSelectedMealIndex(1);
         }
     }
@@ -187,34 +187,8 @@ public class MenuActivity extends AppCompatActivity implements MenuItemListFragm
         setSupportActionBar(toolbar);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-        mBinding.menuViewPager.setAdapter(new FragmentStatePagerAdapter(fragmentManager) {
-            @Override
-            public Fragment getItem(int position) {
-                int mealIndex = mViewModel.getSelectedMealIndex().getValue();
-                if (mFullDayMenu != null && position < mFullDayMenu.getNumMenus() && mFullDayMenu.getMenu(position).isServing(mealIndex))
-                    return MenuItemListFragment.newInstance(position, mealIndex);
-                if (mFullDayMenu != null && position < mFullDayMenu.getNumMenus() && mFullDayMenu.getMenu(position).getMeal(mealIndex) != null)
-                    return NotServingFragment.newInstance(mFullDayMenu.getMenu(position).getMeal(mealIndex).getStatus());
-                return NotServingFragment.newInstance(getString(R.string.not_serving));
-            }
-
-            @Override
-            public int getCount() {
-                if (mFullDayMenu != null)
-                    return mFullDayMenu.getNumMenus();
-                return 0;
-            }
-
-            @Override
-            public CharSequence getPageTitle(int position) {
-                return mFullDayMenu.getMenu(position).getLocation();
-            }
-
-            @Override
-            public int getItemPosition(Object object) {
-                return POSITION_NONE;
-            }
-        });
+        mMenuPagerAdapter = new MenuPagerAdapter(fragmentManager);
+        mBinding.menuViewPager.setAdapter(mMenuPagerAdapter);
 
         tabLayout.setupWithViewPager(mBinding.menuViewPager);
 
