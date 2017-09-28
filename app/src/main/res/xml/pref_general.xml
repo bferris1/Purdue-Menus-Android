@@ -12,5 +12,20 @@
         android:key="show_serving_times"
         android:title="@string/pref_show_serving_times"/>
 
+    <ListPreference
+        android:title="Night Mode"
+        android:key="night_mode"
+        android:defaultValue="@string/pref_night_mode_off"
+        android:summary="%s"
+        android:entries="@array/pref_nightMode_entries"
+        android:entryValues="@array/pref_nightMode_values"/>
+
+
+    <!--<Preference android:title="Log In"
+        android:summary="You are not currently logged in."
+        android:key="log_in">
+    </Preference>-->
+
+
 
 </PreferenceScreen>

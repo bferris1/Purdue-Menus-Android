@@ -1,12 +1,13 @@
 package com.moufee.purduemenus.ui.menu;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,17 +15,12 @@ import android.view.ViewGroup;
 import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.menus.DailyMenuViewModel;
 import com.moufee.purduemenus.menus.DiningCourtMenu;
-import com.moufee.purduemenus.menus.DiningCourtMenu.MenuItem;
+import com.moufee.purduemenus.menus.FullDayMenu;
+import com.moufee.purduemenus.menus.MenuItem;
+import com.moufee.purduemenus.menus.MenuRecyclerViewAdapter;
+import com.moufee.purduemenus.util.Resource;
 
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-
-import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
 
 /**
  * A Fragment that contains a list of menu items for one Meal at one Dining Court
@@ -34,7 +30,6 @@ import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapt
  */
 public class MenuItemListFragment extends Fragment {
 
-    private static final String ARG_COLUMN_COUNT = "column-count";
     private static final String ARG_DINING_COURT_INDEX = "dining-court-index";
     private static final String ARG_MEAL_INDEX = "meal-index";
     private static final String TAG = "MENU_ITEM_LIST_FRAGMENT";
@@ -45,8 +40,7 @@ public class MenuItemListFragment extends Fragment {
     private List<DiningCourtMenu.Station> mStations;
     private OnListFragmentInteractionListener mListener;
     private RecyclerView mMenuItemRecyclerView;
-//    private MenuItemAdapter mAdapter;
-    private SectionedRecyclerViewAdapter mSectionAdapter;
+    private MenuRecyclerViewAdapter mDataBoundAdapter;
     private DailyMenuViewModel mViewModel;
 
     /**
@@ -63,7 +57,6 @@ public class MenuItemListFragment extends Fragment {
         Bundle args = new Bundle();
         args.putInt(ARG_DINING_COURT_INDEX, diningCourtIndex);
         args.putInt(ARG_MEAL_INDEX, mealIndex);
-//        args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
         return fragment;
     }
@@ -84,20 +77,29 @@ public class MenuItemListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_menuitem_list, container, false);
         mViewModel = ViewModelProviders.of(getActivity()).get(DailyMenuViewModel.class);
 
-        //todo: remove this?
-        if (mViewModel.getFullMenu() == null)
-        mViewModel.init(new DateTime(), 0);
-
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             mMenuItemRecyclerView = (RecyclerView) view.findViewById(R.id.menu_item_recyclerview);
+            mDataBoundAdapter = new MenuRecyclerViewAdapter();
+            mMenuItemRecyclerView.setAdapter(mDataBoundAdapter);
 
             mMenuItemRecyclerView.setLayoutManager(new LinearLayoutManager(context));
 
-            updateUI();
+            setListener();
         }
         return view;
+    }
+
+
+    private void setListener(){
+        mViewModel.getFullMenu().observe(this, new Observer<Resource<FullDayMenu>>() {
+            @Override
+            public void onChanged(@Nullable Resource<FullDayMenu> fullDayMenuResource) {
+                if (fullDayMenuResource != null && fullDayMenuResource.data != null)
+                    mDataBoundAdapter.setStations(fullDayMenuResource.data.getMenu(mDiningCourtIndex).getMeal(mMealIndex).getStations());
+            }
+        });
     }
 
 
@@ -134,7 +136,7 @@ public class MenuItemListFragment extends Fragment {
         void onListFragmentInteraction(MenuItem item);
     }
 
-    private void updateUI(){
+    /*private void updateUI(){
         List<DiningCourtMenu.Station> stations;
         try {
 //            mStations = mViewModel.getFullMenu().getValue().getMenu(mDiningCourtIndex).getMeal(mMealIndex).getStations();
@@ -144,17 +146,14 @@ public class MenuItemListFragment extends Fragment {
             //todo: handle more gracefully?
             mStations = new ArrayList<>();
         }
-        if (mSectionAdapter == null){
-            mSectionAdapter = new SectionedRecyclerViewAdapter();
-            for (DiningCourtMenu.Station station :
-                    mStations) {
-                mSectionAdapter.addSection(new StationSection(station));
-            }
-            mMenuItemRecyclerView.setAdapter(mSectionAdapter);
+        if (mDataBoundAdapter == null){
+            mDataBoundAdapter = new MenuRecyclerViewAdapter();
+            mDataBoundAdapter.setStations(mStations);
+            mMenuItemRecyclerView.setAdapter(mDataBoundAdapter);
         }else {
-//            mAdapter.setStations(stations);
-            mSectionAdapter.notifyDataSetChanged();
+            mDataBoundAdapter.setStations(mStations);
+            mDataBoundAdapter.notifyDataSetChanged();
         }
 
-    }
+    }*/
 }

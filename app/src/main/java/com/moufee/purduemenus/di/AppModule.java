@@ -1,5 +1,9 @@
 package com.moufee.purduemenus.di;
 
+import android.app.Application;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -25,7 +29,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 @Module
-class AppModule {
+public class AppModule {
+    Application application;
+
+    public AppModule(Application application){
+        this.application = application;
+    }
     @Singleton @Provides
      Webservice provideWebService(AppExecutors executors, Gson gson){
         return new Retrofit.Builder()
@@ -46,5 +55,14 @@ class AppModule {
      OkHttpClient provideHttpClient(){
         //todo: restore cookies or not?
         return new OkHttpClient();
+    }
+    @Provides
+    @Singleton
+    Application providesApplication() {
+        return application;
+    }
+    @Singleton @Provides
+    SharedPreferences sharedPreferences(Application application){
+         return PreferenceManager.getDefaultSharedPreferences(application);
     }
 }
