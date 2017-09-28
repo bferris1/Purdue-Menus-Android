@@ -37,7 +37,6 @@ public class MenuItemListFragment extends Fragment {
     // TODO: restructure so that all data stays in ViewModel (data binding?)
     private int mDiningCourtIndex = 0;
     private int mMealIndex = 0;
-    private List<DiningCourtMenu.Station> mStations;
     private OnListFragmentInteractionListener mListener;
     private RecyclerView mMenuItemRecyclerView;
     private MenuRecyclerViewAdapter mDataBoundAdapter;
@@ -135,25 +134,4 @@ public class MenuItemListFragment extends Fragment {
 
         void onListFragmentInteraction(MenuItem item);
     }
-
-    /*private void updateUI(){
-        List<DiningCourtMenu.Station> stations;
-        try {
-//            mStations = mViewModel.getFullMenu().getValue().getMenu(mDiningCourtIndex).getMeal(mMealIndex).getStations();
-            mStations = mViewModel.getFullMenu().getValue().data.getMenu(mDiningCourtIndex).getMeal(mMealIndex).getStations();
-        } catch (Exception e) {
-            Log.e(TAG, "updateUI: error",e );
-            //todo: handle more gracefully?
-            mStations = new ArrayList<>();
-        }
-        if (mDataBoundAdapter == null){
-            mDataBoundAdapter = new MenuRecyclerViewAdapter();
-            mDataBoundAdapter.setStations(mStations);
-            mMenuItemRecyclerView.setAdapter(mDataBoundAdapter);
-        }else {
-            mDataBoundAdapter.setStations(mStations);
-            mDataBoundAdapter.notifyDataSetChanged();
-        }
-
-    }*/
 }
