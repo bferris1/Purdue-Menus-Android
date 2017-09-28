@@ -8,6 +8,7 @@ import com.moufee.purduemenus.databinding.FragmentMenuitemBinding;
 import com.moufee.purduemenus.databinding.StationHeaderBinding;
 import com.moufee.purduemenus.ui.menu.MenuItemHolder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,8 +18,8 @@ import java.util.List;
 
 public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private List<DiningCourtMenu.Station> stations;
-    private int totalItems;
+    private List<DiningCourtMenu.Station> stations = new ArrayList<>();
+    private int totalItems = 0;
 
     public final static int VIEW_TYPE_HEADER = 0;
     public final static int VIEW_TYPE_ITEM = 1;
@@ -32,6 +33,7 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
         total += stations.size();
         totalItems = total;
+        notifyDataSetChanged();
     }
 
     @Override
