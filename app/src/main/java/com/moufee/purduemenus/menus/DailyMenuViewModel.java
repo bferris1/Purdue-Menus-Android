@@ -12,6 +12,8 @@ import com.moufee.purduemenus.util.Resource;
 
 import org.joda.time.DateTime;
 
+import java.util.List;
+
 
 /**
  * Created by Ben on 22/07/2017.
@@ -32,8 +34,6 @@ public class DailyMenuViewModel extends AndroidViewModel {
             return mMenuRepository.getMenus(DailyMenuViewModel.this.getApplication(), input);
         }
     });
-
-//    private final MutableLiveData<DiningCourtMenu.Meal> mSelectedMeal = new MutableLiveData<>();
 
     public DailyMenuViewModel(Application application) {
         super(application);
@@ -84,5 +84,8 @@ public class DailyMenuViewModel extends AndroidViewModel {
     public void previousDay(){
         if (mCurrentDate.getValue() != null)
             mCurrentDate.setValue(mCurrentDate.getValue().plusDays(-1));
+    }
+    public void currentDay(){
+        mCurrentDate.setValue(new DateTime());
     }
 }

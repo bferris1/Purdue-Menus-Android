@@ -2,7 +2,6 @@ package com.moufee.purduemenus.menus;
 
 import android.support.annotation.Keep;
 
-import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
 
 import java.util.ArrayList;
@@ -150,29 +149,18 @@ public class DiningCourtMenu{
             return items;
         }
 
+        public int getNumItems(){
+            if (items == null)
+                return 0;
+            return items.size();
+        }
+
+        public MenuItem getItem(int index){
+            return items.get(index);
+        }
+
         private String name;
         private ArrayList<MenuItem> items;
-
-    }
-
-    @Keep
-    public class MenuItem {
-        private String id;
-        private String name;
-        private Boolean isVegetarian;
-
-
-        public String getName() {
-            return name;
-        }
-
-        public Boolean isVegetarian() {
-            return isVegetarian;
-        }
-
-        public String getId() {
-            return id;
-        }
 
     }
 

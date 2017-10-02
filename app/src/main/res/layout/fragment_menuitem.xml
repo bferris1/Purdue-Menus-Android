@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              xmlns:tools="http://schemas.android.com/tools"
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="menuItem"
+            type="com.moufee.purduemenus.menus.MenuItem"
+            />
+    </data>
+<RelativeLayout
+
               android:layout_width="match_parent"
               android:layout_height="48dp"
               android:orientation="horizontal">
@@ -20,6 +30,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginEnd="8dp"
         android:textAppearance="?attr/textAppearanceListItem"
+        android:text="@{menuItem.name}"
         tools:text="Menu Item Name"/>
 
     <ImageView
@@ -33,7 +44,7 @@
         android:contentDescription="@string/description_vegetarian_icon"
         android:scaleType="centerInside"
         android:src="@drawable/ic_vegetarian_mark"
-        android:visibility="invisible"
+        app:visibleGone="@{menuItem.isVegetarian}"
         tools:visibility="visible"/>
 
     <ImageButton
@@ -47,9 +58,10 @@
         android:layout_marginRight="16dp"
         android:background="@android:color/transparent"
         android:contentDescription="@string/description_favorite_button"
-        android:src="@drawable/ic_favorite_border_24dp"
+        android:src="@drawable/ic_favorite_24dp"
         android:visibility="gone"
         tools:visibility="visible"/>
 
 
 </RelativeLayout>
+</layout>

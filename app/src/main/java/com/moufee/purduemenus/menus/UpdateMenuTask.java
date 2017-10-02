@@ -11,17 +11,13 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.moufee.purduemenus.MenusApp;
 import com.moufee.purduemenus.api.Webservice;
-import com.moufee.purduemenus.di.AppComponent;
-import com.moufee.purduemenus.di.DaggerAppComponent;
 import com.moufee.purduemenus.util.Resource;
 
 import org.joda.time.DateTime;
-import org.joda.time.Days;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;

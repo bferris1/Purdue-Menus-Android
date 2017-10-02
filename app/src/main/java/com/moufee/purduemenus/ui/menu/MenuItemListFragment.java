@@ -14,17 +14,13 @@ import android.view.ViewGroup;
 import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.menus.DailyMenuViewModel;
 import com.moufee.purduemenus.menus.DiningCourtMenu;
-import com.moufee.purduemenus.menus.DiningCourtMenu.MenuItem;
+import com.moufee.purduemenus.menus.MenuItem;
+import com.moufee.purduemenus.menus.MenuRecyclerViewAdapter;
 
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-
-import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
 
 /**
  * A Fragment that contains a list of menu items for one Meal at one Dining Court
@@ -46,7 +42,8 @@ public class MenuItemListFragment extends Fragment {
     private OnListFragmentInteractionListener mListener;
     private RecyclerView mMenuItemRecyclerView;
 //    private MenuItemAdapter mAdapter;
-    private SectionedRecyclerViewAdapter mSectionAdapter;
+//    private SectionedRecyclerViewAdapter mSectionAdapter;
+    private MenuRecyclerViewAdapter mDataBoundAdapter;
     private DailyMenuViewModel mViewModel;
 
     /**
@@ -144,16 +141,13 @@ public class MenuItemListFragment extends Fragment {
             //todo: handle more gracefully?
             mStations = new ArrayList<>();
         }
-        if (mSectionAdapter == null){
-            mSectionAdapter = new SectionedRecyclerViewAdapter();
-            for (DiningCourtMenu.Station station :
-                    mStations) {
-                mSectionAdapter.addSection(new StationSection(station));
-            }
-            mMenuItemRecyclerView.setAdapter(mSectionAdapter);
+        if (mDataBoundAdapter == null){
+            mDataBoundAdapter = new MenuRecyclerViewAdapter();
+            mDataBoundAdapter.setStations(mStations);
+            mMenuItemRecyclerView.setAdapter(mDataBoundAdapter);
         }else {
 //            mAdapter.setStations(stations);
-            mSectionAdapter.notifyDataSetChanged();
+            mDataBoundAdapter.notifyDataSetChanged();
         }
 
     }
