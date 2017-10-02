@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import com.moufee.purduemenus.menus.MenuItem;
 import com.moufee.purduemenus.menus.MenuRecyclerViewAdapter;
 import com.moufee.purduemenus.util.Resource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -96,7 +98,12 @@ public class MenuItemListFragment extends Fragment {
             @Override
             public void onChanged(@Nullable Resource<FullDayMenu> fullDayMenuResource) {
                 if (fullDayMenuResource != null && fullDayMenuResource.data != null)
-                    mDataBoundAdapter.setStations(fullDayMenuResource.data.getMenu(mDiningCourtIndex).getMeal(mMealIndex).getStations());
+                    try {
+                        mDataBoundAdapter.setStations(fullDayMenuResource.data.getMenu(mDiningCourtIndex).getMeal(mMealIndex).getStations());
+                    } catch (Exception e) {
+                    mDataBoundAdapter.setStations(new ArrayList<DiningCourtMenu.Station>());
+                        Log.e(TAG, "onChanged: ", e);
+                    }
             }
         });
     }
