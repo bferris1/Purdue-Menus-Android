@@ -12,6 +12,8 @@ import com.moufee.purduemenus.util.Resource;
 
 import org.joda.time.DateTime;
 
+import java.util.List;
+
 
 /**
  * Created by Ben on 22/07/2017.
@@ -33,18 +35,10 @@ public class DailyMenuViewModel extends AndroidViewModel {
         }
     });
 
-//    private final MutableLiveData<DiningCourtMenu.Meal> mSelectedMeal = new MutableLiveData<>();
-
     public DailyMenuViewModel(Application application) {
         super(application);
         this.mMenuRepository = MenuRepository.get();
         mSelectedMealIndex.setValue(0);
-    }
-
-    public void init(DateTime date, int selectedMealIndex){
-        if (mCurrentDate.getValue() == null)
-            mCurrentDate.setValue(date);
-        mSelectedMealIndex.setValue(selectedMealIndex);
     }
 
     public boolean showVegetarianIcons() {
@@ -84,5 +78,8 @@ public class DailyMenuViewModel extends AndroidViewModel {
     public void previousDay(){
         if (mCurrentDate.getValue() != null)
             mCurrentDate.setValue(mCurrentDate.getValue().plusDays(-1));
+    }
+    public void currentDay(){
+        mCurrentDate.setValue(new DateTime());
     }
 }

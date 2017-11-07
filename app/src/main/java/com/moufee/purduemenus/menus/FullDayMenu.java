@@ -24,6 +24,10 @@ public class FullDayMenu {
         return mMenus.size();
     }
 
+    public List<DiningCourtMenu> getMenus(){
+        return mMenus;
+    }
+
     /**
      * Gets a  menu from a designated index
      * @param index, the index of the {@link DiningCourtMenu} to get
