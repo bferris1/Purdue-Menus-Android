@@ -39,6 +39,7 @@ public class DailyMenuViewModel extends AndroidViewModel {
         super(application);
         this.mMenuRepository = MenuRepository.get();
         mSelectedMealIndex.setValue(0);
+        setDate(new DateTime());
     }
 
     public boolean showVegetarianIcons() {
