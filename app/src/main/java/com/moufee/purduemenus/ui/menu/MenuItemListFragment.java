@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.menus.DailyMenuViewModel;
@@ -22,7 +23,6 @@ import com.moufee.purduemenus.menus.MenuRecyclerViewAdapter;
 import com.moufee.purduemenus.util.Resource;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A Fragment that contains a list of menu items for one Meal at one Dining Court
@@ -41,6 +41,7 @@ public class MenuItemListFragment extends Fragment {
     private int mMealIndex = 0;
     private OnListFragmentInteractionListener mListener;
     private RecyclerView mMenuItemRecyclerView;
+    private TextView mNotServingTextView;
     private MenuRecyclerViewAdapter mDataBoundAdapter;
     private DailyMenuViewModel mViewModel;
 
@@ -70,40 +71,75 @@ public class MenuItemListFragment extends Fragment {
             mDiningCourtIndex = getArguments().getInt(ARG_DINING_COURT_INDEX);
             mMealIndex = getArguments().getInt(ARG_MEAL_INDEX);
         }
+        mViewModel = ViewModelProviders.of(getActivity()).get(DailyMenuViewModel.class);
+        mDataBoundAdapter = new MenuRecyclerViewAdapter();
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_menuitem_list, container, false);
-        mViewModel = ViewModelProviders.of(getActivity()).get(DailyMenuViewModel.class);
+
 
         // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            mMenuItemRecyclerView = (RecyclerView) view.findViewById(R.id.menu_item_recyclerview);
-            mDataBoundAdapter = new MenuRecyclerViewAdapter();
-            mMenuItemRecyclerView.setAdapter(mDataBoundAdapter);
+        Context context = view.getContext();
+        mMenuItemRecyclerView = (RecyclerView) view.findViewById(R.id.menu_item_recyclerview);
+        mNotServingTextView = view.findViewById(R.id.not_serving_textview);
+        mMenuItemRecyclerView.setAdapter(mDataBoundAdapter);
 
-            mMenuItemRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+        mMenuItemRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+        setListener();
 
-            setListener();
-        }
         return view;
     }
 
 
-    private void setListener(){
+    private void setListener() {
         mViewModel.getFullMenu().observe(this, new Observer<Resource<FullDayMenu>>() {
             @Override
             public void onChanged(@Nullable Resource<FullDayMenu> fullDayMenuResource) {
-                if (fullDayMenuResource != null && fullDayMenuResource.data != null)
-                    try {
+                try {
+                    if (fullDayMenuResource != null && fullDayMenuResource.data != null && fullDayMenuResource.data.getMenu(mDiningCourtIndex).isServing(mMealIndex)) {
                         mDataBoundAdapter.setStations(fullDayMenuResource.data.getMenu(mDiningCourtIndex).getMeal(mMealIndex).getStations());
-                    } catch (Exception e) {
-                    mDataBoundAdapter.setStations(new ArrayList<DiningCourtMenu.Station>());
-                        Log.e(TAG, "onChanged: ", e);
+                        mMenuItemRecyclerView.setVisibility(View.VISIBLE);
+                        mNotServingTextView.setVisibility(View.GONE);
+                    } else {
+                        mMenuItemRecyclerView.setVisibility(View.GONE);
+                        mNotServingTextView.setVisibility(View.VISIBLE);
                     }
+                } catch (Exception e) {
+                    mDataBoundAdapter.setStations(new ArrayList<DiningCourtMenu.Station>());
+                    Log.e(TAG, "onChanged: ", e);
+                    mMenuItemRecyclerView.setVisibility(View.GONE);
+                    mNotServingTextView.setVisibility(View.VISIBLE);
+                }
+
+            }
+        });
+        mViewModel.getSelectedMealIndex().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(@Nullable Integer integer) {
+                if (integer == null)
+                    return;
+                mMealIndex = integer;
+                Resource<FullDayMenu> fullDayMenuResource = mViewModel.getFullMenu().getValue();
+                try {
+                    if (fullDayMenuResource != null && fullDayMenuResource.data != null && fullDayMenuResource.data.getMenu(mDiningCourtIndex).isServing(mMealIndex)) {
+//                        DiningCourtMenu.Meal meal = fullDayMenuResource.data.getMenu(mDiningCourtIndex).getMeal(mMealIndex);
+                        mDataBoundAdapter.setStations(mViewModel.getFullMenu().getValue().data.getMenu(mDiningCourtIndex).getMeal(mMealIndex).getStations());
+                        mMenuItemRecyclerView.setVisibility(View.VISIBLE);
+                        mNotServingTextView.setVisibility(View.GONE);
+                    } else {
+                        mMenuItemRecyclerView.setVisibility(View.GONE);
+                        mNotServingTextView.setVisibility(View.VISIBLE);
+                    }
+                } catch (Exception e) {
+                    mDataBoundAdapter.setStations(new ArrayList<DiningCourtMenu.Station>());
+                    Log.e(TAG, "onChanged: ", e);
+                    mMenuItemRecyclerView.setVisibility(View.GONE);
+                    mNotServingTextView.setVisibility(View.VISIBLE);
+                }
             }
         });
     }

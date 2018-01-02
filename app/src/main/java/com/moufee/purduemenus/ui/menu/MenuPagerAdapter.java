@@ -22,20 +22,19 @@ public class MenuPagerAdapter extends FragmentStatePagerAdapter {
         super(fm);
     }
 
-    public void setMenus(List<DiningCourtMenu> diningCourtMenus){
+    public void setMenus(List<DiningCourtMenu> diningCourtMenus) {
         this.diningCourtMenus = diningCourtMenus;
         notifyDataSetChanged();
     }
-    public void setMealIndex(int mealIndex){
+
+    public void setMealIndex(int mealIndex) {
         this.mealIndex = mealIndex;
-        notifyDataSetChanged();
+//        notifyDataSetChanged();
     }
 
     @Override
     public Fragment getItem(int position) {
-        if (diningCourtMenus.get(position).isServing(mealIndex))
-            return MenuItemListFragment.newInstance(position, mealIndex);
-        else return NotServingFragment.newInstance("Not Serving");
+        return MenuItemListFragment.newInstance(position, mealIndex);
     }
 
     @Override
