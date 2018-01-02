@@ -267,6 +267,7 @@ public class MenuActivity extends AppCompatActivity implements MenuItemListFragm
         public void onReceive(Context context, Intent intent) {
             ConnectivityManager conn =  (ConnectivityManager)
                     context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (conn == null) return;
             NetworkInfo networkInfo = conn.getActiveNetworkInfo();
             boolean isConnected = networkInfo != null &&
                     networkInfo.isConnected();
