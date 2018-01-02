@@ -21,8 +21,8 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     private List<DiningCourtMenu.Station> stations = new ArrayList<>();
     private int totalItems = 0;
 
-    public final static int VIEW_TYPE_HEADER = 0;
-    public final static int VIEW_TYPE_ITEM = 1;
+    private final static int VIEW_TYPE_HEADER = 0;
+    private final static int VIEW_TYPE_ITEM = 1;
 
     public void setStations(List<DiningCourtMenu.Station> stations){
         this.stations = stations;
