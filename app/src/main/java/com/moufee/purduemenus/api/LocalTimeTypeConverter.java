@@ -15,7 +15,7 @@ import org.joda.time.format.DateTimeFormatter;
 import java.lang.reflect.Type;
 
 /**
- * Created by Ben on 16/08/2017.
+ * Handles conversion of time string to and from LocalTime (for meal serving times and Hours)
  */
 
 public class LocalTimeTypeConverter implements JsonSerializer<LocalTime>, JsonDeserializer<LocalTime> {
@@ -24,7 +24,7 @@ public class LocalTimeTypeConverter implements JsonSerializer<LocalTime>, JsonDe
 
     @Override
     public LocalTime deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        return mDateTimeFormatter.parseLocalTime(json.getAsString());
+        return mDateTimeFormatter.parseLocalTime(json.getAsString().substring(0, 8));
     }
 
     @Override
