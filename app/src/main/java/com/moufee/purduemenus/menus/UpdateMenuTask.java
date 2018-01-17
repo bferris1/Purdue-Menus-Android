@@ -164,18 +164,7 @@ public class UpdateMenuTask implements Runnable {
                         tempMenusList.add(response.body());
 
                     if (tempMenusList.size() == diningCourts.size()) {
-                        Collections.sort(tempMenusList,new Comparator<DiningCourtMenu>() {
-                            @Override
-                            public int compare(DiningCourtMenu o1, DiningCourtMenu o2) {
-                                if (o1 == null || o2 == null)
-                                    return 0;
-                                if (diningCourts.indexOf(o1.getLocation()) < diningCourts.indexOf(o2.getLocation()))
-                                    return -1;
-                                if (diningCourts.indexOf(o1.getLocation()) < diningCourts.indexOf(o2.getLocation()))
-                                    return 1;
-                                return 0;
-                            }
-                        });
+                        Collections.sort(tempMenusList, new DiningCourtComparator());
                         mFullMenu.postValue(Resource.success(new FullDayMenu(tempMenusList, mMenuDate, hasLateLunch(tempMenusList))));
                         //save to json
                         try {
