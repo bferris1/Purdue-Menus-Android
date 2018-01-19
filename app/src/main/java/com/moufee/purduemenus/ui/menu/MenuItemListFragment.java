@@ -106,12 +106,14 @@ public class MenuItemListFragment extends Fragment {
                         mNotServingTextView.setVisibility(View.GONE);
                     } else {
                         mMenuItemRecyclerView.setVisibility(View.GONE);
+                        mNotServingTextView.setText(fullDayMenuResource.data.getMenu(mDiningCourtIndex).getMeal(mMealIndex).getStatus());
                         mNotServingTextView.setVisibility(View.VISIBLE);
                     }
                 } catch (Exception e) {
                     mDataBoundAdapter.setStations(new ArrayList<DiningCourtMenu.Station>());
                     Log.e(TAG, "onChanged: ", e);
                     mMenuItemRecyclerView.setVisibility(View.GONE);
+                    mNotServingTextView.setText(R.string.not_serving);
                     mNotServingTextView.setVisibility(View.VISIBLE);
                 }
 
@@ -132,12 +134,14 @@ public class MenuItemListFragment extends Fragment {
                         mNotServingTextView.setVisibility(View.GONE);
                     } else {
                         mMenuItemRecyclerView.setVisibility(View.GONE);
+                        mNotServingTextView.setText(fullDayMenuResource.data.getMenu(mDiningCourtIndex).getMeal(mMealIndex).getStatus());
                         mNotServingTextView.setVisibility(View.VISIBLE);
                     }
                 } catch (Exception e) {
                     mDataBoundAdapter.setStations(new ArrayList<DiningCourtMenu.Station>());
                     Log.e(TAG, "onChanged: ", e);
                     mMenuItemRecyclerView.setVisibility(View.GONE);
+                    mNotServingTextView.setText(R.string.not_serving);
                     mNotServingTextView.setVisibility(View.VISIBLE);
                 }
             }
