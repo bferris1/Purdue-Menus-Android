@@ -115,7 +115,6 @@ public class MenuActivity extends AppCompatActivity implements MenuItemListFragm
                                 mMenuPagerAdapter.setMenus(fullDayMenuResource.data.getMenus());
                             } else {
                                 Snackbar.make(mBinding.activityMenuCoordinatorLayout, getString(R.string.network_error_message), Snackbar.LENGTH_SHORT).show();
-                                mBinding.menuViewPager.setVisibility(View.GONE);
                             }
                             break;
                     }
