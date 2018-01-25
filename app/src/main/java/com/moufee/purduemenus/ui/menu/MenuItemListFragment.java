@@ -110,8 +110,9 @@ public class MenuItemListFragment extends Fragment {
                         mNotServingTextView.setVisibility(View.VISIBLE);
                     }
                 } catch (Exception e) {
+                    // this is called frequently due to getStatus() being called on null meals
+                    // todo: better handling of null meals (Kotlin?)
                     mDataBoundAdapter.setStations(new ArrayList<DiningCourtMenu.Station>());
-                    Log.e(TAG, "onChanged: ", e);
                     mMenuItemRecyclerView.setVisibility(View.GONE);
                     mNotServingTextView.setText(R.string.not_serving);
                     mNotServingTextView.setVisibility(View.VISIBLE);
@@ -119,6 +120,7 @@ public class MenuItemListFragment extends Fragment {
 
             }
         });
+        // todo: refactor this and above method to remove duplicated code
         mViewModel.getSelectedMealIndex().observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(@Nullable Integer integer) {
@@ -139,7 +141,6 @@ public class MenuItemListFragment extends Fragment {
                     }
                 } catch (Exception e) {
                     mDataBoundAdapter.setStations(new ArrayList<DiningCourtMenu.Station>());
-                    Log.e(TAG, "onChanged: ", e);
                     mMenuItemRecyclerView.setVisibility(View.GONE);
                     mNotServingTextView.setText(R.string.not_serving);
                     mNotServingTextView.setVisibility(View.VISIBLE);

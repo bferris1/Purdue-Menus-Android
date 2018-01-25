@@ -8,7 +8,6 @@ import com.moufee.purduemenus.menus.MenuItem;
 /**
  * Created by Ben on 14/07/2017.
  * RecyclerView ViewHolder for a menu item
- *
  */
 
 public class MenuItemHolder extends RecyclerView.ViewHolder {

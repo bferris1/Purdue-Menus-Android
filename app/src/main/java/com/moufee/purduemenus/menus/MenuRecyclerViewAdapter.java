@@ -24,10 +24,10 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     private final static int VIEW_TYPE_HEADER = 0;
     private final static int VIEW_TYPE_ITEM = 1;
 
-    public void setStations(List<DiningCourtMenu.Station> stations){
+    public void setStations(List<DiningCourtMenu.Station> stations) {
         this.stations = stations;
         int total = 0;
-        for (DiningCourtMenu.Station station:
+        for (DiningCourtMenu.Station station :
                 stations) {
             total += station.getNumItems();
         }
@@ -40,7 +40,7 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater =
                 LayoutInflater.from(parent.getContext());
-        if (viewType == VIEW_TYPE_HEADER){
+        if (viewType == VIEW_TYPE_HEADER) {
             StationHeaderBinding binding = StationHeaderBinding.inflate(layoutInflater, parent, false);
             return new StationHeaderViewHolder(binding);
         }
@@ -51,10 +51,10 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if (holder.getItemViewType() == VIEW_TYPE_HEADER && holder instanceof StationHeaderViewHolder){
+        if (holder.getItemViewType() == VIEW_TYPE_HEADER && holder instanceof StationHeaderViewHolder) {
             StationHeaderViewHolder stationHolder = (StationHeaderViewHolder) holder;
             stationHolder.bind(stations.get(getSectionIndex(position)));
-        }else {
+        } else {
             MenuItemHolder itemHolder = (MenuItemHolder) holder;
             itemHolder.bind(getMenuItemForPosition(position));
         }
@@ -72,25 +72,26 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
         return VIEW_TYPE_ITEM;
     }
 
-    private MenuItem getMenuItemForPosition(int position){
+    private MenuItem getMenuItemForPosition(int position) {
         return stations.get(getSectionIndex(position)).getItem(getPositionInSection(position) - 1);
     }
 
-    private int getPositionInSection(int position){
+    private int getPositionInSection(int position) {
         int currentStationStartIndex = 0;
-        for (DiningCourtMenu.Station station : stations){
-            if (position >= currentStationStartIndex && position <= currentStationStartIndex + station.getNumItems()){
+        for (DiningCourtMenu.Station station : stations) {
+            if (position >= currentStationStartIndex && position <= currentStationStartIndex + station.getNumItems()) {
                 return position - currentStationStartIndex;
             }
             currentStationStartIndex += station.getNumItems() + 1;
         }
         throw new IndexOutOfBoundsException("Position is outside the allowed range.");
     }
-    private int getSectionIndex(int position){
+
+    private int getSectionIndex(int position) {
         int currentStationStartIndex = 0;
         for (int i = 0; i < stations.size(); i++) {
             DiningCourtMenu.Station station = stations.get(i);
-            if (position >= currentStationStartIndex && position <= currentStationStartIndex + station.getNumItems()){
+            if (position >= currentStationStartIndex && position <= currentStationStartIndex + station.getNumItems()) {
                 return i;
             }
             currentStationStartIndex += station.getNumItems() + 1;
@@ -108,7 +109,7 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
             this.binding = binding;
         }
 
-        private void bind(DiningCourtMenu.Station station){
+        private void bind(DiningCourtMenu.Station station) {
             binding.setStation(station);
             binding.executePendingBindings();
         }

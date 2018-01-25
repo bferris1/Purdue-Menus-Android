@@ -2,15 +2,13 @@ package com.moufee.purduemenus.api;
 
 import com.moufee.purduemenus.menus.DiningCourtMenu;
 
-import javax.inject.Singleton;
-
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.Path;
 
 /**
- * Created by Ben on 17/07/2017.
+ * Defines the available HTTP requests for the Menus API
  */
 
 public interface Webservice {

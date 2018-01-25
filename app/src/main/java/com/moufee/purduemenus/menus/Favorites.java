@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 
 /**
- * Created by Ben on 13/08/2017.
+ * A container for a list of favorites
  */
 @Keep
 public class Favorites {

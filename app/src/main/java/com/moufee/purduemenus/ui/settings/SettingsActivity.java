@@ -8,9 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -29,7 +27,8 @@ public class SettingsActivity extends SingleFragmentActivity implements SharedPr
     public static final String KEY_PREF_SHOW_SERVING_TIMES = "show_serving_times";
     public static final String KEY_PREF_USE_NIGHT_MODE = "night_mode";
 
-    @Inject SharedPreferences sharedPreferences;
+    @Inject
+    SharedPreferences sharedPreferences;
 
 
     @Override
@@ -42,7 +41,7 @@ public class SettingsActivity extends SingleFragmentActivity implements SharedPr
                 android.R.anim.fade_out);
     }
 
-    public static Intent getIntent(Context packageContext){
+    public static Intent getIntent(Context packageContext) {
         return new Intent(packageContext, SettingsActivity.class);
     }
 
@@ -72,9 +71,9 @@ public class SettingsActivity extends SingleFragmentActivity implements SharedPr
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(KEY_PREF_USE_NIGHT_MODE)){
+        if (key.equals(KEY_PREF_USE_NIGHT_MODE)) {
             String value = sharedPreferences.getString(key, "");
-            switch (value){
+            switch (value) {
                 case "mode_off":
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                     getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
@@ -90,10 +89,10 @@ public class SettingsActivity extends SingleFragmentActivity implements SharedPr
                     getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
                     //permissions are needed
                     if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                            != PackageManager.PERMISSION_GRANTED){
-                        if (ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.ACCESS_COARSE_LOCATION)){
+                            != PackageManager.PERMISSION_GRANTED) {
+                        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
                             //do something?
-                        }else{
+                        } else {
                             ActivityCompat.requestPermissions(this,
                                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                                     0);
@@ -106,11 +105,11 @@ public class SettingsActivity extends SingleFragmentActivity implements SharedPr
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode){
+        switch (requestCode) {
             case 0:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 //                    recreate();
-                }else {
+                } else {
 //                    recreate();
                 }
                 break;

@@ -1,7 +1,5 @@
 package com.moufee.purduemenus.ui.menu;
 
-import android.arch.lifecycle.LifecycleRegistry;
-import android.arch.lifecycle.LifecycleRegistryOwner;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
@@ -15,13 +13,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -39,7 +34,6 @@ import com.moufee.purduemenus.menus.DiningCourtMenu;
 import com.moufee.purduemenus.menus.FullDayMenu;
 import com.moufee.purduemenus.ui.login.LoginActivity;
 import com.moufee.purduemenus.ui.settings.SettingsActivity;
-import com.moufee.purduemenus.ui.settings.SettingsFragment;
 import com.moufee.purduemenus.util.DateTimeHelper;
 import com.moufee.purduemenus.util.Resource;
 
@@ -62,7 +56,8 @@ public class MenuActivity extends AppCompatActivity implements MenuItemListFragm
     private NetworkReceiver mNetworkReceiver = new NetworkReceiver();
     private DateTimeFormatter mTimeFormatter = DateTimeFormat.shortTime();
     private ViewPager.OnPageChangeListener mOnPageChangeListener;
-    @Inject SharedPreferences mSharedPreferences;
+    @Inject
+    SharedPreferences mSharedPreferences;
     private SharedPreferences.OnSharedPreferenceChangeListener mSharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
@@ -80,7 +75,7 @@ public class MenuActivity extends AppCompatActivity implements MenuItemListFragm
     }
 
 
-    private void setListeners(){
+    private void setListeners() {
         mViewModel.getCurrentDate().observe(this, new Observer<DateTime>() {
             @Override
             public void onChanged(@Nullable DateTime dateTime) {
@@ -102,10 +97,10 @@ public class MenuActivity extends AppCompatActivity implements MenuItemListFragm
         mViewModel.getFullMenu().observe(this, new Observer<Resource<FullDayMenu>>() {
             @Override
             public void onChanged(@Nullable Resource<FullDayMenu> fullDayMenuResource) {
-                mBinding.setMenusResource(fullDayMenuResource == null ? null: fullDayMenuResource);
+                mBinding.setMenusResource(fullDayMenuResource == null ? null : fullDayMenuResource);
                 //done: loading state
-                if (fullDayMenuResource != null){
-                    switch (fullDayMenuResource.status){
+                if (fullDayMenuResource != null) {
+                    switch (fullDayMenuResource.status) {
                         case SUCCESS:
                             mBinding.setMenu(fullDayMenuResource.data);
                             if (fullDayMenuResource.data != null)
@@ -116,7 +111,7 @@ public class MenuActivity extends AppCompatActivity implements MenuItemListFragm
                         case LOADING:
                             break;
                         case ERROR:
-                            if (fullDayMenuResource.data != null){
+                            if (fullDayMenuResource.data != null) {
                                 mMenuPagerAdapter.setMenus(fullDayMenuResource.data.getMenus());
                             } else {
                                 Snackbar.make(mBinding.activityMenuCoordinatorLayout, getString(R.string.network_error_message), Snackbar.LENGTH_SHORT).show();
@@ -129,14 +124,14 @@ public class MenuActivity extends AppCompatActivity implements MenuItemListFragm
         });
     }
 
-    private void updateLateLunch(boolean isLateLunchServed){
-            if (mViewModel.getSelectedMealIndex().getValue() == 2 && !isLateLunchServed) {
-                mViewModel.setSelectedMealIndex(1);
+    private void updateLateLunch(boolean isLateLunchServed) {
+        if (mViewModel.getSelectedMealIndex().getValue() == 2 && !isLateLunchServed) {
+            mViewModel.setSelectedMealIndex(1);
         }
     }
 
-    private void updateServingTime(){
-        boolean showServingTimes = mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_SHOW_SERVING_TIMES,true);
+    private void updateServingTime() {
+        boolean showServingTimes = mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_SHOW_SERVING_TIMES, true);
         mBinding.setShowServingTimes(showServingTimes);
 
         LocalTime startTime;
@@ -218,7 +213,6 @@ public class MenuActivity extends AppCompatActivity implements MenuItemListFragm
         mBinding.menuViewPager.addOnPageChangeListener(mOnPageChangeListener);
 
 
-
     }
 
     @Override
@@ -231,18 +225,18 @@ public class MenuActivity extends AppCompatActivity implements MenuItemListFragm
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_settings:
                 startActivity(SettingsActivity.getIntent(this));
                 return true;
             case R.id.action_login:
-                Intent loginIntent = new Intent(this,LoginActivity.class);
+                Intent loginIntent = new Intent(this, LoginActivity.class);
                 startActivity(loginIntent);
                 return true;
             case R.id.action_feedback:
                 Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
                 emailIntent.setData(Uri.parse("mailto:")); // only email apps should handle this
-                emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {"feedback@purdue.tools"}); // recipients
+                emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"feedback@purdue.tools"}); // recipients
                 emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Purdue Menus Feedback");
                 if (emailIntent.resolveActivity(getPackageManager()) != null) {
                     startActivity(emailIntent);
@@ -262,16 +256,16 @@ public class MenuActivity extends AppCompatActivity implements MenuItemListFragm
         super.onDestroy();
     }
 
-    class NetworkReceiver extends BroadcastReceiver{
+    class NetworkReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            ConnectivityManager conn =  (ConnectivityManager)
+            ConnectivityManager conn = (ConnectivityManager)
                     context.getSystemService(Context.CONNECTIVITY_SERVICE);
             if (conn == null) return;
             NetworkInfo networkInfo = conn.getActiveNetworkInfo();
             boolean isConnected = networkInfo != null &&
                     networkInfo.isConnected();
-            if (isConnected && mViewModel.getCurrentDate().getValue() != null){
+            if (isConnected && mViewModel.getCurrentDate().getValue() != null) {
                 //todo: better way to force update?
                 mViewModel.setDate(new DateTime(mViewModel.getCurrentDate().getValue()));
             }

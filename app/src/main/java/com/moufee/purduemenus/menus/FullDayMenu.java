@@ -2,7 +2,6 @@ package com.moufee.purduemenus.menus;
 
 import org.joda.time.DateTime;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,20 +19,21 @@ public class FullDayMenu {
         mLateLunchServed = lateLunchServed;
     }
 
-    public int getNumMenus(){
+    public int getNumMenus() {
         return mMenus.size();
     }
 
-    public List<DiningCourtMenu> getMenus(){
+    public List<DiningCourtMenu> getMenus() {
         return mMenus;
     }
 
     /**
      * Gets a  menu from a designated index
+     *
      * @param index, the index of the {@link DiningCourtMenu} to get
      * @return a {@link DiningCourtMenu}, or null if none exists
      */
-    public DiningCourtMenu getMenu(int index){
+    public DiningCourtMenu getMenu(int index) {
         if (mMenus != null && index < mMenus.size())
             return mMenus.get(index);
         return null;
