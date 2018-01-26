@@ -38,7 +38,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         addPreferencesFromResource(R.xml.pref_general);
 
 
-
 //        Preference logInPref = findPreference("log_in");
 
         /*logInPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {

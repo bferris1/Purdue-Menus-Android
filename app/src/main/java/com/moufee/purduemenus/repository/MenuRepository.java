@@ -4,9 +4,9 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 
+import com.moufee.purduemenus.menus.FullDayMenu;
 import com.moufee.purduemenus.menus.UpdateMenuTask;
 import com.moufee.purduemenus.util.Resource;
-import com.moufee.purduemenus.menus.FullDayMenu;
 
 import org.joda.time.DateTime;
 
@@ -25,18 +25,18 @@ public class MenuRepository {
     private static MenuRepository sMenuRepository;
     private static final String TAG = "MenuRepository";
 
-    public static MenuRepository get(){
+    public static MenuRepository get() {
         if (sMenuRepository == null)
             sMenuRepository = new MenuRepository();
         return sMenuRepository;
     }
 
-    public LiveData<Resource<FullDayMenu>> getMenus(Context context){
+    public LiveData<Resource<FullDayMenu>> getMenus(Context context) {
         return getMenus(context, new DateTime());
     }
 
 
-    public LiveData<Resource<FullDayMenu>> getMenus(Context context, DateTime dateTime){
+    public LiveData<Resource<FullDayMenu>> getMenus(Context context, DateTime dateTime) {
         MutableLiveData<Resource<FullDayMenu>> data = new MutableLiveData<>();
         UpdateMenuTask task = new UpdateMenuTask(data, context, dateTime);
         Thread t = new Thread(task);

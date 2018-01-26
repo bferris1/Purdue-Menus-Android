@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * Gson Constructs objects from JSON using these classes
  */
 @Keep
-public class DiningCourtMenu{
+public class DiningCourtMenu {
 
     private String location;
     private String date;
@@ -40,10 +40,11 @@ public class DiningCourtMenu{
     /**
      * Gets the meal associated with the provided index
      * Index 3 is dinner, but some dining courts only have three meals (up to index 2)
+     *
      * @param mealIndex the index of the meal to get
      * @return the Meal associated with the provided index
      */
-    public Meal getMeal (int mealIndex){
+    public Meal getMeal(int mealIndex) {
         if (meals != null && meals.size() > 0) {
             for (Meal meal :
                     meals) {
@@ -52,36 +53,24 @@ public class DiningCourtMenu{
             }
         }
 
-//        if (meals != null) {
-//            if (meals.size() == 0)
-//                return null;
-//
-//            //trying to get late lunch, but this dining court doesn't serve it
-//            if (mealIndex == 2 && !servesLateLunch())
-//                return null;
-//
-//            if (mealIndex < meals.size())
-//                return meals.get(mealIndex);
-//            else if(mealIndex == meals.size())
-//                return meals.get(meals.size() - 1);
-//        }
         return null;
     }
 
-    public boolean servesLateLunch(){
+    public boolean servesLateLunch() {
         if (meals != null)
             for (Meal meal :
                     meals) {
                 if (meal.getName().equals("Late Lunch") && meal.isOpen())
                     return true;
             }
-            return false;
+        return false;
 //        return meals != null && meals.size() == 4 && meals.get(2).isOpen();
     }
 
-    public boolean isServing(int mealIndex){
+    public boolean isServing(int mealIndex) {
         return meals != null && getMeal(mealIndex) != null && getMeal(mealIndex).isOpen();
     }
+
     @Keep
     public class Meal {
 
@@ -109,7 +98,7 @@ public class DiningCourtMenu{
             return stations;
         }
 
-        public boolean isOpen(){
+        public boolean isOpen() {
             return status != null && status.equals("Open");
         }
 
@@ -122,7 +111,7 @@ public class DiningCourtMenu{
     }
 
     @Keep
-    public class Hours{
+    public class Hours {
 
         public LocalTime getStartTime() {
             return startTime;
@@ -149,13 +138,13 @@ public class DiningCourtMenu{
             return items;
         }
 
-        public int getNumItems(){
+        public int getNumItems() {
             if (items == null)
                 return 0;
             return items.size();
         }
 
-        public MenuItem getItem(int index){
+        public MenuItem getItem(int index) {
             return items.get(index);
         }
 

@@ -30,7 +30,7 @@ public class NotServingFragment extends Fragment {
         Bundle args = new Bundle();
         args.putString(ARG_MESSAGE, message);
         fragment.setArguments(args);
-                return fragment;
+        return fragment;
     }
 
     @Override
@@ -51,7 +51,7 @@ public class NotServingFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_not_serving, container, false);
         TextView textView = (TextView) view.findViewById(R.id.not_serving_message_textview);
         if (mMessage != null)
-        textView.setText(mMessage);
+            textView.setText(mMessage);
 
         return view;
     }

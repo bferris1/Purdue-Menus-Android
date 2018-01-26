@@ -12,8 +12,6 @@ import com.moufee.purduemenus.util.Resource;
 
 import org.joda.time.DateTime;
 
-import java.util.List;
-
 
 /**
  * Created by Ben on 22/07/2017.
@@ -23,11 +21,9 @@ import java.util.List;
 public class DailyMenuViewModel extends AndroidViewModel {
 
 
-
     private MenuRepository mMenuRepository;
     private final MutableLiveData<DateTime> mCurrentDate = new MutableLiveData<>();
     private final MutableLiveData<Integer> mSelectedMealIndex = new MutableLiveData<>();
-    private boolean showVegetarianIcons = true;
     private final LiveData<Resource<FullDayMenu>> mFullMenu = Transformations.switchMap(mCurrentDate, new Function<DateTime, LiveData<Resource<FullDayMenu>>>() {
         @Override
         public LiveData<Resource<FullDayMenu>> apply(DateTime input) {
@@ -39,31 +35,24 @@ public class DailyMenuViewModel extends AndroidViewModel {
         super(application);
         this.mMenuRepository = MenuRepository.get();
         mSelectedMealIndex.setValue(0);
+        setDate(new DateTime());
+
     }
 
-    public boolean showVegetarianIcons() {
-        return showVegetarianIcons;
-    }
-
-    public void setShowVegetarianIcons(boolean showVegetarianIcons) {
-        this.showVegetarianIcons = showVegetarianIcons;
-    }
-
-    public LiveData<Integer> getSelectedMealIndex(){
+    public LiveData<Integer> getSelectedMealIndex() {
         return mSelectedMealIndex;
     }
-    public void setSelectedMealIndex(int index){
+
+    public void setSelectedMealIndex(int index) {
         mSelectedMealIndex.setValue(index);
     }
-
-
 
 
     public LiveData<Resource<FullDayMenu>> getFullMenu() {
         return mFullMenu;
     }
 
-    public void setDate(DateTime date){
+    public void setDate(DateTime date) {
         mCurrentDate.setValue(date);
     }
 
@@ -71,15 +60,17 @@ public class DailyMenuViewModel extends AndroidViewModel {
         return mCurrentDate;
     }
 
-    public void nextDay(){
+    public void nextDay() {
         if (mCurrentDate.getValue() != null)
             mCurrentDate.setValue(mCurrentDate.getValue().plusDays(1));
     }
-    public void previousDay(){
+
+    public void previousDay() {
         if (mCurrentDate.getValue() != null)
             mCurrentDate.setValue(mCurrentDate.getValue().plusDays(-1));
     }
-    public void currentDay(){
+
+    public void currentDay() {
         mCurrentDate.setValue(new DateTime());
     }
 }
