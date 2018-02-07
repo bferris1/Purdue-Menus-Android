@@ -1,6 +1,7 @@
 package com.moufee.purduemenus.ui.menu;
 
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -16,6 +17,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -24,7 +26,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.moufee.purduemenus.MenusApp;
 import com.moufee.purduemenus.R;
@@ -46,7 +47,12 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
-public class MenuActivity extends AppCompatActivity implements MenuItemListFragment.OnListFragmentInteractionListener {
+import dagger.android.AndroidInjection;
+import dagger.android.AndroidInjector;
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.support.HasSupportFragmentInjector;
+
+public class MenuActivity extends AppCompatActivity implements HasSupportFragmentInjector, MenuItemListFragment.OnListFragmentInteractionListener {
 
     private static String TAG = "MENU_ACTIVITY";
 
@@ -58,6 +64,11 @@ public class MenuActivity extends AppCompatActivity implements MenuItemListFragm
     private ViewPager.OnPageChangeListener mOnPageChangeListener;
     @Inject
     SharedPreferences mSharedPreferences;
+    @Inject
+    DispatchingAndroidInjector<Fragment> mDispatchingAndroidInjector;
+    @Inject
+    ViewModelProvider.Factory mViewModelFactory;
+
     private SharedPreferences.OnSharedPreferenceChangeListener mSharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
@@ -74,6 +85,10 @@ public class MenuActivity extends AppCompatActivity implements MenuItemListFragm
 
     }
 
+    @Override
+    public AndroidInjector<Fragment> supportFragmentInjector() {
+        return mDispatchingAndroidInjector;
+    }
 
     private void setListeners() {
         mViewModel.getCurrentDate().observe(this, new Observer<DateTime>() {
@@ -159,15 +174,15 @@ public class MenuActivity extends AppCompatActivity implements MenuItemListFragm
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: oncreate called");
+        AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         MenusApp app = (MenusApp) getApplication();
-        app.getAppComponent().inject(this);
         setTitle(getString(R.string.app_name));
 
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_menu_date_picker_time);
         mBinding.setSelectedMealIndex(0);
 
-        mViewModel = ViewModelProviders.of(this).get(DailyMenuViewModel.class);
+        mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(DailyMenuViewModel.class);
         mViewModel.setDate(new DateTime());
         mViewModel.setSelectedMealIndex(DateTimeHelper.getCurrentMealIndex());
         mBinding.setViewModel(mViewModel);

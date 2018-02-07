@@ -1,6 +1,7 @@
 package com.moufee.purduemenus.di;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
@@ -8,8 +9,8 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.moufee.purduemenus.api.LocalTimeTypeConverter;
-import com.moufee.purduemenus.util.AppExecutors;
 import com.moufee.purduemenus.api.Webservice;
+import com.moufee.purduemenus.util.AppExecutors;
 
 import org.joda.time.LocalTime;
 
@@ -28,15 +29,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * in progress: use dagger
  */
 
-@Module
-public class AppModule {
-    Application application;
+@Module(includes = {ViewModelModule.class})
+class AppModule {
 
-    public AppModule(Application application){
-        this.application = application;
-    }
-    @Singleton @Provides
-     Webservice provideWebService(AppExecutors executors, Gson gson){
+    @Singleton
+    @Provides
+    Webservice provideWebService(AppExecutors executors, Gson gson) {
         return new Retrofit.Builder()
                 .baseUrl("https://api.hfs.purdue.edu")
                 .addConverterFactory(GsonConverterFactory.create(gson))
@@ -44,25 +42,32 @@ public class AppModule {
                 .build()
                 .create(Webservice.class);
     }
-    @Singleton @Provides
-     Gson provideGson(){
+
+    @Singleton
+    @Provides
+    Gson provideGson() {
         return new GsonBuilder()
                 .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
                 .registerTypeAdapter(LocalTime.class, new LocalTimeTypeConverter())
                 .create();
     }
-    @Singleton @Provides
-     OkHttpClient provideHttpClient(){
+
+    @Singleton
+    @Provides
+    OkHttpClient provideHttpClient() {
         //todo: restore cookies or not?
         return new OkHttpClient();
     }
-    @Provides
+
     @Singleton
-    Application providesApplication() {
-        return application;
+    @Provides
+    SharedPreferences sharedPreferences(Application application) {
+        return PreferenceManager.getDefaultSharedPreferences(application);
     }
-    @Singleton @Provides
-    SharedPreferences sharedPreferences(Application application){
-         return PreferenceManager.getDefaultSharedPreferences(application);
+
+    @Singleton
+    @Provides
+    Context provideContext(Application application) {
+        return application.getApplicationContext();
     }
 }

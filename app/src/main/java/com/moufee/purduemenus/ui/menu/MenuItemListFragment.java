@@ -1,14 +1,15 @@
 package com.moufee.purduemenus.ui.menu;
 
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,10 @@ import com.moufee.purduemenus.menus.MenuRecyclerViewAdapter;
 import com.moufee.purduemenus.util.Resource;
 
 import java.util.ArrayList;
+
+import javax.inject.Inject;
+
+import dagger.android.support.AndroidSupportInjection;
 
 /**
  * A Fragment that contains a list of menu items for one Meal at one Dining Court
@@ -44,6 +49,8 @@ public class MenuItemListFragment extends Fragment {
     private TextView mNotServingTextView;
     private MenuRecyclerViewAdapter mDataBoundAdapter;
     private DailyMenuViewModel mViewModel;
+    @Inject
+    ViewModelProvider.Factory mViewModelFactory;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -66,13 +73,13 @@ public class MenuItemListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mDataBoundAdapter = new MenuRecyclerViewAdapter();
 
         if (getArguments() != null) {
             mDiningCourtIndex = getArguments().getInt(ARG_DINING_COURT_INDEX);
             mMealIndex = getArguments().getInt(ARG_MEAL_INDEX);
         }
-        mViewModel = ViewModelProviders.of(getActivity()).get(DailyMenuViewModel.class);
-        mDataBoundAdapter = new MenuRecyclerViewAdapter();
+
 
     }
 
@@ -89,7 +96,6 @@ public class MenuItemListFragment extends Fragment {
         mMenuItemRecyclerView.setAdapter(mDataBoundAdapter);
 
         mMenuItemRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-        setListener();
 
         return view;
     }
@@ -152,6 +158,7 @@ public class MenuItemListFragment extends Fragment {
 
     @Override
     public void onAttach(Context context) {
+        AndroidSupportInjection.inject(this);
         super.onAttach(context);
         if (context instanceof OnListFragmentInteractionListener) {
             mListener = (OnListFragmentInteractionListener) context;
@@ -159,6 +166,11 @@ public class MenuItemListFragment extends Fragment {
             throw new RuntimeException(context.toString()
                     + " must implement OnListFragmentInteractionListener");
         }
+        if (context instanceof AppCompatActivity) {
+            mViewModel = ViewModelProviders.of((AppCompatActivity) context, mViewModelFactory).get(DailyMenuViewModel.class);
+            setListener();
+        }
+
     }
 
     @Override

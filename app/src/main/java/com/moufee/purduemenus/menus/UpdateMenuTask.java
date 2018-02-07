@@ -9,7 +9,6 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.moufee.purduemenus.MenusApp;
 import com.moufee.purduemenus.api.Webservice;
 import com.moufee.purduemenus.util.Resource;
 
@@ -25,8 +24,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import javax.inject.Inject;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -46,19 +43,23 @@ public class UpdateMenuTask implements Runnable {
     private static final String TAG = "UpdateMenuTask";
     private static final String[] DINING_COURTS = {"Earhart", "Ford", "Wiley", "Windsor", "Hillenbrand", "The Gathering Place"};
     private boolean mFetchedFromFile = false;
-    @Inject
-    Webservice mWebservice;
-    @Inject
-    Gson mGson;
+    private Webservice mWebservice;
+    private Gson mGson;
     ConnectivityManager mConnectivityManager;
 
-    public UpdateMenuTask(MutableLiveData<Resource<FullDayMenu>> menu, Context context, DateTime date) {
-        mFullMenu = menu;
+
+    public UpdateMenuTask(MutableLiveData<Resource<FullDayMenu>> liveData, Context context, Webservice webservice, Gson gson) {
+        this.mFullMenu = liveData;
         mContext = context;
-        mMenuDate = date;
+        mWebservice = webservice;
+        mMenuDate = new DateTime();
+        mGson = gson;
         mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        MenusApp app = (MenusApp) context.getApplicationContext();
-        app.getAppComponent().inject(this);
+    }
+
+    public UpdateMenuTask withDate(DateTime date) {
+        this.mMenuDate = date;
+        return this;
     }
 
     @Override
