@@ -26,7 +26,8 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 /**
- * Created by Ben on 2/6/18.
+ * Responsible for creating ViewModels
+ * A Map of Classes to Providers of ViewModels is provided by Dagger
  */
 @Singleton
 public class MenusAppViewModelFactory implements ViewModelProvider.Factory {

@@ -14,6 +14,7 @@ import com.moufee.purduemenus.util.Resource;
 import org.joda.time.DateTime;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 
 /**
@@ -22,9 +23,7 @@ import javax.inject.Inject;
  * Abstracts the data sources from the rest of the app
  * Creates threads to retrieve and process menu data
  */
-
-//todo (in progress): dagger dependency injection?
-
+@Singleton
 public class MenuRepository {
 
     private static final String TAG = "MenuRepository";

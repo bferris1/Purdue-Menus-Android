@@ -14,7 +14,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatDelegate;
 
-import com.moufee.purduemenus.MenusApp;
 import com.moufee.purduemenus.util.SingleFragmentActivity;
 
 import javax.inject.Inject;
@@ -51,7 +50,6 @@ public class SettingsActivity extends SingleFragmentActivity implements SharedPr
     protected void onCreate(Bundle savedInstanceState) {
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
-        MenusApp app = (MenusApp) getApplication();
     }
 
     @Override

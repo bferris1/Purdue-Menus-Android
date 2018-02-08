@@ -15,7 +15,6 @@ import javax.inject.Inject;
 
 
 /**
- * Created by Ben on 22/07/2017.
  * A ViewModel representing all the dining menus for one day.
  */
 

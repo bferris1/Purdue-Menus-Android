@@ -2,7 +2,7 @@ package com.moufee.purduemenus;
 
 import android.app.Activity;
 import android.app.Application;
-import android.preference.PreferenceManager;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatDelegate;
 
 import com.moufee.purduemenus.di.DaggerAppComponent;
@@ -15,13 +15,18 @@ import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasActivityInjector;
 
 /**
- * Created by Ben on 25/08/2017.
+ * The Application for this App
+ * Allows Dagger Android injection
+ * Sets night mode according to preferences when the app starts
  */
 
 public class MenusApp extends Application implements HasActivityInjector {
 
     @Inject
     DispatchingAndroidInjector<Activity> mDispatchingAndroidInjector;
+
+    @Inject
+    SharedPreferences mSharedPreferences;
 
     @Override
     public AndroidInjector<Activity> activityInjector() {
@@ -30,7 +35,10 @@ public class MenusApp extends Application implements HasActivityInjector {
 
     @Override
     public void onCreate() {
-        switch (PreferenceManager.getDefaultSharedPreferences(this).getString(SettingsFragment.KEY_PREF_USE_NIGHT_MODE, "")) {
+
+        DaggerAppComponent.builder().application(this).build().inject(this);
+
+        switch (mSharedPreferences.getString(SettingsFragment.KEY_PREF_USE_NIGHT_MODE, "")) {
             case "mode_off":
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
                 break;
@@ -44,7 +52,6 @@ public class MenusApp extends Application implements HasActivityInjector {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
                 break;
         }
-        DaggerAppComponent.builder().application(this).build().inject(this);
         super.onCreate();
 
     }

@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 import dagger.MapKey;
 
 /**
- * Created by Ben on 2/6/18.
+ * A custom key for the ViewModel map, for using classes that extend {@link ViewModel} as keys
  */
 
 @Documented

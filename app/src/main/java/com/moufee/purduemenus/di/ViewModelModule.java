@@ -10,7 +10,7 @@ import dagger.Module;
 import dagger.multibindings.IntoMap;
 
 /**
- * Created by Ben on 2/6/18.
+ * Maps ViewModel classes to ViewModel (providers)
  */
 
 @Module
