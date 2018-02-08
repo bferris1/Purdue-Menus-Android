@@ -11,7 +11,7 @@ import dagger.android.ContributesAndroidInjector;
  * Allows MenuActivity and Fragments it hosts to use dependency injection
  */
 @Module
-public abstract class MenuActivityModule {
+public abstract class ActivityModule {
     @ContributesAndroidInjector(modules = FragmentBuildersModule.class)
     abstract MenuActivity contributeMenuActivity();
 
