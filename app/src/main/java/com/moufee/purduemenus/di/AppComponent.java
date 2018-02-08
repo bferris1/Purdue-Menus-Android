@@ -12,7 +12,6 @@ import dagger.android.AndroidInjectionModule;
 
 /**
  * Defines where dependency injection may be performed
- * In progress: convert to Android dependency injection
  */
 @Singleton
 @Component(modules = {AndroidInjectionModule.class, AppModule.class, ActivityModule.class})
