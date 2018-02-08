@@ -1,25 +1,30 @@
 package com.moufee.purduemenus.di;
 
-import com.moufee.purduemenus.menus.UpdateMenuTask;
-import com.moufee.purduemenus.ui.menu.MenuActivity;
-import com.moufee.purduemenus.ui.settings.SettingsActivity;
+import android.app.Application;
+
+import com.moufee.purduemenus.MenusApp;
 
 import javax.inject.Singleton;
 
+import dagger.BindsInstance;
 import dagger.Component;
+import dagger.android.AndroidInjectionModule;
 
 /**
  * Defines where dependency injection may be performed
- * In progress: convert to Android dependency injection
  */
 @Singleton
-@Component(modules = {AppModule.class})
+@Component(modules = {AndroidInjectionModule.class, AppModule.class, ActivityModule.class})
 public interface AppComponent {
 
+    @Component.Builder
+    interface Builder {
+        @BindsInstance
+        Builder application(Application application);
 
-    void inject(UpdateMenuTask task);
+        AppComponent build();
+    }
 
-    void inject(MenuActivity menuActivity);
+    void inject(MenusApp app);
 
-    void inject(SettingsActivity settingsActivity);
 }

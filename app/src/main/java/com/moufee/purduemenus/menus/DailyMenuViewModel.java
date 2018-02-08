@@ -1,24 +1,24 @@
 package com.moufee.purduemenus.menus;
 
-import android.app.Application;
 import android.arch.core.util.Function;
-import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Transformations;
+import android.arch.lifecycle.ViewModel;
 
 import com.moufee.purduemenus.repository.MenuRepository;
 import com.moufee.purduemenus.util.Resource;
 
 import org.joda.time.DateTime;
 
+import javax.inject.Inject;
+
 
 /**
- * Created by Ben on 22/07/2017.
  * A ViewModel representing all the dining menus for one day.
  */
 
-public class DailyMenuViewModel extends AndroidViewModel {
+public class DailyMenuViewModel extends ViewModel {
 
 
     private MenuRepository mMenuRepository;
@@ -27,16 +27,15 @@ public class DailyMenuViewModel extends AndroidViewModel {
     private final LiveData<Resource<FullDayMenu>> mFullMenu = Transformations.switchMap(mCurrentDate, new Function<DateTime, LiveData<Resource<FullDayMenu>>>() {
         @Override
         public LiveData<Resource<FullDayMenu>> apply(DateTime input) {
-            return mMenuRepository.getMenus(DailyMenuViewModel.this.getApplication(), input);
+            return mMenuRepository.getMenus(input);
         }
     });
 
-    public DailyMenuViewModel(Application application) {
-        super(application);
-        this.mMenuRepository = MenuRepository.get();
+    @Inject
+    public DailyMenuViewModel(MenuRepository menuRepository) {
+        mMenuRepository = menuRepository;
         mSelectedMealIndex.setValue(0);
         setDate(new DateTime());
-
     }
 
     public LiveData<Integer> getSelectedMealIndex() {
