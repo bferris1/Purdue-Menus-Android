@@ -25,8 +25,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 /**
  * Created by Ben on 28/07/2017.
  * The Dagger App Module, Provides dependencies for injection
- * Update: not using dagger fully for initial release
- * in progress: use dagger
  */
 
 @Module(includes = {ViewModelModule.class})
