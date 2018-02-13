@@ -183,8 +183,6 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
         mBinding.setSelectedMealIndex(0);
 
         mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(DailyMenuViewModel.class);
-        mViewModel.setDate(new DateTime());
-        mViewModel.setSelectedMealIndex(DateTimeHelper.getCurrentMealIndex());
         mBinding.setViewModel(mViewModel);
 
 

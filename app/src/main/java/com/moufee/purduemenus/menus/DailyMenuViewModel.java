@@ -7,6 +7,7 @@ import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
 
 import com.moufee.purduemenus.repository.MenuRepository;
+import com.moufee.purduemenus.util.DateTimeHelper;
 import com.moufee.purduemenus.util.Resource;
 
 import org.joda.time.DateTime;
@@ -34,7 +35,7 @@ public class DailyMenuViewModel extends ViewModel {
     @Inject
     public DailyMenuViewModel(MenuRepository menuRepository) {
         mMenuRepository = menuRepository;
-        mSelectedMealIndex.setValue(0);
+        mSelectedMealIndex.setValue(DateTimeHelper.getCurrentMealIndex());
         setDate(new DateTime());
     }
 
