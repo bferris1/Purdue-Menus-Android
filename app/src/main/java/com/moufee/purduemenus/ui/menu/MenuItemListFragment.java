@@ -4,10 +4,12 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -91,11 +93,21 @@ public class MenuItemListFragment extends Fragment {
 
         // Set the adapter
         Context context = view.getContext();
-        mMenuItemRecyclerView = (RecyclerView) view.findViewById(R.id.menu_item_recyclerview);
+        mMenuItemRecyclerView = view.findViewById(R.id.menu_item_recyclerview);
         mNotServingTextView = view.findViewById(R.id.not_serving_textview);
         mMenuItemRecyclerView.setAdapter(mDataBoundAdapter);
-
-        mMenuItemRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(context);
+        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 2);
+            layoutManager = gridLayoutManager;
+            gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                @Override
+                public int getSpanSize(int position) {
+                    return mDataBoundAdapter.isHeader(position) ? 2 : 1;
+                }
+            });
+        }
+        mMenuItemRecyclerView.setLayoutManager(layoutManager);
 
         return view;
     }

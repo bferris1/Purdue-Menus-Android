@@ -72,6 +72,10 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
         return VIEW_TYPE_ITEM;
     }
 
+    public boolean isHeader(int position) {
+        return getItemViewType(position) == VIEW_TYPE_HEADER;
+    }
+
     private MenuItem getMenuItemForPosition(int position) {
         return stations.get(getSectionIndex(position)).getItem(getPositionInSection(position) - 1);
     }
