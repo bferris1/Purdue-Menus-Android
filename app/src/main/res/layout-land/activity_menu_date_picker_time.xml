@@ -195,7 +195,7 @@
                 android:id="@+id/meal_button_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:background="?android:attr/colorBackground"
+                android:background="@drawable/border_right"
                 android:elevation="1dp"
                 android:orientation="vertical"
                 android:paddingBottom="8dp"
@@ -219,7 +219,7 @@
                     android:onClick="@{() -> viewModel.setSelectedMealIndex(0)}"
                     android:text="@string/breakfast"
                     app:selected="@{selectedMealIndex == 0}"
-                    tools:text="Breakfast"/>
+                    tools:text="Breakfast" />
 
                 <Button
                     android:id="@+id/button_lunch"
@@ -233,7 +233,7 @@
                     android:padding="0dp"
                     android:text="@string/lunch"
                     app:selected="@{selectedMealIndex == 1}"
-                    tools:text="Lunch"/>
+                    tools:text="Lunch" />
 
                 <Button
                     android:id="@+id/button_late_lunch"
@@ -251,7 +251,7 @@
                     app:selected="@{selectedMealIndex == 2}"
                     app:visibleGone="@{menu.isLateLunchServed}"
                     tools:text="Late Lunch"
-                    tools:visibility="visible"/>
+                    tools:visibility="visible" />
 
                 <Button
                     android:id="@+id/button_dinner"
@@ -264,7 +264,7 @@
                     android:onClick="@{() -> viewModel.setSelectedMealIndex(3)}"
                     android:text="@string/dinner"
                     app:selected="@{selectedMealIndex == 3}"
-                    tools:text="Dinner"/>
+                    tools:text="Dinner" />
             </LinearLayout>
 
         </android.support.constraint.ConstraintLayout>
