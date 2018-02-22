@@ -21,10 +21,10 @@
         android:entryValues="@array/pref_nightMode_values"/>
 
 
-    <!--<Preference android:title="Log In"
+    <Preference
+        android:title="Log In"
         android:summary="You are not currently logged in."
-        android:key="log_in">
-    </Preference>-->
+        android:key="log_in"></Preference>
 
 
 

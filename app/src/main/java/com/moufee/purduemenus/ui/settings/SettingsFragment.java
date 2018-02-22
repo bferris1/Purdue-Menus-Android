@@ -1,11 +1,14 @@
 package com.moufee.purduemenus.ui.settings;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.annotation.Nullable;
 
 import com.moufee.purduemenus.R;
+import com.moufee.purduemenus.ui.login.LoginActivity;
 
 /**
  * Displays preferences for the app
@@ -38,16 +41,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         addPreferencesFromResource(R.xml.pref_general);
 
 
-//        Preference logInPref = findPreference("log_in");
+        Preference logInPref = findPreference("log_in");
 
-        /*logInPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        logInPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 Intent intent = new Intent(getActivity(), LoginActivity.class);
                 startActivity(intent);
                 return true;
             }
-        });*/
+        });
     }
 
     @Override
