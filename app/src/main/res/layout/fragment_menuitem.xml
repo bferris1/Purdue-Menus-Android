@@ -54,12 +54,14 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
+        android:maxHeight="14sp"
+        android:maxWidth="14sp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:background="@android:color/transparent"
         android:contentDescription="@string/description_favorite_button"
         android:src="@drawable/ic_favorite_24dp"
-        android:visibility="gone"
+        app:visibleGone="@{menuItem.isFavorite}"
         tools:visibility="visible"/>
 
 

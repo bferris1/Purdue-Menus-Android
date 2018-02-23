@@ -10,6 +10,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.moufee.purduemenus.api.Webservice;
+import com.moufee.purduemenus.db.FavoriteDao;
 import com.moufee.purduemenus.util.Resource;
 
 import org.joda.time.DateTime;
@@ -45,15 +46,17 @@ public class UpdateMenuTask implements Runnable {
     private boolean mFetchedFromFile = false;
     private Webservice mWebservice;
     private Gson mGson;
+    private FavoriteDao mFavoriteDao;
     ConnectivityManager mConnectivityManager;
 
 
-    public UpdateMenuTask(MutableLiveData<Resource<FullDayMenu>> liveData, Context context, Webservice webservice, Gson gson) {
+    public UpdateMenuTask(MutableLiveData<Resource<FullDayMenu>> liveData, Context context, Webservice webservice, Gson gson, FavoriteDao favoriteDao) {
         this.mFullMenu = liveData;
         mContext = context;
         mWebservice = webservice;
         mMenuDate = new DateTime();
         mGson = gson;
+        mFavoriteDao = favoriteDao;
         mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
@@ -93,6 +96,24 @@ public class UpdateMenuTask implements Runnable {
                 return true;
         }
         return false;
+    }
+
+    private void processFavorites(List<DiningCourtMenu> menus) {
+        for (int i = 0; i < menus.size(); i++) {
+            DiningCourtMenu diningCourtMenu = menus.get(i);
+            for (int j = 0; j < diningCourtMenu.getMeals().size(); j++) {
+                DiningCourtMenu.Meal meal = diningCourtMenu.getMeals().get(j);
+                for (int k = 0; k < meal.getStations().size(); k++) {
+                    DiningCourtMenu.Station station = meal.getStations().get(k);
+                    for (int l = 0; l < station.getItems().size(); l++) {
+                        MenuItem menuItem = station.getItems().get(l);
+                        if (mFavoriteDao.getFavoriteByItemId(menuItem.getId()) != null) {
+                            menuItem.setFavorite(true);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private ArrayList<DiningCourtMenu> getMenusFromFile(String formattedDate) {
@@ -157,6 +178,8 @@ public class UpdateMenuTask implements Runnable {
 
                     if (tempMenusList.size() == DINING_COURTS.length) {
                         Collections.sort(tempMenusList, new DiningCourtComparator());
+//                        FullDayMenu fullDayMenu = new FullDayMenu(tempMenusList, mMenuDate, hasLateLunch((tempMenusList)));
+                        processFavorites(tempMenusList);
                         mFullMenu.postValue(Resource.success(new FullDayMenu(tempMenusList, mMenuDate, hasLateLunch(tempMenusList))));
                         //save to json
                         try {

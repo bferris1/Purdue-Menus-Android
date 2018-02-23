@@ -3,9 +3,12 @@ package com.moufee.purduemenus.ui.login;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.arch.lifecycle.Observer;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -19,14 +22,18 @@ import android.widget.TextView;
 
 import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.api.Webservice;
+import com.moufee.purduemenus.db.FavoriteDao;
+import com.moufee.purduemenus.menus.Favorite;
 import com.moufee.purduemenus.menus.Favorites;
+import com.moufee.purduemenus.util.AuthHelper;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
 import okhttp3.FormBody;
 import okhttp3.Headers;
-import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -39,13 +46,6 @@ public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
 
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -60,6 +60,10 @@ public class LoginActivity extends AppCompatActivity {
     Webservice mWebservice;
     @Inject
     OkHttpClient mHTTPClient;
+    @Inject
+    SharedPreferences mSharedPreferences;
+    @Inject
+    FavoriteDao mFavoriteDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +95,12 @@ public class LoginActivity extends AppCompatActivity {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+        mFavoriteDao.loadAllFavorites().observe(this, new Observer<List<Favorite>>() {
+            @Override
+            public void onChanged(@Nullable List<Favorite> favorites) {
+                Log.d(TAG, "onChanged: favorites: " + favorites);
+            }
+        });
     }
 
     /**
@@ -193,62 +203,42 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
-            /*try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }*/
-
-            /*for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mUsername)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }*/
 
             try {
 
                 String favoritesURL = "https://api.hfs.purdue.edu/menus/v2/favorites";
-                String ticketURL = "https://www.purdue.edu/apps/account/cas/v1/tickets";
 
-
-                FormBody formBody = new FormBody.Builder()
-                        .add("username", mUsername)
-                        .add("password", mPassword)
-                        .build();
-                Request firstRequest = new Request.Builder()
-                        .url(ticketURL)
-                        .post(formBody)
-                        .build();
+                Request firstRequest = AuthHelper.getTGTRequest(mUsername, mPassword);
 
                 Response response = mHTTPClient.newCall(firstRequest).execute();
                 Log.d(TAG, "doInBackground: code" + response.code());
                 Log.d(TAG, "doInBackground: was successful: " + response.isSuccessful());
-                if (!response.isSuccessful())
+                if (!response.isSuccessful()) {
+                    mSharedPreferences.edit()
+                            .putBoolean("logged_in", false)
+                            .apply();
                     return false;
+                }
+                // otherwise the credentials are valid
+                //todo: store this more securely and use constants for keys
+                mSharedPreferences.edit()
+                        .putBoolean("logged_in", true)
+                        .putString("username", mUsername)
+                        .putString("password", mPassword)
+                        .apply();
                 Headers responseHeaders = response.headers();
                 String location = response.headers().get("Location");
                 Log.d(TAG, "doInBackground: location: " + location);
+
                 if (location == null)
                     return false;
-
-                for (int i = 0; i < responseHeaders.size(); i++) {
-                    Log.d(TAG, responseHeaders.name(i) + ": " + responseHeaders.value(i));
-                }
 
 
                 FormBody ticketRequestBody = new FormBody.Builder()
                         .add("service", favoritesURL)
                         .build();
 
-                Request ticketRequest = new Request.Builder()
-                        .url(location)
-                        .post(ticketRequestBody)
-                        .build();
+                Request ticketRequest = AuthHelper.getTicketRequest(location);
 
                 Response ticketResponse = mHTTPClient.newCall(ticketRequest).execute();
                 if (!ticketResponse.isSuccessful()) {
@@ -259,17 +249,6 @@ public class LoginActivity extends AppCompatActivity {
                 Log.d(TAG, "doInBackground: ticket: " + ticket);
 
 
-                String requestURL = favoritesURL + "?ticket=" + ticket;
-                Log.d(TAG, "doInBackground: request URL: " + requestURL);
-                HttpUrl favoriteHttpUrl = HttpUrl.parse(requestURL);
-                Log.d(TAG, "doInBackground: " + favoriteHttpUrl);
-                Log.d(TAG, "doInBackground: params: " + favoriteHttpUrl.queryParameter("ticket"));
-                Request favoritesRequest = new Request.Builder()
-                        .get()
-                        .url(favoriteHttpUrl)
-                        .addHeader("Accept", "text/json")
-                        .build();
-
                 Call favoritesCall = mWebservice.getFavorites(ticket);
                 Log.d(TAG, "doInBackground: favoritesCall: " + favoritesCall.request().toString());
                 retrofit2.Response<Favorites> favoritesResponse = mWebservice.getFavorites(ticket).execute();
@@ -277,6 +256,9 @@ public class LoginActivity extends AppCompatActivity {
                     Favorites favorites = favoritesResponse.body();
                     if (favorites == null)
                         Log.d(TAG, "doInBackground: favorites were null!");
+                    else {
+                        mFavoriteDao.insertFavorites(favorites.getFavorites());
+                    }
 
                     Log.d(TAG, "doInBackground: favorites: " + favorites.getFavorites());
                 } else {

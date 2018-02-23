@@ -1,6 +1,7 @@
 package com.moufee.purduemenus.di;
 
 import android.app.Application;
+import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -11,6 +12,8 @@ import com.google.gson.GsonBuilder;
 import com.moufee.purduemenus.api.ApiCookieJar;
 import com.moufee.purduemenus.api.LocalTimeTypeConverter;
 import com.moufee.purduemenus.api.Webservice;
+import com.moufee.purduemenus.db.AppDatabase;
+import com.moufee.purduemenus.db.FavoriteDao;
 import com.moufee.purduemenus.util.AppExecutors;
 
 import org.joda.time.LocalTime;
@@ -71,5 +74,18 @@ class AppModule {
     @Provides
     Context provideContext(Application application) {
         return application.getApplicationContext();
+    }
+
+    @Singleton
+    @Provides
+    AppDatabase provideAppDatabase(Context applicationContext) {
+        return Room.databaseBuilder(applicationContext, AppDatabase.class, "menus-database")
+                .build();
+    }
+
+    @Singleton
+    @Provides
+    FavoriteDao provideFavoriteDao(AppDatabase appDatabase) {
+        return appDatabase.favoriteDao();
     }
 }

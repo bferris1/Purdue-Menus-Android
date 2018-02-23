@@ -6,6 +6,7 @@ import android.content.Context;
 
 import com.google.gson.Gson;
 import com.moufee.purduemenus.api.Webservice;
+import com.moufee.purduemenus.db.FavoriteDao;
 import com.moufee.purduemenus.menus.FullDayMenu;
 import com.moufee.purduemenus.menus.UpdateMenuTask;
 import com.moufee.purduemenus.util.AppExecutors;
@@ -32,13 +33,15 @@ public class MenuRepository {
     private Gson mGson;
     private Context mApplicationContext;
     private AppExecutors mAppExecutors;
+    private FavoriteDao mFavoriteDao;
 
     @Inject
-    public MenuRepository(Webservice webservice, Gson gson, Context applicationContext, AppExecutors appExecutors) {
+    public MenuRepository(Webservice webservice, Gson gson, Context applicationContext, AppExecutors appExecutors, FavoriteDao favoriteDao) {
         mWebservice = webservice;
         mGson = gson;
         mApplicationContext = applicationContext;
         mAppExecutors = appExecutors;
+        mFavoriteDao = favoriteDao;
     }
 
     public LiveData<Resource<FullDayMenu>> getMenus() {
@@ -48,7 +51,7 @@ public class MenuRepository {
 
     public LiveData<Resource<FullDayMenu>> getMenus(DateTime dateTime) {
         MutableLiveData<Resource<FullDayMenu>> data = new MutableLiveData<>();
-        UpdateMenuTask task = new UpdateMenuTask(data, mApplicationContext, mWebservice, mGson).withDate(dateTime);
+        UpdateMenuTask task = new UpdateMenuTask(data, mApplicationContext, mWebservice, mGson, mFavoriteDao).withDate(dateTime);
         mAppExecutors.diskIO().execute(task);
         return data;
     }

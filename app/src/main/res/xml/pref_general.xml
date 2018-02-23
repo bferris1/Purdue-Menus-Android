@@ -22,9 +22,9 @@
 
 
     <Preference
-        android:title="Log In"
-        android:summary="You are not currently logged in."
-        android:key="log_in"></Preference>
+        android:title="@string/pref_log_in"
+        android:summary="@string/pref_summary_not_logged_in"
+        android:key="log_in" />
 
 
 
