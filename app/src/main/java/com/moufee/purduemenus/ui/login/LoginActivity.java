@@ -13,29 +13,30 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.moufee.purduemenus.R;
+import com.moufee.purduemenus.api.Webservice;
+import com.moufee.purduemenus.menus.Favorites;
 
+import javax.inject.Inject;
+
+import dagger.android.AndroidInjection;
 import okhttp3.FormBody;
 import okhttp3.Headers;
-import okhttp3.MediaType;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import retrofit2.Call;
 
 /**
- * A login screen that offers login via email/password.
+ * A login screen that offers login via username/password.
  */
 public class LoginActivity extends AppCompatActivity {
 
-    /**
-     * Id to identity READ_CONTACTS permission request.
-     */
-    private static final int REQUEST_READ_CONTACTS = 0;
     private static final String TAG = "LoginActivity";
 
     /**
@@ -51,23 +52,28 @@ public class LoginActivity extends AppCompatActivity {
     private UserLoginTask mAuthTask = null;
 
     // UI references.
-    private AutoCompleteTextView mEmailView;
+    private EditText mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    @Inject
+    Webservice mWebservice;
+    @Inject
+    OkHttpClient mHTTPClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         // Set up the login form.
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        mEmailView = findViewById(R.id.username);
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
+                if (id == R.integer.login_id || id == EditorInfo.IME_NULL) {
                     attemptLogin();
                     return true;
                 }
@@ -108,9 +114,9 @@ public class LoginActivity extends AppCompatActivity {
         boolean cancel = false;
         View focusView = null;
 
-        // Check for a valid password
-        if (!isPasswordValid(password)) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
+        // Check that password is entered
+        if (TextUtils.isEmpty(password)) {
+            mPasswordView.setError(getString(R.string.error_field_required));
             focusView = mPasswordView;
             cancel = true;
         }
@@ -133,11 +139,6 @@ public class LoginActivity extends AppCompatActivity {
             mAuthTask = new UserLoginTask(email, password);
             mAuthTask.execute((Void) null);
         }
-    }
-
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
     }
 
     /**
@@ -182,11 +183,11 @@ public class LoginActivity extends AppCompatActivity {
      */
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
-        private final String mEmail;
+        private final String mUsername;
         private final String mPassword;
 
         UserLoginTask(String email, String password) {
-            mEmail = email;
+            mUsername = email;
             mPassword = password;
         }
 
@@ -194,50 +195,98 @@ public class LoginActivity extends AppCompatActivity {
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
 
-            try {
+            /*try {
                 // Simulate network access.
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 return false;
-            }
+            }*/
 
-            for (String credential : DUMMY_CREDENTIALS) {
+            /*for (String credential : DUMMY_CREDENTIALS) {
                 String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
+                if (pieces[0].equals(mUsername)) {
                     // Account exists, return true if the password matches.
                     return pieces[1].equals(mPassword);
                 }
-            }
+            }*/
 
             try {
-                OkHttpClient httpClient = new OkHttpClient();
-                Headers loginHeaders = new Headers.Builder()
-                        .add("User-Agent","Purdue Menus Android/2.1")
-                        .add("Accept-Encoding","gzip")
-                        .build();
 
-                MediaType contentType = MediaType.parse("application/x-www-form-urlencoded");
+                String favoritesURL = "https://api.hfs.purdue.edu/menus/v2/favorites";
+                String ticketURL = "https://www.purdue.edu/apps/account/cas/v1/tickets";
+
+
                 FormBody formBody = new FormBody.Builder()
-                        .add("username", mEmail)
+                        .add("username", mUsername)
                         .add("password", mPassword)
                         .build();
                 Request firstRequest = new Request.Builder()
-                        .url("https://www.purdue.edu/apps/account/cas/v1/tickets")
-                        .addHeader("User-Agent","Purdue Menus Android/2.1")
-                        .addHeader("Accept-Encoding","gzip")
+                        .url(ticketURL)
                         .post(formBody)
                         .build();
 
-                Response response = httpClient.newCall(firstRequest).execute();
-                Log.d(TAG, "doInBackground: code"+ response.code());
-                Log.d(TAG, "doInBackground: was successful: "+response.isSuccessful());
+                Response response = mHTTPClient.newCall(firstRequest).execute();
+                Log.d(TAG, "doInBackground: code" + response.code());
+                Log.d(TAG, "doInBackground: was successful: " + response.isSuccessful());
                 if (!response.isSuccessful())
                     return false;
                 Headers responseHeaders = response.headers();
-                Log.d(TAG, "doInBackground: location: "+response.headers().get("Location"));
+                String location = response.headers().get("Location");
+                Log.d(TAG, "doInBackground: location: " + location);
+                if (location == null)
+                    return false;
+
                 for (int i = 0; i < responseHeaders.size(); i++) {
                     Log.d(TAG, responseHeaders.name(i) + ": " + responseHeaders.value(i));
                 }
+
+
+                FormBody ticketRequestBody = new FormBody.Builder()
+                        .add("service", favoritesURL)
+                        .build();
+
+                Request ticketRequest = new Request.Builder()
+                        .url(location)
+                        .post(ticketRequestBody)
+                        .build();
+
+                Response ticketResponse = mHTTPClient.newCall(ticketRequest).execute();
+                if (!ticketResponse.isSuccessful()) {
+                    Log.d(TAG, "doInBackground: Ticket response not successful");
+                    return false;
+                }
+                String ticket = ticketResponse.body().string().trim();
+                Log.d(TAG, "doInBackground: ticket: " + ticket);
+
+
+                String requestURL = favoritesURL + "?ticket=" + ticket;
+                Log.d(TAG, "doInBackground: request URL: " + requestURL);
+                HttpUrl favoriteHttpUrl = HttpUrl.parse(requestURL);
+                Log.d(TAG, "doInBackground: " + favoriteHttpUrl);
+                Log.d(TAG, "doInBackground: params: " + favoriteHttpUrl.queryParameter("ticket"));
+                Request favoritesRequest = new Request.Builder()
+                        .get()
+                        .url(favoriteHttpUrl)
+                        .addHeader("Accept", "text/json")
+                        .build();
+
+                Call favoritesCall = mWebservice.getFavorites(ticket);
+                Log.d(TAG, "doInBackground: favoritesCall: " + favoritesCall.request().toString());
+                retrofit2.Response<Favorites> favoritesResponse = mWebservice.getFavorites(ticket).execute();
+                if (favoritesResponse.isSuccessful()) {
+                    Favorites favorites = favoritesResponse.body();
+                    if (favorites == null)
+                        Log.d(TAG, "doInBackground: favorites were null!");
+
+                    Log.d(TAG, "doInBackground: favorites: " + favorites.getFavorites());
+                } else {
+                    Log.d(TAG, "doInBackground: favorites call not successful!");
+                    Log.d(TAG, "doInBackground: " + favoritesResponse.code());
+                    Log.d(TAG, "doInBackground: " + favoritesResponse.errorBody().string());
+                    Log.d(TAG, "doInBackground: " + favoritesResponse.raw().toString());
+                }
+
+
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: http error", e);
                 return false;

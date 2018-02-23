@@ -29,4 +29,9 @@ public class Favorite {
     public Boolean isVegetarian() {
         return isVegetarian;
     }
+
+    @Override
+    public String toString() {
+        return itemName;
+    }
 }

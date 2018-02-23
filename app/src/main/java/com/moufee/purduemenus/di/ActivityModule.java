@@ -1,5 +1,6 @@
 package com.moufee.purduemenus.di;
 
+import com.moufee.purduemenus.ui.login.LoginActivity;
 import com.moufee.purduemenus.ui.menu.MenuActivity;
 import com.moufee.purduemenus.ui.settings.SettingsActivity;
 
@@ -17,4 +18,7 @@ public abstract class ActivityModule {
 
     @ContributesAndroidInjector
     abstract SettingsActivity contributeSettingsActivity();
+
+    @ContributesAndroidInjector
+    abstract LoginActivity contributeLoginActivity();
 }

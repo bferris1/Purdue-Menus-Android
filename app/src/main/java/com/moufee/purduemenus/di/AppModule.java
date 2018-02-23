@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.moufee.purduemenus.api.ApiCookieJar;
 import com.moufee.purduemenus.api.LocalTimeTypeConverter;
 import com.moufee.purduemenus.api.Webservice;
 import com.moufee.purduemenus.util.AppExecutors;
@@ -32,9 +33,10 @@ class AppModule {
 
     @Singleton
     @Provides
-    Webservice provideWebService(AppExecutors executors, Gson gson) {
+    Webservice provideWebService(AppExecutors executors, Gson gson, OkHttpClient client) {
         return new Retrofit.Builder()
                 .baseUrl("https://api.hfs.purdue.edu")
+                .client(client)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .callbackExecutor(executors.diskIO())
                 .build()
@@ -52,9 +54,11 @@ class AppModule {
 
     @Singleton
     @Provides
-    OkHttpClient provideHttpClient() {
+    OkHttpClient provideHttpClient(ApiCookieJar cookieJar) {
         //todo: restore cookies or not?
-        return new OkHttpClient();
+        return new OkHttpClient.Builder()
+                .cookieJar(cookieJar)
+                .build();
     }
 
     @Singleton
