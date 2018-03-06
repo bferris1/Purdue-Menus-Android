@@ -14,6 +14,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatDelegate;
 
+import com.moufee.purduemenus.repository.FavoritesRepository;
 import com.moufee.purduemenus.util.SingleFragmentActivity;
 
 import javax.inject.Inject;
@@ -30,6 +31,9 @@ public class SettingsActivity extends SingleFragmentActivity implements SharedPr
 
     @Inject
     SharedPreferences sharedPreferences;
+
+    @Inject
+    FavoritesRepository mFavoritesRepository;
 
 
     @Override
@@ -99,6 +103,11 @@ public class SettingsActivity extends SingleFragmentActivity implements SharedPr
                         }
                     }
                     break;
+            }
+        } else if (key.equals(SettingsFragment.KEY_PREF_LOGGED_IN)) {
+            boolean loggedIn = sharedPreferences.getBoolean(key, false);
+            if (!loggedIn) {
+                mFavoritesRepository.clearLocalFavorites();
             }
         }
     }
