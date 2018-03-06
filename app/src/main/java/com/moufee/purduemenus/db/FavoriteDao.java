@@ -16,11 +16,20 @@ public interface FavoriteDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public void insertFavorites(List<Favorite> favorites);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    public void insertFavorites(Favorite... favorites);
+
     @Query("SELECT * FROM favorite")
     public LiveData<List<Favorite>> loadAllFavorites();
 
+    @Query("SELECT itemId FROM favorite")
+    public LiveData<List<String>> getFavoriteIDs();
+
     @Query("SELECT * FROM favorite WHERE itemId = :itemID LIMIT 1")
     public Favorite getFavoriteByItemId(String itemID);
+
+    @Query("DELETE FROM favorite WHERE itemId = :itemID")
+    public void deleteByItemID(String itemID);
 
     @Delete
     public void deleteFavorites(Favorite... favorites);
