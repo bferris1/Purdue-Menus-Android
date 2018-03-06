@@ -47,7 +47,7 @@ public class UpdateMenuTask implements Runnable {
     private Webservice mWebservice;
     private Gson mGson;
     private FavoriteDao mFavoriteDao;
-    ConnectivityManager mConnectivityManager;
+    private ConnectivityManager mConnectivityManager;
 
 
     public UpdateMenuTask(MutableLiveData<Resource<FullDayMenu>> liveData, Context context, Webservice webservice, Gson gson, FavoriteDao favoriteDao) {
@@ -74,7 +74,7 @@ public class UpdateMenuTask implements Runnable {
             mFullMenu.postValue(Resource.success(new FullDayMenu(fileMenus, mMenuDate, hasLateLunch(fileMenus))));
             Log.d(TAG, "getFullMenu: Read from file!");
         } else {
-            mFullMenu.postValue(Resource.<FullDayMenu>loading(null));
+            mFullMenu.postValue(Resource.loading(null));
         }
         if (fileMenus == null || shouldFetch()) {
             fetchFromNetwork();
@@ -162,7 +162,7 @@ public class UpdateMenuTask implements Runnable {
             if (mFetchedFromFile)
                 return;
             else
-                mFullMenu.postValue(Resource.<FullDayMenu>error("Not connected to network", null));
+                mFullMenu.postValue(Resource.error("Not connected to network", null));
             return;
         }
         //this is similar to the initial implementation from the architecture components guide
@@ -178,8 +178,6 @@ public class UpdateMenuTask implements Runnable {
 
                     if (tempMenusList.size() == DINING_COURTS.length) {
                         Collections.sort(tempMenusList, new DiningCourtComparator());
-//                        FullDayMenu fullDayMenu = new FullDayMenu(tempMenusList, mMenuDate, hasLateLunch((tempMenusList)));
-                        processFavorites(tempMenusList);
                         mFullMenu.postValue(Resource.success(new FullDayMenu(tempMenusList, mMenuDate, hasLateLunch(tempMenusList))));
                         //save to json
                         try {
@@ -187,7 +185,7 @@ public class UpdateMenuTask implements Runnable {
 
                         } catch (IOException e) {
                             Log.e(TAG, "onResponse: error saving to file ", e);
-                            mFullMenu.postValue(Resource.<FullDayMenu>error(e.getMessage() != null ? e.getMessage() : "an error occurred while saving to file", null));
+                            mFullMenu.postValue(Resource.error(e.getMessage() != null ? e.getMessage() : "an error occurred while saving to file", null));
                         }
                     }
                 }
@@ -199,7 +197,7 @@ public class UpdateMenuTask implements Runnable {
                     if (mFullMenu.getValue() != null)
                         mFullMenu.postValue(Resource.error("Network Error", mFullMenu.getValue().data));
                     else
-                        mFullMenu.postValue(Resource.<FullDayMenu>error(t.getMessage(), null));
+                        mFullMenu.postValue(Resource.error(t.getMessage(), null));
                 }
             });
 
