@@ -25,13 +25,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private SharedPreferences mSharedPreferences;
     private Preference mLoginPref;
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
-//        updateLoginPreference();
-    }
-
 
     @Override
     public void onDestroy() {
@@ -51,41 +44,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         updateLoginPreference();
-        if (mSharedPreferences.getBoolean("logged_in", false)) {
-            setLogoutClick();
-        } else {
-            setLoginClick();
-        }
-    }
 
-    private void updateLoginPreference() {
-        boolean isLoggedIn = mSharedPreferences.getBoolean("logged_in", false);
-        if (isLoggedIn) {
-            mLoginPref.setTitle("Sign Out");
-            mLoginPref.setSummary("You are signed in as " + mSharedPreferences.getString("username", "user"));
-            setLogoutClick();
-        } else {
-            mLoginPref.setTitle(R.string.action_login);
-            mLoginPref.setSummary(R.string.pref_summary_not_logged_in);
-            setLoginClick();
-        }
-    }
-
-    private void setLoginClick() {
-        mLoginPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                Intent intent = new Intent(getActivity(), LoginActivity.class);
-                startActivity(intent);
-                return true;
-            }
-        });
-    }
-
-    private void setLogoutClick() {
-        mLoginPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
+        mLoginPref.setOnPreferenceClickListener(preference -> {
+            boolean isLoggedIn = mSharedPreferences.getBoolean("logged_in", false);
+            if (isLoggedIn) {
                 mSharedPreferences
                         .edit()
                         .putBoolean(KEY_PREF_LOGGED_IN, false)
@@ -93,9 +55,28 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                         .putString("password", null)
                         .apply();
                 return true;
+            } else {
+                Intent intent = new Intent(getActivity(), LoginActivity.class);
+                startActivity(intent);
+                return true;
             }
         });
+
+        mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
+
     }
+
+    private void updateLoginPreference() {
+        boolean isLoggedIn = mSharedPreferences.getBoolean("logged_in", false);
+        if (isLoggedIn) {
+            mLoginPref.setTitle("Sign Out");
+            mLoginPref.setSummary("You are signed in as " + mSharedPreferences.getString("username", "user"));
+        } else {
+            mLoginPref.setTitle(R.string.action_login);
+            mLoginPref.setSummary(R.string.pref_summary_not_logged_in);
+        }
+    }
+
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
