@@ -1,10 +1,12 @@
 package com.moufee.purduemenus.menus;
 
 import android.support.annotation.Keep;
+import android.support.annotation.Nullable;
 
 import org.joda.time.LocalTime;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 /**
  * Mirrors JSON structure from API to allow easy deserialization
@@ -92,6 +94,23 @@ public class DiningCourtMenu {
 
         public Hours getHours() {
             return hours;
+        }
+
+        public int getNumFavorites(@Nullable Set<String> favoriteIDs) {
+
+            if (favoriteIDs == null)
+                return 0;
+
+            int count = 0;
+            for (Station station :
+                    stations) {
+                for (MenuItem item :
+                        station.items) {
+                    if (favoriteIDs.contains(item.getId()))
+                        count++;
+                }
+            }
+            return count;
         }
 
         public ArrayList<Station> getStations() {
