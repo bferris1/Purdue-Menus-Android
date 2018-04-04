@@ -3,37 +3,27 @@ package com.moufee.purduemenus.ui.login;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.arch.lifecycle.Observer;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.api.Webservice;
 import com.moufee.purduemenus.db.FavoriteDao;
-import com.moufee.purduemenus.menus.Favorite;
 import com.moufee.purduemenus.menus.Favorites;
 import com.moufee.purduemenus.util.AuthHelper;
-
-import java.util.List;
 
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
-import okhttp3.FormBody;
-import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -74,33 +64,19 @@ public class LoginActivity extends AppCompatActivity {
         mEmailView = findViewById(R.id.username);
 
         mPasswordView = (EditText) findViewById(R.id.password);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.integer.login_id || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
-                }
-                return false;
+        mPasswordView.setOnEditorActionListener((textView, id, keyEvent) -> {
+            if (id == R.integer.login_id || id == EditorInfo.IME_NULL) {
+                attemptLogin();
+                return true;
             }
+            return false;
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                attemptLogin();
-            }
-        });
+        Button mEmailSignInButton = findViewById(R.id.email_sign_in_button);
+        mEmailSignInButton.setOnClickListener(view -> attemptLogin());
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-        mFavoriteDao.loadAllFavorites().observe(this, new Observer<List<Favorite>>() {
-            @Override
-            public void onChanged(@Nullable List<Favorite> favorites) {
-                Log.d(TAG, "onChanged: favorites: " + favorites);
-            }
-        });
     }
 
     /**
@@ -206,8 +182,6 @@ public class LoginActivity extends AppCompatActivity {
 
             try {
 
-                String favoritesURL = "https://api.hfs.purdue.edu/menus/v2/favorites";
-
                 Request firstRequest = AuthHelper.getTGTRequest(mUsername, mPassword);
 
                 Response response = mHTTPClient.newCall(firstRequest).execute();
@@ -226,17 +200,12 @@ public class LoginActivity extends AppCompatActivity {
                         .putString("username", mUsername)
                         .putString("password", mPassword)
                         .apply();
-                Headers responseHeaders = response.headers();
                 String location = response.headers().get("Location");
                 Log.d(TAG, "doInBackground: location: " + location);
 
                 if (location == null)
                     return false;
 
-
-                FormBody ticketRequestBody = new FormBody.Builder()
-                        .add("service", favoritesURL)
-                        .build();
 
                 Request ticketRequest = AuthHelper.getTicketRequest(location);
 
@@ -274,7 +243,6 @@ public class LoginActivity extends AppCompatActivity {
                 return false;
             }
 
-            // TODO: register the new account here.
             return true;
         }
 
