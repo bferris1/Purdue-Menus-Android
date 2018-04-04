@@ -68,10 +68,17 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
     private SharedPreferences.OnSharedPreferenceChangeListener mSharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (key.equals(SettingsActivity.KEY_PREF_SHOW_SERVING_TIMES))
-                updateServingTime();
-            else if (key.equals(SettingsActivity.KEY_PREF_USE_NIGHT_MODE))
-                recreate();
+            switch (key) {
+                case SettingsActivity.KEY_PREF_SHOW_SERVING_TIMES:
+                    updateServingTime();
+                    break;
+                case SettingsActivity.KEY_PREF_USE_NIGHT_MODE:
+                    recreate();
+                    break;
+                case SettingsActivity.KEY_PREF_SHOW_FAVORITE_COUNT:
+                    mMenuPagerAdapter.setShowFavoriteCount(mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_SHOW_FAVORITE_COUNT, true));
+                    break;
+            }
         }
     };
 
@@ -184,6 +191,7 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         mMenuPagerAdapter = new MenuPagerAdapter(fragmentManager);
+        mMenuPagerAdapter.setShowFavoriteCount(mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_SHOW_FAVORITE_COUNT, true));
         mBinding.menuViewPager.setAdapter(mMenuPagerAdapter);
 
         tabLayout.setupWithViewPager(mBinding.menuViewPager);

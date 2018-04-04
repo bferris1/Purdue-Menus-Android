@@ -19,6 +19,7 @@ public class MenuPagerAdapter extends FragmentStatePagerAdapter {
     private List<DiningCourtMenu> diningCourtMenus = new ArrayList<>();
     private int mealIndex;
     private Set<String> mFavoritesSet;
+    private boolean mShowFavoriteCount = true;
 
     public void setFavoritesSet(Set<String> favoritesSet) {
         mFavoritesSet = favoritesSet;
@@ -39,6 +40,11 @@ public class MenuPagerAdapter extends FragmentStatePagerAdapter {
         notifyDataSetChanged();
     }
 
+    public void setShowFavoriteCount(boolean showFavoriteCount) {
+        mShowFavoriteCount = showFavoriteCount;
+        notifyDataSetChanged();
+    }
+
     @Override
     public Fragment getItem(int position) {
         return MenuItemListFragment.newInstance(position, mealIndex);
@@ -52,7 +58,7 @@ public class MenuPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         String title = diningCourtMenus.get(position).getLocation();
-        if (mFavoritesSet == null || mFavoritesSet.isEmpty())
+        if (!mShowFavoriteCount || mFavoritesSet == null || mFavoritesSet.isEmpty())
             return title;
 
         int numFavorites = 0;
