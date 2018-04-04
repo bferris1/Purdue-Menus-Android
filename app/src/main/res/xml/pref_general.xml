@@ -31,6 +31,10 @@
         android:summary="@string/pref_summary_not_logged_in"
         android:key="log_in" />
 
+    <!--<Preference
+        android:title="Clear Favorites"
+        android:key="clear_favorites"/>-->
+
 
 
 </PreferenceScreen>

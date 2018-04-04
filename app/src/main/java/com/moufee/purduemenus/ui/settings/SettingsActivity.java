@@ -105,11 +105,6 @@ public class SettingsActivity extends SingleFragmentActivity implements SharedPr
                     }
                     break;
             }
-        } else if (key.equals(SettingsFragment.KEY_PREF_LOGGED_IN)) {
-            boolean loggedIn = sharedPreferences.getBoolean(key, false);
-            if (!loggedIn) {
-                mFavoritesRepository.clearLocalFavorites();
-            }
         }
     }
 
