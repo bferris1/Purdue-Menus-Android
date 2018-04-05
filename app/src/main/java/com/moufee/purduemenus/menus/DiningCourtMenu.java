@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import org.joda.time.LocalTime;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -102,12 +103,15 @@ public class DiningCourtMenu {
                 return 0;
 
             int count = 0;
+            Set<String> countedFavorites = new HashSet<>();
             for (Station station :
                     stations) {
                 for (MenuItem item :
                         station.items) {
-                    if (favoriteIDs.contains(item.getId()))
+                    if (favoriteIDs.contains(item.getId()) && !countedFavorites.contains(item.getId())) {
                         count++;
+                        countedFavorites.add(item.getId());
+                    }
                 }
             }
             return count;
