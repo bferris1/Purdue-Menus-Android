@@ -67,11 +67,8 @@
     <string name="pref_log_in">Log In</string>
     <string name="pref_summary_not_logged_in">You are not currently logged in.</string>
     <string name="pref_title_show_favorite_count">Show Favorite Counts</string>
-    <string name="login_details">
-        When you are logged in, the app will attempt to keep your
-        favorites synchronized with the Purdue favorites system.
-    </string>
-    <string name="hint_purdue_username">Purdue Username</string>
+    <string name="login_details">When you are logged in, the app will attempt to keep your favorites synchronized with the Purdue favorites system.</string>
+    <string name="hint_purdue_username" translatable="false">Purdue Username</string>
 
 
 </resources>

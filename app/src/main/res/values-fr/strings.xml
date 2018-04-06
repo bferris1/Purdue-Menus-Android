@@ -32,11 +32,13 @@
     <string name="title_activity_login">Inscrivez-vous</string>
     <string name="data_unavailable">Indisponible</string>
     <string name="network_error_message">Il y a eu une erreur de réseau</string>
-    <string name="pref_show_serving_times">Montrer les temps de service</string>
+    <string name="pref_show_serving_times">Afficher les temps de service</string>
     <string name="late_lunch">Déjeuner tard</string>
     <string name="on">Activé</string>
     <string name="off">Desactivé</string>
     <string name="auto">Automatique</string>
     <string name="pref_log_in">Se connecter</string>
     <string name="pref_summary_not_logged_in">Vous n\'êtes pas connecté</string>
+    <string name="pref_title_show_favorite_count">Afficher les comptes des favoris</string>
+    <string name="login_details">Lorsque vous êtes connecté, l\'application tente de synchroniser vos favoris avec le système de favoris Purdue.</string>
 </resources>
