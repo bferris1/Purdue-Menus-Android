@@ -9,7 +9,9 @@ import com.moufee.purduemenus.databinding.StationHeaderBinding;
 import com.moufee.purduemenus.ui.menu.MenuItemHolder;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Ben on 9/7/17.
@@ -19,10 +21,21 @@ import java.util.List;
 public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<DiningCourtMenu.Station> stations = new ArrayList<>();
+    private Set<String> mFavoriteSet = new HashSet<>();
     private int totalItems = 0;
+    private OnToggleFavoriteListener mFavoriteListener;
 
     private final static int VIEW_TYPE_HEADER = 0;
     private final static int VIEW_TYPE_ITEM = 1;
+
+    public MenuRecyclerViewAdapter(OnToggleFavoriteListener favoriteListener) {
+        mFavoriteListener = favoriteListener;
+    }
+
+    public void setFavoriteSet(Set<String> favoriteSet) {
+        mFavoriteSet = favoriteSet;
+        notifyDataSetChanged();
+    }
 
     public void setStations(List<DiningCourtMenu.Station> stations) {
         this.stations = stations;
@@ -56,7 +69,8 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
             stationHolder.bind(stations.get(getSectionIndex(position)));
         } else {
             MenuItemHolder itemHolder = (MenuItemHolder) holder;
-            itemHolder.bind(getMenuItemForPosition(position));
+            MenuItem item = getMenuItemForPosition(position);
+            itemHolder.bind(item, mFavoriteListener, mFavoriteSet.contains(item.getId()));
         }
     }
 

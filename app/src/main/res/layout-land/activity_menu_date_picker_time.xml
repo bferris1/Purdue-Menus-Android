@@ -4,35 +4,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     >
-
     <data>
-
         <import type="com.moufee.purduemenus.util.Resource"/>
-
-        <import type="com.moufee.purduemenus.menus.FullDayMenu"/>
-
         <import type="com.moufee.purduemenus.util.Status"/>
-
         <variable
             name="selectedMealIndex"
             type="int"/>
-
         <variable
             name="viewModel"
             type="com.moufee.purduemenus.menus.DailyMenuViewModel"/>
-
         <variable
             name="menusResource"
             type="com.moufee.purduemenus.util.Resource"/>
-
         <variable
             name="menu"
-            type="FullDayMenu"/>
-
+            type="com.moufee.purduemenus.menus.FullDayMenu" />
         <variable
             name="showServingTimes"
             type="boolean"/>
-
 
     </data>
 

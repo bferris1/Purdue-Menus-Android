@@ -6,7 +6,6 @@
     >
     <data>
         <import type="com.moufee.purduemenus.util.Resource"/>
-        <import type="com.moufee.purduemenus.menus.FullDayMenu"/>
         <import type="com.moufee.purduemenus.util.Status"/>
         <variable
             name="selectedMealIndex"
@@ -19,11 +18,10 @@
             type="com.moufee.purduemenus.util.Resource"/>
         <variable
             name="menu"
-            type="FullDayMenu"/>
+            type="com.moufee.purduemenus.menus.FullDayMenu" />
         <variable
             name="showServingTimes"
             type="boolean"/>
-
 
     </data>
     <android.support.design.widget.CoordinatorLayout

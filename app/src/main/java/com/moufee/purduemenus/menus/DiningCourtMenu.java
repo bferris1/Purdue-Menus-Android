@@ -1,10 +1,13 @@
 package com.moufee.purduemenus.menus;
 
 import android.support.annotation.Keep;
+import android.support.annotation.Nullable;
 
 import org.joda.time.LocalTime;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Mirrors JSON structure from API to allow easy deserialization
@@ -92,6 +95,26 @@ public class DiningCourtMenu {
 
         public Hours getHours() {
             return hours;
+        }
+
+        public int getNumFavorites(@Nullable Set<String> favoriteIDs) {
+
+            if (favoriteIDs == null)
+                return 0;
+
+            int count = 0;
+            Set<String> countedFavorites = new HashSet<>();
+            for (Station station :
+                    stations) {
+                for (MenuItem item :
+                        station.items) {
+                    if (favoriteIDs.contains(item.getId()) && !countedFavorites.contains(item.getId())) {
+                        count++;
+                        countedFavorites.add(item.getId());
+                    }
+                }
+            }
+            return count;
         }
 
         public ArrayList<Station> getStations() {

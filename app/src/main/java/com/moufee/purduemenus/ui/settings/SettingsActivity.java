@@ -14,6 +14,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatDelegate;
 
+import com.moufee.purduemenus.repository.FavoritesRepository;
 import com.moufee.purduemenus.util.SingleFragmentActivity;
 
 import javax.inject.Inject;
@@ -27,9 +28,13 @@ import dagger.android.AndroidInjection;
 public class SettingsActivity extends SingleFragmentActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     public static final String KEY_PREF_SHOW_SERVING_TIMES = "show_serving_times";
     public static final String KEY_PREF_USE_NIGHT_MODE = "night_mode";
+    public static final String KEY_PREF_SHOW_FAVORITE_COUNT = "show_favorite_count";
 
     @Inject
     SharedPreferences sharedPreferences;
+
+    @Inject
+    FavoritesRepository mFavoritesRepository;
 
 
     @Override

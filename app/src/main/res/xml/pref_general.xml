@@ -12,6 +12,11 @@
         android:key="show_serving_times"
         android:title="@string/pref_show_serving_times"/>
 
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="show_favorite_count"
+        android:title="@string/pref_title_show_favorite_count" />
+
     <ListPreference
         android:title="Night Mode"
         android:key="night_mode"
@@ -21,10 +26,14 @@
         android:entryValues="@array/pref_nightMode_values"/>
 
 
-    <!--<Preference android:title="Log In"
-        android:summary="You are not currently logged in."
-        android:key="log_in">
-    </Preference>-->
+    <Preference
+        android:title="@string/pref_log_in"
+        android:summary="@string/pref_summary_not_logged_in"
+        android:key="log_in" />
+
+    <!--<Preference
+        android:title="Clear Favorites"
+        android:key="clear_favorites"/>-->
 
 
 

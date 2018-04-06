@@ -10,6 +10,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.moufee.purduemenus.api.Webservice;
+import com.moufee.purduemenus.db.FavoriteDao;
 import com.moufee.purduemenus.util.Resource;
 
 import org.joda.time.DateTime;
@@ -45,15 +46,17 @@ public class UpdateMenuTask implements Runnable {
     private boolean mFetchedFromFile = false;
     private Webservice mWebservice;
     private Gson mGson;
-    ConnectivityManager mConnectivityManager;
+    private FavoriteDao mFavoriteDao;
+    private ConnectivityManager mConnectivityManager;
 
 
-    public UpdateMenuTask(MutableLiveData<Resource<FullDayMenu>> liveData, Context context, Webservice webservice, Gson gson) {
+    public UpdateMenuTask(MutableLiveData<Resource<FullDayMenu>> liveData, Context context, Webservice webservice, Gson gson, FavoriteDao favoriteDao) {
         this.mFullMenu = liveData;
         mContext = context;
         mWebservice = webservice;
         mMenuDate = new DateTime();
         mGson = gson;
+        mFavoriteDao = favoriteDao;
         mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
@@ -71,7 +74,7 @@ public class UpdateMenuTask implements Runnable {
             mFullMenu.postValue(Resource.success(new FullDayMenu(fileMenus, mMenuDate, hasLateLunch(fileMenus))));
             Log.d(TAG, "getFullMenu: Read from file!");
         } else {
-            mFullMenu.postValue(Resource.<FullDayMenu>loading(null));
+            mFullMenu.postValue(Resource.loading(null));
         }
         if (fileMenus == null || shouldFetch()) {
             fetchFromNetwork();
@@ -93,6 +96,24 @@ public class UpdateMenuTask implements Runnable {
                 return true;
         }
         return false;
+    }
+
+    private void processFavorites(List<DiningCourtMenu> menus) {
+        for (int i = 0; i < menus.size(); i++) {
+            DiningCourtMenu diningCourtMenu = menus.get(i);
+            for (int j = 0; j < diningCourtMenu.getMeals().size(); j++) {
+                DiningCourtMenu.Meal meal = diningCourtMenu.getMeals().get(j);
+                for (int k = 0; k < meal.getStations().size(); k++) {
+                    DiningCourtMenu.Station station = meal.getStations().get(k);
+                    for (int l = 0; l < station.getItems().size(); l++) {
+                        MenuItem menuItem = station.getItems().get(l);
+                        if (mFavoriteDao.getFavoriteByItemId(menuItem.getId()) != null) {
+                            menuItem.setFavorite(true);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private ArrayList<DiningCourtMenu> getMenusFromFile(String formattedDate) {
@@ -141,7 +162,7 @@ public class UpdateMenuTask implements Runnable {
             if (mFetchedFromFile)
                 return;
             else
-                mFullMenu.postValue(Resource.<FullDayMenu>error("Not connected to network", null));
+                mFullMenu.postValue(Resource.error("Not connected to network", null));
             return;
         }
         //this is similar to the initial implementation from the architecture components guide
@@ -164,7 +185,7 @@ public class UpdateMenuTask implements Runnable {
 
                         } catch (IOException e) {
                             Log.e(TAG, "onResponse: error saving to file ", e);
-                            mFullMenu.postValue(Resource.<FullDayMenu>error(e.getMessage() != null ? e.getMessage() : "an error occurred while saving to file", null));
+                            mFullMenu.postValue(Resource.error(e.getMessage() != null ? e.getMessage() : "an error occurred while saving to file", null));
                         }
                     }
                 }
@@ -176,7 +197,7 @@ public class UpdateMenuTask implements Runnable {
                     if (mFullMenu.getValue() != null)
                         mFullMenu.postValue(Resource.error("Network Error", mFullMenu.getValue().data));
                     else
-                        mFullMenu.postValue(Resource.<FullDayMenu>error(t.getMessage(), null));
+                        mFullMenu.postValue(Resource.error(t.getMessage(), null));
                 }
             });
 
