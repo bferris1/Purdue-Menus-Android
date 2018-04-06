@@ -162,7 +162,8 @@ public class UpdateMenuTask implements Runnable {
     private void sortMenus(List<DiningCourtMenu> menus) {
 
         String[] customOrder = PreferenceManager.getDefaultSharedPreferences(mContext).getString("dining_court_order", "").split(",");
-        if (customOrder.length > 0)
+        Log.d(TAG, "sortMenus custom : " + Arrays.toString(customOrder));
+        if (customOrder.length  == DINING_COURTS.length)
             Collections.sort(menus, new DiningCourtComparator(Arrays.asList(customOrder)));
         else
             Collections.sort(menus, new DiningCourtComparator());
