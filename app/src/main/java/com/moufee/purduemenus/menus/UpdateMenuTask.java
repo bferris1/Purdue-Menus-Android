@@ -4,6 +4,7 @@ import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -23,6 +24,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -128,6 +130,7 @@ public class UpdateMenuTask implements Runnable {
             Type type = new TypeToken<ArrayList<DiningCourtMenu>>() {
             }.getType();
             result = mGson.fromJson(sourceReader, type);
+            sortMenus(result);
         } catch (Exception e) {
             try {
                 if (sourceReader != null)
@@ -156,6 +159,15 @@ public class UpdateMenuTask implements Runnable {
         writer.close();
     }
 
+    private void sortMenus(List<DiningCourtMenu> menus) {
+
+        String[] customOrder = PreferenceManager.getDefaultSharedPreferences(mContext).getString("dining_court_order", "").split(",");
+        if (customOrder.length > 0)
+            Collections.sort(menus, new DiningCourtComparator(Arrays.asList(customOrder)));
+        else
+            Collections.sort(menus, new DiningCourtComparator());
+    }
+
     private void fetchFromNetwork() {
         NetworkInfo networkInfo = mConnectivityManager.getActiveNetworkInfo();
         if (networkInfo == null || !networkInfo.isConnected()) {
@@ -177,7 +189,7 @@ public class UpdateMenuTask implements Runnable {
                         tempMenusList.add(response.body());
 
                     if (tempMenusList.size() == DINING_COURTS.length) {
-                        Collections.sort(tempMenusList, new DiningCourtComparator());
+                        sortMenus(tempMenusList);
                         mFullMenu.postValue(Resource.success(new FullDayMenu(tempMenusList, mMenuDate, hasLateLunch(tempMenusList))));
                         //save to json
                         try {

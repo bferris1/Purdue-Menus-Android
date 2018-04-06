@@ -1,6 +1,7 @@
 package com.moufee.purduemenus.di;
 
 import com.moufee.purduemenus.ui.menu.MenuItemListFragment;
+import com.moufee.purduemenus.ui.settings.CustomOrderFragment;
 
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
@@ -13,4 +14,7 @@ import dagger.android.ContributesAndroidInjector;
 public abstract class FragmentBuildersModule {
     @ContributesAndroidInjector
     abstract MenuItemListFragment contributeMenuItemListFragment();
+
+    @ContributesAndroidInjector
+    abstract CustomOrderFragment contributeCustomOrderFragment();
 }

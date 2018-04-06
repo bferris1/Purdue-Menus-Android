@@ -31,6 +31,7 @@ import com.moufee.purduemenus.databinding.ActivityMenuDatePickerTimeBinding;
 import com.moufee.purduemenus.menus.DailyMenuViewModel;
 import com.moufee.purduemenus.menus.DiningCourtMenu;
 import com.moufee.purduemenus.ui.login.LoginActivity;
+import com.moufee.purduemenus.ui.settings.CustomOrderFragment;
 import com.moufee.purduemenus.ui.settings.SettingsActivity;
 import com.moufee.purduemenus.util.DateTimeHelper;
 
@@ -78,6 +79,8 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
                 case SettingsActivity.KEY_PREF_SHOW_FAVORITE_COUNT:
                     mMenuPagerAdapter.setShowFavoriteCount(mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_SHOW_FAVORITE_COUNT, true));
                     break;
+                case "dining_court_order":
+                    mViewModel.setDate(mViewModel.getCurrentDate().getValue());
             }
         }
     };
