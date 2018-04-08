@@ -10,31 +10,35 @@
     <SwitchPreference
         android:defaultValue="true"
         android:key="show_serving_times"
-        android:title="@string/pref_show_serving_times"/>
+        android:title="@string/pref_show_serving_times" />
 
     <SwitchPreference
         android:defaultValue="true"
         android:key="show_favorite_count"
         android:title="@string/pref_title_show_favorite_count" />
 
+    <Preference
+        android:key="dining_court_order"
+        android:title="Manage Dining Court Display Order"
+        android:summary="Drag and drop to customize." />
+
     <ListPreference
-        android:title="Night Mode"
-        android:key="night_mode"
         android:defaultValue="@string/pref_night_mode_off"
-        android:summary="%s"
         android:entries="@array/pref_nightMode_entries"
-        android:entryValues="@array/pref_nightMode_values"/>
+        android:entryValues="@array/pref_nightMode_values"
+        android:key="night_mode"
+        android:summary="%s"
+        android:title="Night Mode" />
 
 
     <Preference
-        android:title="@string/pref_log_in"
+        android:key="log_in"
         android:summary="@string/pref_summary_not_logged_in"
-        android:key="log_in" />
+        android:title="@string/pref_log_in" />
 
     <!--<Preference
         android:title="Clear Favorites"
         android:key="clear_favorites"/>-->
-
 
 
 </PreferenceScreen>

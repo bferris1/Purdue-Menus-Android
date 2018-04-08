@@ -40,6 +40,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
 
         mLoginPref = findPreference("log_in");
+        Preference sortOrderPref = findPreference("dining_court_order");
+        sortOrderPref.setOnPreferenceClickListener(preference -> {
+            startActivity(new Intent(getActivity(), CustomOrderActivity.class));
+            return true;
+        });
 
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());

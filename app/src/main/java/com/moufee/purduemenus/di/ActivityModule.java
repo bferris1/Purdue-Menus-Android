@@ -2,6 +2,7 @@ package com.moufee.purduemenus.di;
 
 import com.moufee.purduemenus.ui.login.LoginActivity;
 import com.moufee.purduemenus.ui.menu.MenuActivity;
+import com.moufee.purduemenus.ui.settings.CustomOrderActivity;
 import com.moufee.purduemenus.ui.settings.SettingsActivity;
 
 import dagger.Module;
@@ -21,4 +22,7 @@ public abstract class ActivityModule {
 
     @ContributesAndroidInjector
     abstract LoginActivity contributeLoginActivity();
+
+    @ContributesAndroidInjector(modules = FragmentBuildersModule.class)
+    abstract CustomOrderActivity contributeCustomOrderActivity();
 }
