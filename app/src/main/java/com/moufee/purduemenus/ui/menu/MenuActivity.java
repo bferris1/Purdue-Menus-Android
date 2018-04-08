@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
@@ -25,14 +26,15 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.moufee.purduemenus.BuildConfig;
 import com.moufee.purduemenus.MenusApp;
 import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.databinding.ActivityMenuDatePickerTimeBinding;
 import com.moufee.purduemenus.menus.DailyMenuViewModel;
 import com.moufee.purduemenus.menus.DiningCourtMenu;
 import com.moufee.purduemenus.ui.login.LoginActivity;
-import com.moufee.purduemenus.ui.settings.CustomOrderFragment;
 import com.moufee.purduemenus.ui.settings.SettingsActivity;
+import com.moufee.purduemenus.util.ConstantsKt;
 import com.moufee.purduemenus.util.DateTimeHelper;
 
 import org.joda.time.DateTime;
@@ -200,6 +202,7 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
         tabLayout.setupWithViewPager(mBinding.menuViewPager);
 
         setListeners();
+        displayChangelog();
 
         //receive network status updates, to trigger data update when connectivity is reestablished
         //todo: integrate with Lifecycle
@@ -225,6 +228,16 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
         mBinding.menuViewPager.addOnPageChangeListener(mOnPageChangeListener);
 
 
+    }
+
+    void displayChangelog() {
+        int versionCode = BuildConfig.VERSION_CODE;
+        boolean hasShownMessage = mSharedPreferences.getBoolean(ConstantsKt.UPDATE_MESSAGE_KEY + versionCode, false);
+        if (!hasShownMessage) {
+            DialogFragment changelogFragment = new ChangelogDialogFragment();
+            changelogFragment.show(getSupportFragmentManager(), "changelog");
+            mSharedPreferences.edit().putBoolean(ConstantsKt.UPDATE_MESSAGE_KEY + versionCode, true).apply();
+        }
     }
 
     @Override
