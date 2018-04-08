@@ -26,7 +26,7 @@ class CustomOrderActivity : AppCompatActivity(), HasSupportFragmentInjector {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_fragment)
         supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, CustomOrderFragment.newInstance("asdf", "fdsa"))
+                .replace(R.id.fragment_container, CustomOrderFragment.newInstance())
                 .commit()
     }
 }

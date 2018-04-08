@@ -20,7 +20,7 @@
     <Preference
         android:key="dining_court_order"
         android:title="Manage Dining Court Display Order"
-        android:summary="Drag and drop to customize display order."/>
+        android:summary="Drag and drop to customize." />
 
     <ListPreference
         android:defaultValue="@string/pref_night_mode_off"
