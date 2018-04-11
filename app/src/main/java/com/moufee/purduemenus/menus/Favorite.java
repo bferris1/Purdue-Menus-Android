@@ -11,20 +11,20 @@ import android.support.annotation.NonNull;
  * Represents one favorite, as returned by the dining API
  */
 @Keep
-@Entity(indices = @Index("itemId"))
+@Entity
 public class Favorite {
     @NonNull
     public final String itemName;
 
-    @PrimaryKey
     @NonNull
     public final String favoriteId;
+    @PrimaryKey
     @NonNull
     public final String itemId;
     @NonNull
     public final Boolean isVegetarian;
 
-    public Favorite(String itemName, @NonNull String favoriteId, String itemId, Boolean isVegetarian) {
+    public Favorite(@NonNull String itemName, @NonNull String favoriteId, @NonNull String itemId, @NonNull Boolean isVegetarian) {
         this.itemName = itemName;
         this.favoriteId = favoriteId;
         this.itemId = itemId;
