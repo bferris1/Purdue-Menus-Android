@@ -1,11 +1,18 @@
 package com.moufee.purduemenus.api;
 
+import android.support.annotation.Nullable;
+
 import com.moufee.purduemenus.menus.DiningCourtMenu;
+import com.moufee.purduemenus.menus.Favorite;
 import com.moufee.purduemenus.menus.Favorites;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -25,5 +32,11 @@ public interface Webservice {
             "Accept: text/json"
     })
     @GET("/menus/v2/favorites")
-    Call<Favorites> getFavorites(@Query("ticket") String ticket);
+    Call<Favorites> getFavorites(@Query("ticket") @Nullable String ticket);
+
+    @POST("/menus/v2/favorites")
+    Call<ResponseBody> addFavorite(@Body Favorite favorite, @Query("ticket") @Nullable String ticket);
+
+    @DELETE("/menus/v2/favorites/{favoriteID}")
+    Call<ResponseBody> deleteFavorite(@Path("favoriteID") String favoriteID, @Query("ticket") @Nullable String ticket);
 }

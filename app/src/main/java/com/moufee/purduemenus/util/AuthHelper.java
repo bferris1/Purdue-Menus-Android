@@ -5,6 +5,9 @@ import okhttp3.Request;
 
 public class AuthHelper {
 
+    public static final String favoritesURL = "https://api.hfs.purdue.edu/menus/v2/favorites";
+
+
     public static Request getTGTRequest(String username, String password) {
         FormBody formBody = new FormBody.Builder()
                 .add("username", username)
@@ -17,10 +20,9 @@ public class AuthHelper {
                 .build();
     }
 
-    public static Request getTicketRequest(String location) {
-        String favoritesURL = "https://api.hfs.purdue.edu/menus/v2/favorites";
+    public static Request getTicketRequest(String location, String service) {
         FormBody ticketRequestBody = new FormBody.Builder()
-                .add("service", favoritesURL)
+                .add("service", service)
                 .build();
 
         return new Request.Builder()
