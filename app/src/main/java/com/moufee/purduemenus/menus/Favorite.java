@@ -1,7 +1,6 @@
 package com.moufee.purduemenus.menus;
 
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
@@ -29,6 +28,16 @@ public class Favorite {
         this.favoriteId = favoriteId;
         this.itemId = itemId;
         this.isVegetarian = isVegetarian;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null && obj instanceof Favorite && ((Favorite) obj).itemId.equals(itemId);
+    }
+
+    @Override
+    public int hashCode() {
+        return itemId.hashCode();
     }
 
     @Override

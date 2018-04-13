@@ -6,8 +6,8 @@ import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.moufee.purduemenus.api.DownloadFavoritesTask;
 import com.moufee.purduemenus.api.FavoriteTransactionTask;
+import com.moufee.purduemenus.api.UpdateFavoritesTask;
 import com.moufee.purduemenus.api.Webservice;
 import com.moufee.purduemenus.db.FavoriteDao;
 import com.moufee.purduemenus.menus.Favorite;
@@ -63,8 +63,8 @@ public class FavoritesRepository {
         });
     }
 
-    private void updateFavoritesFromWeb() {
-        mAppExecutors.networkIO().execute(new DownloadFavoritesTask(mHttpClient, mSharedPreferences, mWebservice, mFavoriteDao));
+    public void updateFavoritesFromWeb() {
+        mAppExecutors.networkIO().execute(new UpdateFavoritesTask(mHttpClient, mSharedPreferences, mWebservice, mFavoriteDao));
     }
 
     public void addFavorite(MenuItem item) {
