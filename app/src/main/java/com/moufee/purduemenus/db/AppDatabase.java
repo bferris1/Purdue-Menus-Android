@@ -22,7 +22,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             "`itemId` TEXT NOT NULL, " +
                             "`isVegetarian` INTEGER NOT NULL, " +
                             "PRIMARY KEY(`itemId`));");
-            database.execSQL("INSERT INTO temp_table SELECT * FROM favorite");
+            database.execSQL("INSERT OR IGNORE INTO temp_table SELECT * FROM favorite");
             database.execSQL("DROP TABLE favorite");
             database.execSQL("ALTER TABLE temp_table RENAME TO Favorite");
         }

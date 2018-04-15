@@ -39,6 +39,8 @@ public class MigrationTest {
         // db has schema version 1. insert some data using SQL queries.
         // cannot use DAO classes because they expect the latest schema.
         db.execSQL("INSERT INTO favorite VALUES ('My Great Food', '123', '321', 1)");
+        // simulate adding a duplicate that was permitted in previous version
+        db.execSQL("INSERT INTO favorite VALUES ('My Great Food', '232', '321', 1)");
 
         // Prepare for the next version.
         db.close();
