@@ -80,6 +80,12 @@
         favorite.
         \n\nFavorite counts are displayed next to dining court names for quick comparison.
         \n\nYou can log in to import your favorites from the Purdue system. Two-way synchronization is not yet supported in this beta release.</string>
+    <string name="action_clear_favorites">Clear Favorites</string>
+    <string name="action_only_logout">Just Log Out</string>
+    <string name="action_sign_out">Sign Out</string>
+    <string name="description_signed_in">You are signed in as %1$s</string>
+    <string name="prompt_clear_local_favorites">Would you also like to clear your local favorites, or just stop synchronizing them?</string>
+    <string name="title_prompt_clear_favorites">Clear Favorites?</string>
 
 
 </resources>

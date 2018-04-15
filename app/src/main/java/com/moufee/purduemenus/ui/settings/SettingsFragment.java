@@ -30,6 +30,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String KEY_PREF_SHOW_SERVING_TIMES = "show_serving_times";
     public static final String KEY_PREF_USE_NIGHT_MODE = "night_mode";
     public static final String KEY_PREF_LOGGED_IN = "logged_in";
+    public static final String KEY_PREF_USERNAME = "username";
+    public static final String KEY_PREF_PASSWORD = "password";
+    public static final String KEY_PREF_DINING_COURT_ORDER = "dining_court_order";
+    public static final String PREF_LOG_IN = "log_in";
+
     private static final String TAG = "SettingsFragment";
     @Inject
     SharedPreferences mSharedPreferences;
@@ -56,8 +61,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         addPreferencesFromResource(R.xml.pref_general);
 
 
-        mLoginPref = findPreference("log_in");
-        Preference sortOrderPref = findPreference("dining_court_order");
+        mLoginPref = findPreference(PREF_LOG_IN);
+        Preference sortOrderPref = findPreference(KEY_PREF_DINING_COURT_ORDER);
         sortOrderPref.setOnPreferenceClickListener(preference -> {
             startActivity(new Intent(getActivity(), CustomOrderActivity.class));
             return true;
@@ -68,7 +73,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateLoginPreference();
 
         mLoginPref.setOnPreferenceClickListener(preference -> {
-            boolean isLoggedIn = mSharedPreferences.getBoolean("logged_in", false);
+            boolean isLoggedIn = mSharedPreferences.getBoolean(KEY_PREF_LOGGED_IN, false);
             if (isLoggedIn) {
                 showLogoutPrompt();
                 return true;
@@ -85,14 +90,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     private void showLogoutPrompt() {
         AlertDialog logoutDialog = new AlertDialog.Builder(getActivity())
-                .setTitle("Clear Favorites?")
-                .setMessage("Would you also like to clear your local favorites, or just stop synchronizing them?")
-                .setPositiveButton("Clear Favorites", (dialog, which) -> {
+                .setTitle(R.string.title_prompt_clear_favorites)
+                .setMessage(R.string.prompt_clear_local_favorites)
+                .setPositiveButton(R.string.action_clear_favorites, (dialog, which) -> {
                     mFavoritesRepository.clearLocalFavorites();
                     logout();
                 })
                 .setCancelable(true)
-                .setNegativeButton("Just Log Out", ((dialog, which) -> logout()))
+                .setNegativeButton(R.string.action_only_logout, ((dialog, which) -> logout()))
                 .create();
         logoutDialog.setOnShowListener(dialog -> logoutDialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(Color.RED));
         logoutDialog.show();
@@ -102,16 +107,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         mSharedPreferences
                 .edit()
                 .putBoolean(KEY_PREF_LOGGED_IN, false)
-                .putString("username", null)
-                .putString("password", null)
+                .putString(KEY_PREF_USERNAME, null)
+                .putString(KEY_PREF_PASSWORD, null)
                 .apply();
     }
 
     private void updateLoginPreference() {
-        boolean isLoggedIn = mSharedPreferences.getBoolean("logged_in", false);
+        boolean isLoggedIn = mSharedPreferences.getBoolean(KEY_PREF_LOGGED_IN, false);
         if (isLoggedIn) {
-            mLoginPref.setTitle("Sign Out");
-            mLoginPref.setSummary("You are signed in as " + mSharedPreferences.getString("username", "user"));
+            mLoginPref.setTitle(R.string.action_sign_out);
+            mLoginPref.setSummary(getString(R.string.description_signed_in, mSharedPreferences.getString(KEY_PREF_USERNAME, "user")));
         } else {
             mLoginPref.setTitle(R.string.action_login);
             mLoginPref.setSummary(R.string.pref_summary_not_logged_in);
