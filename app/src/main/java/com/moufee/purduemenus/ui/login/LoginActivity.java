@@ -16,9 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.moufee.purduemenus.R;
-import com.moufee.purduemenus.api.Webservice;
-import com.moufee.purduemenus.db.FavoriteDao;
-import com.moufee.purduemenus.menus.Favorites;
+import com.moufee.purduemenus.repository.FavoritesRepository;
 import com.moufee.purduemenus.util.AuthHelper;
 
 import javax.inject.Inject;
@@ -27,7 +25,6 @@ import dagger.android.AndroidInjection;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import retrofit2.Call;
 
 /**
  * A login screen that offers login via username/password.
@@ -47,13 +44,11 @@ public class LoginActivity extends AppCompatActivity {
     private View mProgressView;
     private View mLoginFormView;
     @Inject
-    Webservice mWebservice;
-    @Inject
     OkHttpClient mHTTPClient;
     @Inject
     SharedPreferences mSharedPreferences;
     @Inject
-    FavoriteDao mFavoriteDao;
+    FavoritesRepository mFavoritesRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -209,26 +204,7 @@ public class LoginActivity extends AppCompatActivity {
                 String ticket = ticketResponse.body().string().trim();
                 Log.d(TAG, "doInBackground: ticket: " + ticket);
 
-
-                Call favoritesCall = mWebservice.getFavorites(ticket);
-                Log.d(TAG, "doInBackground: favoritesCall: " + favoritesCall.request().toString());
-                retrofit2.Response<Favorites> favoritesResponse = mWebservice.getFavorites(ticket).execute();
-                if (favoritesResponse.isSuccessful()) {
-                    Favorites favorites = favoritesResponse.body();
-                    if (favorites == null)
-                        Log.d(TAG, "doInBackground: favorites were null!");
-                    else {
-                        mFavoriteDao.insertFavorites(favorites.getFavorites());
-                    }
-
-                    Log.d(TAG, "doInBackground: favorites: " + favorites.getFavorites());
-                } else {
-                    Log.d(TAG, "doInBackground: favorites call not successful!");
-                    Log.d(TAG, "doInBackground: " + favoritesResponse.code());
-                    Log.d(TAG, "doInBackground: " + favoritesResponse.errorBody().string());
-                    Log.d(TAG, "doInBackground: " + favoritesResponse.raw().toString());
-                }
-
+                mFavoritesRepository.updateFavoritesFromWeb();
 
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: http error", e);
