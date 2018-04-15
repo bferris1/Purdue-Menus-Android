@@ -38,17 +38,20 @@ public class UpdateFavoritesTask extends FavoriteTransactionTask<Favorites> {
 
     @Override
     public void onSuccess(Response<Favorites> response) {
-        saveFavorites(response.body());
-        uploadFavorites(response.body());
+        Favorites favorites = response.body();
+        if (favorites != null) {
+            saveFavorites(favorites);
+            uploadFavorites(favorites);
+        }
     }
 
     private void uploadFavorites(Favorites remoteFavorites) {
-        if (remoteFavorites.getFavorites() == null) return;
+        if (remoteFavorites == null || remoteFavorites.getFavorites() == null) return;
         List<Favorite> localFavorites = mFavoriteDao.getAllFavorites();
-        Set<Favorite> removeFavoriesSet = new HashSet<>(remoteFavorites.getFavorites());
+        Set<Favorite> remoteFavoritesSet = new HashSet<>(remoteFavorites.getFavorites());
         for (Favorite favorite :
                 localFavorites) {
-            if (!removeFavoriesSet.contains(favorite)) {
+            if (!remoteFavoritesSet.contains(favorite)) {
                 Log.d(TAG, "uploadFavorites: " + favorite);
                 mWebservice.addFavorite(favorite, null).enqueue(new Callback<ResponseBody>() {
                     @Override
