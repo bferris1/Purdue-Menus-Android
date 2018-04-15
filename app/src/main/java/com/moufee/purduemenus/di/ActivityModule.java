@@ -17,7 +17,7 @@ public abstract class ActivityModule {
     @ContributesAndroidInjector(modules = FragmentBuildersModule.class)
     abstract MenuActivity contributeMenuActivity();
 
-    @ContributesAndroidInjector
+    @ContributesAndroidInjector(modules = FragmentBuildersModule.class)
     abstract SettingsActivity contributeSettingsActivity();
 
     @ContributesAndroidInjector
