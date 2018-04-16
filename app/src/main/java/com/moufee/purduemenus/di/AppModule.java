@@ -80,6 +80,8 @@ class AppModule {
     @Provides
     AppDatabase provideAppDatabase(Context applicationContext) {
         return Room.databaseBuilder(applicationContext, AppDatabase.class, "menus-database")
+                .addMigrations(AppDatabase.MIGRATION_1_2)
+                .fallbackToDestructiveMigration()
                 .build();
     }
 

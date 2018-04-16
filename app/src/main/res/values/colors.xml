@@ -10,6 +10,7 @@
     <color name="colorTextPrimary">#000000</color>
     <color name="colorTextSecondary">#FFFFFF</color>
     <color name="colorAccent">#ffc400</color>
+    <color name="red">#e53935</color>
 
     <color name="purdueGold">#b1810b</color>
     <color name="purdueGoldLight">#e7b044</color>

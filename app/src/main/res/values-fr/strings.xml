@@ -42,4 +42,10 @@
     <string name="pref_title_show_favorite_count">Afficher les comptes des favoris</string>
     <string name="login_details">Lorsque vous êtes connecté, l\'application tente de synchroniser vos favoris avec le système de favoris Purdue.</string>
     <string name="update_title">Changelog pour %1$s</string>
+    <string name="action_clear_favorites">Supprimer Favoris</string>
+    <string name="title_prompt_clear_favorites">Supprimer Favoris?</string>
+    <string name="description_signed_in">Vous êtes connecté en tant que %1$s</string>
+    <string name="prompt_clear_local_favorites">Souhaitez-vous également supprimer vos favoris locaux ou simplement arrêter de les synchroniser?</string>
+    <string name="action_sign_out">Se déconnecter</string>
+    <string name="action_only_logout">Se déconnecter seulement</string>
 </resources>

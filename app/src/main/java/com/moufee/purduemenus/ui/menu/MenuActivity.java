@@ -32,7 +32,7 @@ import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.databinding.ActivityMenuDatePickerTimeBinding;
 import com.moufee.purduemenus.menus.DailyMenuViewModel;
 import com.moufee.purduemenus.menus.DiningCourtMenu;
-import com.moufee.purduemenus.ui.login.LoginActivity;
+import com.moufee.purduemenus.ui.settings.CustomOrderFragmentKt;
 import com.moufee.purduemenus.ui.settings.SettingsActivity;
 import com.moufee.purduemenus.util.ConstantsKt;
 import com.moufee.purduemenus.util.DateTimeHelper;
@@ -81,7 +81,7 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
                 case SettingsActivity.KEY_PREF_SHOW_FAVORITE_COUNT:
                     mMenuPagerAdapter.setShowFavoriteCount(mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_SHOW_FAVORITE_COUNT, true));
                     break;
-                case "dining_court_order":
+                case CustomOrderFragmentKt.KEY_PREF_DINING_COURT_ORDER:
                     mViewModel.setDate(mViewModel.getCurrentDate().getValue());
             }
         }
@@ -253,10 +253,6 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
         switch (item.getItemId()) {
             case R.id.action_settings:
                 startActivity(SettingsActivity.getIntent(this));
-                return true;
-            case R.id.action_login:
-                Intent loginIntent = new Intent(this, LoginActivity.class);
-                startActivity(loginIntent);
                 return true;
             case R.id.action_feedback:
                 Intent emailIntent = new Intent(Intent.ACTION_SENDTO);

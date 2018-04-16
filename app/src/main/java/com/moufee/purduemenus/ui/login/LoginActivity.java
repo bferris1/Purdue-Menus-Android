@@ -16,9 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.moufee.purduemenus.R;
-import com.moufee.purduemenus.api.Webservice;
-import com.moufee.purduemenus.db.FavoriteDao;
-import com.moufee.purduemenus.menus.Favorites;
+import com.moufee.purduemenus.repository.FavoritesRepository;
 import com.moufee.purduemenus.util.AuthHelper;
 
 import javax.inject.Inject;
@@ -27,7 +25,6 @@ import dagger.android.AndroidInjection;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import retrofit2.Call;
 
 /**
  * A login screen that offers login via username/password.
@@ -47,13 +44,11 @@ public class LoginActivity extends AppCompatActivity {
     private View mProgressView;
     private View mLoginFormView;
     @Inject
-    Webservice mWebservice;
-    @Inject
     OkHttpClient mHTTPClient;
     @Inject
     SharedPreferences mSharedPreferences;
     @Inject
-    FavoriteDao mFavoriteDao;
+    FavoritesRepository mFavoritesRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +58,7 @@ public class LoginActivity extends AppCompatActivity {
         // Set up the login form.
         mEmailView = findViewById(R.id.username);
 
-        mPasswordView = (EditText) findViewById(R.id.password);
+        mPasswordView = findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener((textView, id, keyEvent) -> {
             if (id == R.integer.login_id || id == EditorInfo.IME_NULL) {
                 attemptLogin();
@@ -132,35 +127,27 @@ public class LoginActivity extends AppCompatActivity {
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
+        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
+        mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+        mLoginFormView.animate().setDuration(shortAnimTime).alpha(
+                show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            }
+        });
+
+        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        mProgressView.animate().setDuration(shortAnimTime).alpha(
+                show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            }
+        });
+
     }
 
     /**
@@ -207,7 +194,7 @@ public class LoginActivity extends AppCompatActivity {
                     return false;
 
 
-                Request ticketRequest = AuthHelper.getTicketRequest(location);
+                Request ticketRequest = AuthHelper.getTicketRequest(location, AuthHelper.favoritesURL);
 
                 Response ticketResponse = mHTTPClient.newCall(ticketRequest).execute();
                 if (!ticketResponse.isSuccessful()) {
@@ -217,26 +204,7 @@ public class LoginActivity extends AppCompatActivity {
                 String ticket = ticketResponse.body().string().trim();
                 Log.d(TAG, "doInBackground: ticket: " + ticket);
 
-
-                Call favoritesCall = mWebservice.getFavorites(ticket);
-                Log.d(TAG, "doInBackground: favoritesCall: " + favoritesCall.request().toString());
-                retrofit2.Response<Favorites> favoritesResponse = mWebservice.getFavorites(ticket).execute();
-                if (favoritesResponse.isSuccessful()) {
-                    Favorites favorites = favoritesResponse.body();
-                    if (favorites == null)
-                        Log.d(TAG, "doInBackground: favorites were null!");
-                    else {
-                        mFavoriteDao.insertFavorites(favorites.getFavorites());
-                    }
-
-                    Log.d(TAG, "doInBackground: favorites: " + favorites.getFavorites());
-                } else {
-                    Log.d(TAG, "doInBackground: favorites call not successful!");
-                    Log.d(TAG, "doInBackground: " + favoritesResponse.code());
-                    Log.d(TAG, "doInBackground: " + favoritesResponse.errorBody().string());
-                    Log.d(TAG, "doInBackground: " + favoritesResponse.raw().toString());
-                }
-
+                mFavoritesRepository.updateFavoritesFromWeb();
 
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: http error", e);

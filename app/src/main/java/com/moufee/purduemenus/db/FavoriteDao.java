@@ -22,6 +22,9 @@ public interface FavoriteDao {
     @Query("SELECT * FROM favorite")
     public LiveData<List<Favorite>> loadAllFavorites();
 
+    @Query("SELECT * FROM favorite")
+    public List<Favorite> getAllFavorites();
+
     @Query("SELECT itemId FROM favorite")
     public LiveData<List<String>> getFavoriteIDs();
 
