@@ -11,7 +11,7 @@ class ChangelogDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder = AlertDialog.Builder(activity)
-                .setTitle("Changelog for " + BuildConfig.VERSION_NAME)
+                .setTitle(getString(R.string.changelog_title, BuildConfig.VERSION_NAME))
                 .setPositiveButton("OK", null)
                 .setMessage(R.string.changelog)
 

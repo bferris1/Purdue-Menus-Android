@@ -69,7 +69,7 @@
     <string name="pref_title_show_favorite_count">Show Favorite Counts</string>
     <string name="login_details">When you are logged in, the app will attempt to keep your favorites synchronized with the Purdue favorites system.</string>
     <string name="hint_purdue_username" translatable="false">Purdue Username</string>
-    <string name="update_title">Changelog for v%1$s</string>
+    <string name="changelog_title">Changelog for v%1$s</string>
     <string name="changelog" translatable="false">
         \n<b>Custom Dining Court Order</b>
         \n\nYou can now customize the order in which the dining courts are displayed. Open settings to try it out!

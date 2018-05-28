@@ -41,7 +41,7 @@
     <string name="pref_summary_not_logged_in">Vous n\'êtes pas connecté</string>
     <string name="pref_title_show_favorite_count">Afficher les comptes des favoris</string>
     <string name="login_details">Lorsque vous êtes connecté, l\'application tente de synchroniser vos favoris avec le système de favoris Purdue.</string>
-    <string name="update_title">Changelog pour %1$s</string>
+    <string name="changelog_title">Changelog pour v%1$s</string>
     <string name="action_clear_favorites">Supprimer Favoris</string>
     <string name="title_prompt_clear_favorites">Supprimer Favoris?</string>
     <string name="description_signed_in">Vous êtes connecté en tant que %1$s</string>
