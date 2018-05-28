@@ -1,6 +1,6 @@
 package com.moufee.purduemenus.ui.menu;
 
-import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -13,9 +13,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -24,18 +25,17 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 
+import com.moufee.purduemenus.BuildConfig;
 import com.moufee.purduemenus.MenusApp;
 import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.databinding.ActivityMenuDatePickerTimeBinding;
 import com.moufee.purduemenus.menus.DailyMenuViewModel;
 import com.moufee.purduemenus.menus.DiningCourtMenu;
-import com.moufee.purduemenus.menus.FullDayMenu;
-import com.moufee.purduemenus.ui.login.LoginActivity;
+import com.moufee.purduemenus.ui.settings.CustomOrderFragmentKt;
 import com.moufee.purduemenus.ui.settings.SettingsActivity;
+import com.moufee.purduemenus.util.ConstantsKt;
 import com.moufee.purduemenus.util.DateTimeHelper;
-import com.moufee.purduemenus.util.Resource;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
@@ -46,7 +46,12 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
-public class MenuActivity extends AppCompatActivity implements MenuItemListFragment.OnListFragmentInteractionListener {
+import dagger.android.AndroidInjection;
+import dagger.android.AndroidInjector;
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.support.HasSupportFragmentInjector;
+
+public class MenuActivity extends AppCompatActivity implements HasSupportFragmentInjector, MenuItemListFragment.OnListFragmentInteractionListener {
 
     private static String TAG = "MENU_ACTIVITY";
 
@@ -58,13 +63,27 @@ public class MenuActivity extends AppCompatActivity implements MenuItemListFragm
     private ViewPager.OnPageChangeListener mOnPageChangeListener;
     @Inject
     SharedPreferences mSharedPreferences;
+    @Inject
+    DispatchingAndroidInjector<Fragment> mDispatchingAndroidInjector;
+    @Inject
+    ViewModelProvider.Factory mViewModelFactory;
+
     private SharedPreferences.OnSharedPreferenceChangeListener mSharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (key.equals(SettingsActivity.KEY_PREF_SHOW_SERVING_TIMES))
-                updateServingTime();
-            else if (key.equals(SettingsActivity.KEY_PREF_USE_NIGHT_MODE))
-                recreate();
+            switch (key) {
+                case SettingsActivity.KEY_PREF_SHOW_SERVING_TIMES:
+                    updateServingTime();
+                    break;
+                case SettingsActivity.KEY_PREF_USE_NIGHT_MODE:
+                    recreate();
+                    break;
+                case SettingsActivity.KEY_PREF_SHOW_FAVORITE_COUNT:
+                    mMenuPagerAdapter.setShowFavoriteCount(mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_SHOW_FAVORITE_COUNT, true));
+                    break;
+                case CustomOrderFragmentKt.KEY_PREF_DINING_COURT_ORDER:
+                    mViewModel.setDate(mViewModel.getCurrentDate().getValue());
+            }
         }
     };
 
@@ -74,50 +93,47 @@ public class MenuActivity extends AppCompatActivity implements MenuItemListFragm
 
     }
 
+    @Override
+    public AndroidInjector<Fragment> supportFragmentInjector() {
+        return mDispatchingAndroidInjector;
+    }
 
     private void setListeners() {
-        mViewModel.getCurrentDate().observe(this, new Observer<DateTime>() {
-            @Override
-            public void onChanged(@Nullable DateTime dateTime) {
-                if (dateTime != null)
-                    mBinding.dateTextView.setText(DateTimeHelper.getFriendlyDateFormat(dateTime, Locale.getDefault(), getApplicationContext()));
-            }
+        mViewModel.getCurrentDate().observe(this, dateTime -> {
+            if (dateTime != null)
+                mBinding.dateTextView.setText(DateTimeHelper.getFriendlyDateFormat(dateTime, Locale.getDefault(), getApplicationContext()));
         });
-        mViewModel.getSelectedMealIndex().observe(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(@Nullable Integer newMealIndex) {
-                if (newMealIndex != null) {
-                    mBinding.setSelectedMealIndex(newMealIndex);
-                    mMenuPagerAdapter.setMealIndex(newMealIndex);
-                    updateServingTime();
-                }
+        mViewModel.getSelectedMealIndex().observe(this, newMealIndex -> {
+            if (newMealIndex != null) {
+                mBinding.setSelectedMealIndex(newMealIndex);
+                mMenuPagerAdapter.setMealIndex(newMealIndex);
+                updateServingTime();
             }
         });
 
-        mViewModel.getFullMenu().observe(this, new Observer<Resource<FullDayMenu>>() {
-            @Override
-            public void onChanged(@Nullable Resource<FullDayMenu> fullDayMenuResource) {
-                mBinding.setMenusResource(fullDayMenuResource == null ? null : fullDayMenuResource);
-                //done: loading state
-                if (fullDayMenuResource != null) {
-                    switch (fullDayMenuResource.status) {
-                        case SUCCESS:
-                            mBinding.setMenu(fullDayMenuResource.data);
-                            if (fullDayMenuResource.data != null)
-                                mMenuPagerAdapter.setMenus(fullDayMenuResource.data.getMenus());
-                            updateLateLunch(fullDayMenuResource.data.isLateLunchServed());
-                            updateServingTime();
-                            break;
-                        case LOADING:
-                            break;
-                        case ERROR:
-                            if (fullDayMenuResource.data != null) {
-                                mMenuPagerAdapter.setMenus(fullDayMenuResource.data.getMenus());
-                            } else {
-                                Snackbar.make(mBinding.activityMenuCoordinatorLayout, getString(R.string.network_error_message), Snackbar.LENGTH_SHORT).show();
-                            }
-                            break;
-                    }
+        mViewModel.getFavoriteSet().observe(this, strings -> mMenuPagerAdapter.setFavoritesSet(strings));
+
+        mViewModel.getFullMenu().observe(this, fullDayMenuResource -> {
+            mBinding.setMenusResource(fullDayMenuResource == null ? null : fullDayMenuResource);
+            //done: loading state
+            if (fullDayMenuResource != null) {
+                switch (fullDayMenuResource.status) {
+                    case SUCCESS:
+                        mBinding.setMenu(fullDayMenuResource.data);
+                        if (fullDayMenuResource.data != null)
+                            mMenuPagerAdapter.setMenus(fullDayMenuResource.data.getMenus());
+                        updateLateLunch(fullDayMenuResource.data.isLateLunchServed());
+                        updateServingTime();
+                        break;
+                    case LOADING:
+                        break;
+                    case ERROR:
+                        if (fullDayMenuResource.data != null) {
+                            mMenuPagerAdapter.setMenus(fullDayMenuResource.data.getMenus());
+                        } else {
+                            Snackbar.make(mBinding.activityMenuCoordinatorLayout, getString(R.string.network_error_message), Snackbar.LENGTH_SHORT).show();
+                        }
+                        break;
                 }
             }
         });
@@ -159,17 +175,15 @@ public class MenuActivity extends AppCompatActivity implements MenuItemListFragm
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: oncreate called");
+        AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         MenusApp app = (MenusApp) getApplication();
-        app.getAppComponent().inject(this);
         setTitle(getString(R.string.app_name));
 
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_menu_date_picker_time);
         mBinding.setSelectedMealIndex(0);
 
-        mViewModel = ViewModelProviders.of(this).get(DailyMenuViewModel.class);
-        mViewModel.setDate(new DateTime());
-        mViewModel.setSelectedMealIndex(DateTimeHelper.getCurrentMealIndex());
+        mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(DailyMenuViewModel.class);
         mBinding.setViewModel(mViewModel);
 
 
@@ -182,11 +196,13 @@ public class MenuActivity extends AppCompatActivity implements MenuItemListFragm
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         mMenuPagerAdapter = new MenuPagerAdapter(fragmentManager);
+        mMenuPagerAdapter.setShowFavoriteCount(mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_SHOW_FAVORITE_COUNT, true));
         mBinding.menuViewPager.setAdapter(mMenuPagerAdapter);
 
         tabLayout.setupWithViewPager(mBinding.menuViewPager);
 
         setListeners();
+        displayChangelog();
 
         //receive network status updates, to trigger data update when connectivity is reestablished
         //todo: integrate with Lifecycle
@@ -214,6 +230,16 @@ public class MenuActivity extends AppCompatActivity implements MenuItemListFragm
 
     }
 
+    void displayChangelog() {
+        int versionCode = BuildConfig.VERSION_CODE;
+        boolean hasShownMessage = mSharedPreferences.getBoolean(ConstantsKt.UPDATE_MESSAGE_KEY + versionCode, false);
+        if (!hasShownMessage) {
+            DialogFragment changelogFragment = new ChangelogDialogFragment();
+            changelogFragment.show(getSupportFragmentManager(), "changelog");
+            mSharedPreferences.edit().putBoolean(ConstantsKt.UPDATE_MESSAGE_KEY + versionCode, true).apply();
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -227,10 +253,6 @@ public class MenuActivity extends AppCompatActivity implements MenuItemListFragm
         switch (item.getItemId()) {
             case R.id.action_settings:
                 startActivity(SettingsActivity.getIntent(this));
-                return true;
-            case R.id.action_login:
-                Intent loginIntent = new Intent(this, LoginActivity.class);
-                startActivity(loginIntent);
                 return true;
             case R.id.action_feedback:
                 Intent emailIntent = new Intent(Intent.ACTION_SENDTO);

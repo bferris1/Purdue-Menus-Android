@@ -8,6 +8,7 @@ import com.moufee.purduemenus.menus.DiningCourtMenu;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Ben on 26/09/2017.
@@ -17,6 +18,13 @@ public class MenuPagerAdapter extends FragmentStatePagerAdapter {
 
     private List<DiningCourtMenu> diningCourtMenus = new ArrayList<>();
     private int mealIndex;
+    private Set<String> mFavoritesSet;
+    private boolean mShowFavoriteCount = true;
+
+    public void setFavoritesSet(Set<String> favoritesSet) {
+        mFavoritesSet = favoritesSet;
+        notifyDataSetChanged();
+    }
 
     public MenuPagerAdapter(FragmentManager fm) {
         super(fm);
@@ -29,7 +37,12 @@ public class MenuPagerAdapter extends FragmentStatePagerAdapter {
 
     public void setMealIndex(int mealIndex) {
         this.mealIndex = mealIndex;
-//        notifyDataSetChanged();
+        notifyDataSetChanged();
+    }
+
+    public void setShowFavoriteCount(boolean showFavoriteCount) {
+        mShowFavoriteCount = showFavoriteCount;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -44,11 +57,15 @@ public class MenuPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return diningCourtMenus.get(position).getLocation();
-    }
+        String title = diningCourtMenus.get(position).getLocation();
+        if (!mShowFavoriteCount || mFavoritesSet == null || mFavoritesSet.isEmpty())
+            return title;
 
-    @Override
-    public int getItemPosition(Object object) {
-        return POSITION_NONE;
+        int numFavorites = 0;
+        if (diningCourtMenus.get(position).isServing(mealIndex))
+            numFavorites = diningCourtMenus.get(position).getMeal(mealIndex).getNumFavorites(mFavoritesSet);
+
+        title += " (" + numFavorites + ")";
+        return title;
     }
 }

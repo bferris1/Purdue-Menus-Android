@@ -5,6 +5,7 @@ import android.support.annotation.Keep;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A container for a list of favorites
@@ -14,7 +15,7 @@ public class Favorites {
     @SerializedName("Favorite")
     private ArrayList<Favorite> mFavorites;
 
-    public ArrayList<Favorite> getFavorites() {
+    public List<Favorite> getFavorites() {
         return mFavorites;
     }
 }

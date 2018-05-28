@@ -2,20 +2,31 @@ package com.moufee.purduemenus.menus;
 
 import android.support.annotation.Keep;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by Ben on 9/5/17.
  * Represent one item on the menu
  */
 @Keep
 public class MenuItem {
+    @SerializedName("ID")
     private String id;
     private String name;
     private boolean isVegetarian;
+    private boolean isFavorite = false;
 
     public MenuItem(String name) {
         this.name = name;
     }
 
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
+    }
 
     public String getName() {
         return name;
@@ -29,4 +40,8 @@ public class MenuItem {
         return id;
     }
 
+    @Override
+    public String toString() {
+        return id + " :" + name;
+    }
 }

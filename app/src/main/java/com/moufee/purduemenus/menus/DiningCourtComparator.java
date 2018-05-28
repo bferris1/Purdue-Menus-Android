@@ -10,14 +10,24 @@ import java.util.List;
  */
 
 public class DiningCourtComparator implements Comparator<DiningCourtMenu> {
-    private static final List<String> diningCourts = new ArrayList<>(Arrays.asList("earhart", "ford", "wiley", "windsor", "hillenbrand", "the gathering place"));
+    public static final List<String> diningCourts = new ArrayList<>(Arrays.asList("Earhart", "Ford", "Wiley", "Windsor", "Hillenbrand", "The Gathering Place"));
+
+    private List<String> sortOrder;
+
+    public DiningCourtComparator() {
+        sortOrder = diningCourts;
+    }
+
+    public DiningCourtComparator(List<String> sortOrder) {
+        this.sortOrder = sortOrder;
+    }
 
     @Override
     public int compare(DiningCourtMenu o1, DiningCourtMenu o2) {
         if (o1 == null || o2 == null)
             return 0;
-        int index1 = diningCourts.indexOf(o1.getLocation().toLowerCase());
-        int index2 = diningCourts.indexOf(o2.getLocation().toLowerCase());
+        int index1 = sortOrder.indexOf(o1.getLocation());
+        int index2 = sortOrder.indexOf(o2.getLocation());
 
         if (index1 < index2)
             return -1;

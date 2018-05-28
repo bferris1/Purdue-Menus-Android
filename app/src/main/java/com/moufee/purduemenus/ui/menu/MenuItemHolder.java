@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 
 import com.moufee.purduemenus.databinding.FragmentMenuitemBinding;
 import com.moufee.purduemenus.menus.MenuItem;
+import com.moufee.purduemenus.menus.OnToggleFavoriteListener;
 
 /**
  * Created by Ben on 14/07/2017.
@@ -19,8 +20,10 @@ public class MenuItemHolder extends RecyclerView.ViewHolder {
         menuitemBinding = binding;
     }
 
-    public void bind(MenuItem item) {
+    public void bind(MenuItem item, OnToggleFavoriteListener listener, boolean isFavorite) {
         menuitemBinding.setMenuItem(item);
+        menuitemBinding.setIsFavorite(isFavorite);
+        menuitemBinding.setListener(listener);
         menuitemBinding.executePendingBindings();
     }
 

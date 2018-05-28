@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.moufee.purduemenus"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.moufee.purduemenus">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
-    <uses-feature android:name="android.hardware.location" android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.location"
+        android:required="false" />
 
     <application
-        android:allowBackup="true"
         android:name=".MenusApp"
+        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher_adaptive"
         android:label="@string/app_name_short"
         android:roundIcon="@mipmap/ic_launcher_adaptive_round"
@@ -18,28 +20,31 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ui.menu.MenuActivity"
-            android:launchMode="singleTop"
-            android:label="@string/app_name_short">
+            android:label="@string/app_name_short"
+            android:launchMode="singleTop">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".ui.settings.SettingsActivity"
             android:label="@string/title_settings"
             android:launchMode="singleTop"
-            android:theme="@style/AppTheme.ActionBar"
-            android:parentActivityName=".ui.menu.MenuActivity">
-        </activity>
+            android:parentActivityName=".ui.menu.MenuActivity"
+            android:theme="@style/AppTheme.ActionBar" />
         <activity
             android:name=".ui.login.LoginActivity"
             android:label="@string/title_activity_login"
             android:launchMode="singleTop"
             android:parentActivityName=".ui.settings.SettingsActivity"
-            android:theme="@style/AppTheme.ActionBar">
-        </activity>
+            android:theme="@style/AppTheme.ActionBar" />
+        <activity
+            android:name=".ui.settings.CustomOrderActivity"
+            android:theme="@style/AppTheme.ActionBar"
+            android:parentActivityName=".ui.settings.SettingsActivity"
+            android:label="Dining Court Display Order"/>
     </application>
 
 </manifest>

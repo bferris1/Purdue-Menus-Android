@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+    <data>
+        <import type="com.moufee.purduemenus.util.Resource"/>
+        <import type="com.moufee.purduemenus.util.Status"/>
+        <variable
+            name="selectedMealIndex"
+            type="int"/>
+        <variable
+            name="viewModel"
+            type="com.moufee.purduemenus.menus.DailyMenuViewModel"/>
+        <variable
+            name="menusResource"
+            type="com.moufee.purduemenus.util.Resource"/>
+        <variable
+            name="menu"
+            type="com.moufee.purduemenus.menus.FullDayMenu" />
+        <variable
+            name="showServingTimes"
+            type="boolean"/>
+
+    </data>
+
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/activity_menu_coordinator_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.constraint.ConstraintLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".ui.menu.MenuActivity">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/main_toolbar"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:background="?attr/colorPrimary"
+                android:elevation="2dp"
+                android:minHeight="?attr/actionBarSize"
+                android:theme="?attr/actionBarTheme"
+                android:visibility="gone"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:targetApi="lollipop"/>
+
+            <android.support.design.widget.TabLayout
+                android:id="@+id/menu_tab_layout"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_gravity="top"
+                android:background="?attr/colorPrimary"
+                android:elevation="2dp"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/main_toolbar"
+                app:tabMode="scrollable"/>
+
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/date_picker_layout"
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:elevation="1dp"
+                android:background="?attr/colorPrimary"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent">
+
+                <ImageButton
+                    android:id="@+id/button_next_day"
+                    style="?attr/borderlessButtonStyle"
+                    android:layout_width="50dp"
+                    android:layout_height="0dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@android:color/transparent"
+                    android:contentDescription="@string/next_day_button_description"
+                    android:onClick="@{() -> viewModel.nextDay()}"
+                    android:src="@drawable/ic_keyboard_arrow_right_black_24dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <TextView
+                    android:id="@+id/date_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginStart="8dp"
+                    android:onClick="@{() -> viewModel.currentDay()}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toRightOf="@+id/button_previous_day"
+                    app:layout_constraintRight_toLeftOf="@+id/button_next_day"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="Today"/>
+
+                <ImageButton
+                    android:id="@+id/button_previous_day"
+                    android:layout_width="50dp"
+                    android:layout_height="0dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginStart="16dp"
+                    android:background="@android:color/transparent"
+                    android:contentDescription="@string/previous_day_button_description"
+                    android:onClick="@{() -> viewModel.previousDay()}"
+                    android:src="@drawable/ic_keyboard_arrow_left_black_24dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+            </android.support.constraint.ConstraintLayout>
+
+            <include
+                android:id="@+id/loading_indicator_view"
+                style="?android:attr/progressBarStyle"
+                layout="@layout/loading_state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@id/date_picker_layout"
+                app:layout_constraintHorizontal_bias="0.55"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/menu_tab_layout"
+                app:resource="@{menusResource}"/>
+
+            <LinearLayout
+                android:id="@+id/serving_time_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="0dp"
+                android:layout_marginStart="0dp"
+                android:layout_marginTop="0dp"
+                android:background="?android:attr/colorBackground"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:elevation="1dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@id/meal_button_layout"
+                app:layout_constraintTop_toBottomOf="@+id/menu_tab_layout"
+                tools:layout_editor_absoluteY="220dp">
+
+                <TextView
+                    android:id="@+id/meal_time_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp"
+                    android:textAlignment="center"
+                    app:visibleGone="@{showServingTimes}"
+                    tools:layout_editor_absoluteX="72dp"
+                    tools:layout_editor_absoluteY="239dp"
+                    tools:text="11:00 AM - 2:00 PM"/>
+            </LinearLayout>
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/menu_view_pager"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toTopOf="@+id/date_picker_layout"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/meal_button_layout"
+                app:layout_constraintTop_toBottomOf="@+id/serving_time_layout"
+                app:visibleGone="@{menusResource.data != null}"
+                tools:context="com.moufee.purduemenus.ui.menu.MenuActivity">
+
+
+            </android.support.v4.view.ViewPager>
+
+            <LinearLayout
+                android:id="@+id/meal_button_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:background="@drawable/border_right"
+                android:elevation="1dp"
+                android:orientation="vertical"
+                android:paddingBottom="8dp"
+                android:paddingEnd="8dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:paddingStart="8dp"
+                android:paddingTop="16dp"
+                app:layout_constraintBottom_toTopOf="@+id/date_picker_layout"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/menu_tab_layout">
+
+                <Button
+                    android:id="@+id/button_breakfast"
+                    style="@style/MealButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:drawableTop="@drawable/ic_coffee_state"
+                    android:enabled="@{menusResource.data != null}"
+                    android:onClick="@{() -> viewModel.setSelectedMealIndex(0)}"
+                    android:text="@string/breakfast"
+                    app:selected="@{selectedMealIndex == 0}"
+                    tools:text="Breakfast" />
+
+                <Button
+                    android:id="@+id/button_lunch"
+                    style="@style/MealButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:drawableTop="@drawable/ic_pizza_state"
+                    android:enabled="@{menusResource.data != null}"
+                    android:onClick="@{() -> viewModel.setSelectedMealIndex(1)}"
+                    android:padding="0dp"
+                    android:text="@string/lunch"
+                    app:selected="@{selectedMealIndex == 1}"
+                    tools:text="Lunch" />
+
+                <Button
+                    android:id="@+id/button_late_lunch"
+                    style="@style/MealButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:drawablePadding="0dp"
+                    android:drawableTop="@drawable/ic_food_apple_state"
+                    android:enabled="@{menusResource.data != null}"
+                    android:includeFontPadding="false"
+                    android:onClick="@{() -> viewModel.setSelectedMealIndex(2)}"
+                    android:padding="0dp"
+                    android:text="@string/late_lunch"
+                    app:selected="@{selectedMealIndex == 2}"
+                    app:visibleGone="@{menu.isLateLunchServed}"
+                    tools:text="Late Lunch"
+                    tools:visibility="visible" />
+
+                <Button
+                    android:id="@+id/button_dinner"
+                    style="@style/MealButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:drawableTop="@drawable/ic_hamburger_state"
+                    android:enabled="@{menusResource.data != null}"
+                    android:onClick="@{() -> viewModel.setSelectedMealIndex(3)}"
+                    android:text="@string/dinner"
+                    app:selected="@{selectedMealIndex == 3}"
+                    tools:text="Dinner" />
+            </LinearLayout>
+
+        </android.support.constraint.ConstraintLayout>
+
+    </android.support.design.widget.CoordinatorLayout>
+
+</layout>

@@ -21,8 +21,8 @@
     <string name="preference_vegetarian_summary_on">Les icônes végétariennes sont affichées.</string>
     <string name="pref_header_general">Général</string>
     <string name="action_send_feedback">Envoyer des commentaires</string>
-    <string name="action_login">s\'inscrire</string>
-    <string name="action_sign_in_short">s\'inscrire</string>
+    <string name="action_login">S\'identifier</string>
+    <string name="action_sign_in_short">S\'identifier</string>
     <string name="error_incorrect_password">Le mot de passe n\'est pas correct</string>
     <string name="error_invalid_email">L\'adresse e-mail n\'est pas correcte</string>
     <string name="error_invalid_password">Le mot de passe est trop court</string>
@@ -32,9 +32,20 @@
     <string name="title_activity_login">Inscrivez-vous</string>
     <string name="data_unavailable">Indisponible</string>
     <string name="network_error_message">Il y a eu une erreur de réseau</string>
-    <string name="pref_show_serving_times">Montrer les temps de service</string>
+    <string name="pref_show_serving_times">Afficher les temps de service</string>
     <string name="late_lunch">Déjeuner tard</string>
     <string name="on">Activé</string>
     <string name="off">Desactivé</string>
     <string name="auto">Automatique</string>
+    <string name="pref_log_in">Se connecter</string>
+    <string name="pref_summary_not_logged_in">Vous n\'êtes pas connecté</string>
+    <string name="pref_title_show_favorite_count">Afficher les comptes des favoris</string>
+    <string name="login_details">Lorsque vous êtes connecté, l\'application tente de synchroniser vos favoris avec le système de favoris Purdue.</string>
+    <string name="changelog_title">Changelog pour v%1$s</string>
+    <string name="action_clear_favorites">Supprimer Favoris</string>
+    <string name="title_prompt_clear_favorites">Supprimer Favoris?</string>
+    <string name="description_signed_in">Vous êtes connecté en tant que %1$s</string>
+    <string name="prompt_clear_local_favorites">Souhaitez-vous également supprimer vos favoris locaux ou simplement arrêter de les synchroniser?</string>
+    <string name="action_sign_out">Se déconnecter</string>
+    <string name="action_only_logout">Se déconnecter seulement</string>
 </resources>

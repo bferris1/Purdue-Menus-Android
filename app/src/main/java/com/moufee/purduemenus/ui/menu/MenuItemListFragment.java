@@ -1,11 +1,13 @@
 package com.moufee.purduemenus.ui.menu;
 
-import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -16,13 +18,18 @@ import android.widget.TextView;
 
 import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.menus.DailyMenuViewModel;
-import com.moufee.purduemenus.menus.DiningCourtMenu;
 import com.moufee.purduemenus.menus.FullDayMenu;
 import com.moufee.purduemenus.menus.MenuItem;
 import com.moufee.purduemenus.menus.MenuRecyclerViewAdapter;
+import com.moufee.purduemenus.menus.OnToggleFavoriteListener;
+import com.moufee.purduemenus.repository.FavoritesRepository;
 import com.moufee.purduemenus.util.Resource;
 
 import java.util.ArrayList;
+
+import javax.inject.Inject;
+
+import dagger.android.support.AndroidSupportInjection;
 
 /**
  * A Fragment that contains a list of menu items for one Meal at one Dining Court
@@ -30,7 +37,7 @@ import java.util.ArrayList;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class MenuItemListFragment extends Fragment {
+public class MenuItemListFragment extends Fragment implements OnToggleFavoriteListener {
 
     private static final String ARG_DINING_COURT_INDEX = "dining-court-index";
     private static final String ARG_MEAL_INDEX = "meal-index";
@@ -44,6 +51,10 @@ public class MenuItemListFragment extends Fragment {
     private TextView mNotServingTextView;
     private MenuRecyclerViewAdapter mDataBoundAdapter;
     private DailyMenuViewModel mViewModel;
+    @Inject
+    ViewModelProvider.Factory mViewModelFactory;
+    @Inject
+    FavoritesRepository mFavoritesRepository;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -66,14 +77,23 @@ public class MenuItemListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mDataBoundAdapter = new MenuRecyclerViewAdapter(this);
 
         if (getArguments() != null) {
             mDiningCourtIndex = getArguments().getInt(ARG_DINING_COURT_INDEX);
             mMealIndex = getArguments().getInt(ARG_MEAL_INDEX);
         }
-        mViewModel = ViewModelProviders.of(getActivity()).get(DailyMenuViewModel.class);
-        mDataBoundAdapter = new MenuRecyclerViewAdapter();
+    }
 
+    @Override
+    public boolean toggleFavorite(MenuItem item) {
+        if (mViewModel.getFavoriteSet().getValue() == null) return true;
+        Log.d(TAG, "toggleFavorite: Adding Favorite " + item.getName() + " " + item.getId());
+        if (!mViewModel.getFavoriteSet().getValue().contains(item.getId()))
+            mFavoritesRepository.addFavorite(item);
+        else
+            mFavoritesRepository.removeFavorite(item);
+        return true;
     }
 
     @Override
@@ -84,74 +104,79 @@ public class MenuItemListFragment extends Fragment {
 
         // Set the adapter
         Context context = view.getContext();
-        mMenuItemRecyclerView = (RecyclerView) view.findViewById(R.id.menu_item_recyclerview);
+        mMenuItemRecyclerView = view.findViewById(R.id.menu_item_recyclerview);
         mNotServingTextView = view.findViewById(R.id.not_serving_textview);
         mMenuItemRecyclerView.setAdapter(mDataBoundAdapter);
-
-        mMenuItemRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-        setListener();
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(context);
+        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 2);
+            layoutManager = gridLayoutManager;
+            gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                @Override
+                public int getSpanSize(int position) {
+                    return mDataBoundAdapter.isHeader(position) ? 2 : 1;
+                }
+            });
+        }
+        mMenuItemRecyclerView.setLayoutManager(layoutManager);
 
         return view;
     }
 
 
     private void setListener() {
-        mViewModel.getFullMenu().observe(this, new Observer<Resource<FullDayMenu>>() {
-            @Override
-            public void onChanged(@Nullable Resource<FullDayMenu> fullDayMenuResource) {
-                try {
-                    if (fullDayMenuResource != null && fullDayMenuResource.data != null && fullDayMenuResource.data.getMenu(mDiningCourtIndex).isServing(mMealIndex)) {
-                        mDataBoundAdapter.setStations(fullDayMenuResource.data.getMenu(mDiningCourtIndex).getMeal(mMealIndex).getStations());
-                        mMenuItemRecyclerView.setVisibility(View.VISIBLE);
-                        mNotServingTextView.setVisibility(View.GONE);
-                    } else {
-                        mMenuItemRecyclerView.setVisibility(View.GONE);
-                        mNotServingTextView.setText(fullDayMenuResource.data.getMenu(mDiningCourtIndex).getMeal(mMealIndex).getStatus());
-                        mNotServingTextView.setVisibility(View.VISIBLE);
-                    }
-                } catch (Exception e) {
-                    // this is called frequently due to getStatus() being called on null meals
-                    // todo: better handling of null meals (Kotlin?)
-                    mDataBoundAdapter.setStations(new ArrayList<DiningCourtMenu.Station>());
+        mViewModel.getFullMenu().observe(this, fullDayMenuResource -> {
+            try {
+                if (fullDayMenuResource != null && fullDayMenuResource.data != null && fullDayMenuResource.data.getMenu(mDiningCourtIndex).isServing(mMealIndex)) {
+                    mDataBoundAdapter.setStations(fullDayMenuResource.data.getMenu(mDiningCourtIndex).getMeal(mMealIndex).getStations());
+                    mMenuItemRecyclerView.setVisibility(View.VISIBLE);
+                    mNotServingTextView.setVisibility(View.GONE);
+                } else {
                     mMenuItemRecyclerView.setVisibility(View.GONE);
-                    mNotServingTextView.setText(R.string.not_serving);
+                    mNotServingTextView.setText(fullDayMenuResource.data.getMenu(mDiningCourtIndex).getMeal(mMealIndex).getStatus());
                     mNotServingTextView.setVisibility(View.VISIBLE);
                 }
-
+            } catch (Exception e) {
+                // this is called frequently due to getStatus() being called on null meals
+                // todo: better handling of null meals (Kotlin?)
+                mDataBoundAdapter.setStations(new ArrayList<>());
+                mMenuItemRecyclerView.setVisibility(View.GONE);
+                mNotServingTextView.setText(R.string.not_serving);
+                mNotServingTextView.setVisibility(View.VISIBLE);
             }
+
         });
         // todo: refactor this and above method to remove duplicated code
-        mViewModel.getSelectedMealIndex().observe(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(@Nullable Integer integer) {
-                if (integer == null)
-                    return;
-                mMealIndex = integer;
-                Resource<FullDayMenu> fullDayMenuResource = mViewModel.getFullMenu().getValue();
-                try {
-                    if (fullDayMenuResource != null && fullDayMenuResource.data != null && fullDayMenuResource.data.getMenu(mDiningCourtIndex).isServing(mMealIndex)) {
+        mViewModel.getSelectedMealIndex().observe(this, integer -> {
+            if (integer == null)
+                return;
+            mMealIndex = integer;
+            Resource<FullDayMenu> fullDayMenuResource = mViewModel.getFullMenu().getValue();
+            try {
+                if (fullDayMenuResource != null && fullDayMenuResource.data != null && fullDayMenuResource.data.getMenu(mDiningCourtIndex).isServing(mMealIndex)) {
 //                        DiningCourtMenu.Meal meal = fullDayMenuResource.data.getMenu(mDiningCourtIndex).getMeal(mMealIndex);
-                        mDataBoundAdapter.setStations(mViewModel.getFullMenu().getValue().data.getMenu(mDiningCourtIndex).getMeal(mMealIndex).getStations());
-                        mMenuItemRecyclerView.setVisibility(View.VISIBLE);
-                        mNotServingTextView.setVisibility(View.GONE);
-                    } else {
-                        mMenuItemRecyclerView.setVisibility(View.GONE);
-                        mNotServingTextView.setText(fullDayMenuResource.data.getMenu(mDiningCourtIndex).getMeal(mMealIndex).getStatus());
-                        mNotServingTextView.setVisibility(View.VISIBLE);
-                    }
-                } catch (Exception e) {
-                    mDataBoundAdapter.setStations(new ArrayList<DiningCourtMenu.Station>());
+                    mDataBoundAdapter.setStations(mViewModel.getFullMenu().getValue().data.getMenu(mDiningCourtIndex).getMeal(mMealIndex).getStations());
+                    mMenuItemRecyclerView.setVisibility(View.VISIBLE);
+                    mNotServingTextView.setVisibility(View.GONE);
+                } else {
                     mMenuItemRecyclerView.setVisibility(View.GONE);
-                    mNotServingTextView.setText(R.string.not_serving);
+                    mNotServingTextView.setText(fullDayMenuResource.data.getMenu(mDiningCourtIndex).getMeal(mMealIndex).getStatus());
                     mNotServingTextView.setVisibility(View.VISIBLE);
                 }
+            } catch (Exception e) {
+                mDataBoundAdapter.setStations(new ArrayList<>());
+                mMenuItemRecyclerView.setVisibility(View.GONE);
+                mNotServingTextView.setText(R.string.not_serving);
+                mNotServingTextView.setVisibility(View.VISIBLE);
             }
         });
+        mViewModel.getFavoriteSet().observe(this, favoriteIDs -> mDataBoundAdapter.setFavoriteSet(favoriteIDs));
     }
 
 
     @Override
     public void onAttach(Context context) {
+        AndroidSupportInjection.inject(this);
         super.onAttach(context);
         if (context instanceof OnListFragmentInteractionListener) {
             mListener = (OnListFragmentInteractionListener) context;
@@ -159,6 +184,11 @@ public class MenuItemListFragment extends Fragment {
             throw new RuntimeException(context.toString()
                     + " must implement OnListFragmentInteractionListener");
         }
+        if (context instanceof AppCompatActivity) {
+            mViewModel = ViewModelProviders.of((AppCompatActivity) context, mViewModelFactory).get(DailyMenuViewModel.class);
+            setListener();
+        }
+
     }
 
     @Override

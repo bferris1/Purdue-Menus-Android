@@ -4,13 +4,14 @@ import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.moufee.purduemenus.MenusApp;
 import com.moufee.purduemenus.api.Webservice;
+import com.moufee.purduemenus.db.FavoriteDao;
 import com.moufee.purduemenus.util.Resource;
 
 import org.joda.time.DateTime;
@@ -23,10 +24,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import javax.inject.Inject;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -46,19 +46,25 @@ public class UpdateMenuTask implements Runnable {
     private static final String TAG = "UpdateMenuTask";
     private static final String[] DINING_COURTS = {"Earhart", "Ford", "Wiley", "Windsor", "Hillenbrand", "The Gathering Place"};
     private boolean mFetchedFromFile = false;
-    @Inject
-    Webservice mWebservice;
-    @Inject
-    Gson mGson;
-    ConnectivityManager mConnectivityManager;
+    private Webservice mWebservice;
+    private Gson mGson;
+    private FavoriteDao mFavoriteDao;
+    private ConnectivityManager mConnectivityManager;
 
-    public UpdateMenuTask(MutableLiveData<Resource<FullDayMenu>> menu, Context context, DateTime date) {
-        mFullMenu = menu;
+
+    public UpdateMenuTask(MutableLiveData<Resource<FullDayMenu>> liveData, Context context, Webservice webservice, Gson gson, FavoriteDao favoriteDao) {
+        this.mFullMenu = liveData;
         mContext = context;
-        mMenuDate = date;
+        mWebservice = webservice;
+        mMenuDate = new DateTime();
+        mGson = gson;
+        mFavoriteDao = favoriteDao;
         mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        MenusApp app = (MenusApp) context.getApplicationContext();
-        app.getAppComponent().inject(this);
+    }
+
+    public UpdateMenuTask withDate(DateTime date) {
+        this.mMenuDate = date;
+        return this;
     }
 
     @Override
@@ -70,7 +76,7 @@ public class UpdateMenuTask implements Runnable {
             mFullMenu.postValue(Resource.success(new FullDayMenu(fileMenus, mMenuDate, hasLateLunch(fileMenus))));
             Log.d(TAG, "getFullMenu: Read from file!");
         } else {
-            mFullMenu.postValue(Resource.<FullDayMenu>loading(null));
+            mFullMenu.postValue(Resource.loading(null));
         }
         if (fileMenus == null || shouldFetch()) {
             fetchFromNetwork();
@@ -94,6 +100,24 @@ public class UpdateMenuTask implements Runnable {
         return false;
     }
 
+    private void processFavorites(List<DiningCourtMenu> menus) {
+        for (int i = 0; i < menus.size(); i++) {
+            DiningCourtMenu diningCourtMenu = menus.get(i);
+            for (int j = 0; j < diningCourtMenu.getMeals().size(); j++) {
+                DiningCourtMenu.Meal meal = diningCourtMenu.getMeals().get(j);
+                for (int k = 0; k < meal.getStations().size(); k++) {
+                    DiningCourtMenu.Station station = meal.getStations().get(k);
+                    for (int l = 0; l < station.getItems().size(); l++) {
+                        MenuItem menuItem = station.getItems().get(l);
+                        if (mFavoriteDao.getFavoriteByItemId(menuItem.getId()) != null) {
+                            menuItem.setFavorite(true);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private ArrayList<DiningCourtMenu> getMenusFromFile(String formattedDate) {
         File filesDir = mContext.getCacheDir();
         File sourceFile = new File(filesDir, formattedDate + ".json");
@@ -106,6 +130,7 @@ public class UpdateMenuTask implements Runnable {
             Type type = new TypeToken<ArrayList<DiningCourtMenu>>() {
             }.getType();
             result = mGson.fromJson(sourceReader, type);
+            sortMenus(result);
         } catch (Exception e) {
             try {
                 if (sourceReader != null)
@@ -134,13 +159,23 @@ public class UpdateMenuTask implements Runnable {
         writer.close();
     }
 
+    private void sortMenus(List<DiningCourtMenu> menus) {
+
+        String[] customOrder = PreferenceManager.getDefaultSharedPreferences(mContext).getString("dining_court_order", "").split(",");
+        Log.d(TAG, "sortMenus custom : " + Arrays.toString(customOrder));
+        if (customOrder.length  == DINING_COURTS.length)
+            Collections.sort(menus, new DiningCourtComparator(Arrays.asList(customOrder)));
+        else
+            Collections.sort(menus, new DiningCourtComparator());
+    }
+
     private void fetchFromNetwork() {
         NetworkInfo networkInfo = mConnectivityManager.getActiveNetworkInfo();
         if (networkInfo == null || !networkInfo.isConnected()) {
             if (mFetchedFromFile)
                 return;
             else
-                mFullMenu.postValue(Resource.<FullDayMenu>error("Not connected to network", null));
+                mFullMenu.postValue(Resource.error("Not connected to network", null));
             return;
         }
         //this is similar to the initial implementation from the architecture components guide
@@ -155,7 +190,7 @@ public class UpdateMenuTask implements Runnable {
                         tempMenusList.add(response.body());
 
                     if (tempMenusList.size() == DINING_COURTS.length) {
-                        Collections.sort(tempMenusList, new DiningCourtComparator());
+                        sortMenus(tempMenusList);
                         mFullMenu.postValue(Resource.success(new FullDayMenu(tempMenusList, mMenuDate, hasLateLunch(tempMenusList))));
                         //save to json
                         try {
@@ -163,7 +198,7 @@ public class UpdateMenuTask implements Runnable {
 
                         } catch (IOException e) {
                             Log.e(TAG, "onResponse: error saving to file ", e);
-                            mFullMenu.postValue(Resource.<FullDayMenu>error(e.getMessage() != null ? e.getMessage() : "an error occurred while saving to file", null));
+                            mFullMenu.postValue(Resource.error(e.getMessage() != null ? e.getMessage() : "an error occurred while saving to file", null));
                         }
                     }
                 }
@@ -175,7 +210,7 @@ public class UpdateMenuTask implements Runnable {
                     if (mFullMenu.getValue() != null)
                         mFullMenu.postValue(Resource.error("Network Error", mFullMenu.getValue().data));
                     else
-                        mFullMenu.postValue(Resource.<FullDayMenu>error(t.getMessage(), null));
+                        mFullMenu.postValue(Resource.error(t.getMessage(), null));
                 }
             });
 

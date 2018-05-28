@@ -4,11 +4,18 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 
+import com.google.gson.Gson;
+import com.moufee.purduemenus.api.Webservice;
+import com.moufee.purduemenus.db.FavoriteDao;
 import com.moufee.purduemenus.menus.FullDayMenu;
 import com.moufee.purduemenus.menus.UpdateMenuTask;
+import com.moufee.purduemenus.util.AppExecutors;
 import com.moufee.purduemenus.util.Resource;
 
 import org.joda.time.DateTime;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 
 /**
@@ -17,30 +24,35 @@ import org.joda.time.DateTime;
  * Abstracts the data sources from the rest of the app
  * Creates threads to retrieve and process menu data
  */
-
-//todo (in progress): dagger dependency injection?
-
+@Singleton
 public class MenuRepository {
 
-    private static MenuRepository sMenuRepository;
     private static final String TAG = "MenuRepository";
 
-    public static MenuRepository get() {
-        if (sMenuRepository == null)
-            sMenuRepository = new MenuRepository();
-        return sMenuRepository;
+    private Webservice mWebservice;
+    private Gson mGson;
+    private Context mApplicationContext;
+    private AppExecutors mAppExecutors;
+    private FavoriteDao mFavoriteDao;
+
+    @Inject
+    public MenuRepository(Webservice webservice, Gson gson, Context applicationContext, AppExecutors appExecutors, FavoriteDao favoriteDao) {
+        mWebservice = webservice;
+        mGson = gson;
+        mApplicationContext = applicationContext;
+        mAppExecutors = appExecutors;
+        mFavoriteDao = favoriteDao;
     }
 
-    public LiveData<Resource<FullDayMenu>> getMenus(Context context) {
-        return getMenus(context, new DateTime());
+    public LiveData<Resource<FullDayMenu>> getMenus() {
+        return getMenus(new DateTime());
     }
 
 
-    public LiveData<Resource<FullDayMenu>> getMenus(Context context, DateTime dateTime) {
+    public LiveData<Resource<FullDayMenu>> getMenus(DateTime dateTime) {
         MutableLiveData<Resource<FullDayMenu>> data = new MutableLiveData<>();
-        UpdateMenuTask task = new UpdateMenuTask(data, context, dateTime);
-        Thread t = new Thread(task);
-        t.start();
+        UpdateMenuTask task = new UpdateMenuTask(data, mApplicationContext, mWebservice, mGson, mFavoriteDao).withDate(dateTime);
+        mAppExecutors.diskIO().execute(task);
         return data;
     }
 

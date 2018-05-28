@@ -10,6 +10,7 @@
     <color name="colorTextPrimary">#000000</color>
     <color name="colorTextSecondary">#FFFFFF</color>
     <color name="colorAccent">#ffc400</color>
+    <color name="red">#e53935</color>
 
     <color name="purdueGold">#b1810b</color>
     <color name="purdueGoldLight">#e7b044</color>
@@ -25,4 +26,5 @@
     <color name="purdueDarkGoldMaterial">#827717</color>
     <color name="vegetarian_green">#c8e6c9</color>
     <color name="accent_grey">#e0e0e0</color>
+    <color name="separator_grey">#87b7b7b7</color>
 </resources>

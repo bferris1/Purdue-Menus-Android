@@ -14,21 +14,33 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatDelegate;
 
-import com.moufee.purduemenus.MenusApp;
+import com.moufee.purduemenus.repository.FavoritesRepository;
 import com.moufee.purduemenus.util.SingleFragmentActivity;
 
 import javax.inject.Inject;
+
+import dagger.android.AndroidInjection;
+import dagger.android.AndroidInjector;
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.HasFragmentInjector;
 
 /**
  * Settings Activity
  */
 
-public class SettingsActivity extends SingleFragmentActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class SettingsActivity extends SingleFragmentActivity implements SharedPreferences.OnSharedPreferenceChangeListener, HasFragmentInjector {
     public static final String KEY_PREF_SHOW_SERVING_TIMES = "show_serving_times";
     public static final String KEY_PREF_USE_NIGHT_MODE = "night_mode";
+    public static final String KEY_PREF_SHOW_FAVORITE_COUNT = "show_favorite_count";
 
     @Inject
     SharedPreferences sharedPreferences;
+
+    @Inject
+    FavoritesRepository mFavoritesRepository;
+
+    @Inject
+    DispatchingAndroidInjector<Fragment> mDispatchingAndroidInjector;
 
 
     @Override
@@ -47,9 +59,8 @@ public class SettingsActivity extends SingleFragmentActivity implements SharedPr
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
-        MenusApp app = (MenusApp) getApplication();
-        app.getAppComponent().inject(this);
     }
 
     @Override
@@ -119,5 +130,10 @@ public class SettingsActivity extends SingleFragmentActivity implements SharedPr
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public AndroidInjector<Fragment> fragmentInjector() {
+        return mDispatchingAndroidInjector;
     }
 }
