@@ -69,17 +69,16 @@
     <string name="pref_title_show_favorite_count">Show Favorite Counts</string>
     <string name="login_details">When you are logged in, the app will attempt to keep your favorites synchronized with the Purdue favorites system.</string>
     <string name="hint_purdue_username" translatable="false">Purdue Username</string>
-    <string name="update_title">Changelog for %1$s</string>
-    <string name="changelog" translatable="false"><b>Favorite Sync</b>
-        \n\nThe third beta of version 1.1 adds support for favorites synchronization. The app will now attempt to keep you favorites synchronized with the Purdue
-        favorites system if you are logged in.
-        \n\n<b>Custom Dining Court Order (1.1.0-beta2)</b>
-        \n\nThe second beta of version 1.1 allows you to customize dining court display order. Open settings to try it out!
-        \n\n<b>Favorites Support (1.1.0-beta1)</b>
-        \n\nYou can now long-press on an item to add it as a
-        favorite.
+    <string name="update_title">Changelog for v%1$s</string>
+    <string name="changelog" translatable="false">
+        \n<b>Custom Dining Court Order</b>
+        \n\nYou can now customize the order in which the dining courts are displayed. Open settings to try it out!
+        \n\n<b>Favorites Support</b>
+        \n\nYou can now long-press on an item to add it as a favorite.
         \n\nFavorite counts are displayed next to dining court names for quick comparison.
-        \n\nYou can log in to import your favorites from the Purdue system. Two-way synchronization is not yet supported in this beta release.</string>
+        \n\nYou can log in to import and synchronize your favorites with the Purdue favorites system.
+        The app will attempt to keep your favorites synchronized with the Purdue
+        favorites system while you are logged in.</string>
     <string name="action_clear_favorites">Clear Favorites</string>
     <string name="action_only_logout">Just Log Out</string>
     <string name="action_sign_out">Sign Out</string>
