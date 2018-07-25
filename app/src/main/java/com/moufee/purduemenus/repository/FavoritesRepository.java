@@ -90,18 +90,17 @@ public class FavoritesRepository {
             mAppExecutors.diskIO().execute(() -> {
                 Favorite favorite = mFavoriteDao.getFavoriteByItemId(item.getId());
                 Log.d(TAG, "removeFavorite: deleting favorite" + favorite + " " + favorite.favoriteId);
-                if (mSharedPreferences.getBoolean("logged_in", false))
-                    mAppExecutors.networkIO().execute(new FavoriteTransactionTask<ResponseBody>(mHttpClient, mSharedPreferences) {
-                        @Override
-                        public Call<ResponseBody> getCall(@Nullable String ticket) {
-                            return mWebservice.deleteFavorite(favorite.favoriteId, ticket);
-                        }
+                mAppExecutors.networkIO().execute(new FavoriteTransactionTask<ResponseBody>(mHttpClient, mSharedPreferences) {
+                    @Override
+                    public Call<ResponseBody> getCall(@Nullable String ticket) {
+                        return mWebservice.deleteFavorite(favorite.favoriteId, ticket);
+                    }
 
-                        @Override
-                        public void onSuccess(Response<ResponseBody> response) {
-                            Log.d(TAG, "onSuccess: " + response);
-                        }
-                    });
+                    @Override
+                    public void onSuccess(Response<ResponseBody> response) {
+                        Log.d(TAG, "onSuccess: " + response);
+                    }
+                });
                 mFavoriteDao.deleteByItemID(item.getId());
             });
         else
