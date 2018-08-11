@@ -23,7 +23,7 @@ The current priorities for development are:
     - [x] Login (store credentials) and retrieve favorites
     - [x] Store favorites locally in a suitable format (Room database)
     - [x] Add/remove favorites locally
-    - [ ] Persist favorites between local storage and the menus API
+    - [x] Persist favorites between local storage and the menus API
 4. Updating data periodically in the background
     - Sending notifications when selected items are served
     - Allow users to specify notification times

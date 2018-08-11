@@ -52,7 +52,7 @@ class CustomOrderFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(activity)
         recyclerView.adapter = mAdapter
         currentOrder = mSharedPreferences.getString(KEY_PREF_DINING_COURT_ORDER, "").split(",").toMutableList()
-        if (currentOrder.size != 6)
+        if (currentOrder.size != 5)
             currentOrder = defaultOrder
         mAdapter.submitList(currentOrder)
         val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.DOWN or ItemTouchHelper.UP, 0) {

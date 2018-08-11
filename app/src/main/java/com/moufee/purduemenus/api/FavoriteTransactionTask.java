@@ -27,7 +27,7 @@ public abstract class FavoriteTransactionTask<T> implements Runnable {
 
     public void run() {
 
-        if (!ensureLoggedIn()) return;
+        if (!isLoggedIn()) return;
         try {
             Call<T> initialCall = getCall(null);
             Response<T> response = initialCall.execute();
@@ -62,7 +62,7 @@ public abstract class FavoriteTransactionTask<T> implements Runnable {
 
     public abstract void onSuccess(Response<T> response);
 
-    private boolean ensureLoggedIn() {
+    private boolean isLoggedIn() {
 
         if (!mSharedPreferences.getBoolean("logged_in", false))
             return false;

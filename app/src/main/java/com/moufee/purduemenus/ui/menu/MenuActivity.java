@@ -202,7 +202,7 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
         tabLayout.setupWithViewPager(mBinding.menuViewPager);
 
         setListeners();
-        displayChangelog();
+//        displayChangelog();
 
         //receive network status updates, to trigger data update when connectivity is reestablished
         //todo: integrate with Lifecycle

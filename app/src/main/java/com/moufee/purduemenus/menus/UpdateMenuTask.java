@@ -44,7 +44,7 @@ public class UpdateMenuTask implements Runnable {
     private DateTime mMenuDate;
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd");
     private static final String TAG = "UpdateMenuTask";
-    private static final String[] DINING_COURTS = {"Earhart", "Ford", "Wiley", "Windsor", "Hillenbrand", "The Gathering Place"};
+    private static final String[] DINING_COURTS = {"Earhart", "Ford", "Wiley", "Windsor", "Hillenbrand"};
     private boolean mFetchedFromFile = false;
     private Webservice mWebservice;
     private Gson mGson;
