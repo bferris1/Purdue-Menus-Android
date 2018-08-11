@@ -10,7 +10,7 @@ import java.util.List;
  */
 
 public class DiningCourtComparator implements Comparator<DiningCourtMenu> {
-    public static final List<String> diningCourts = new ArrayList<>(Arrays.asList("Earhart", "Ford", "Wiley", "Windsor", "Hillenbrand", "The Gathering Place"));
+    public static final List<String> diningCourts = new ArrayList<>(Arrays.asList("Earhart", "Ford", "Wiley", "Windsor", "Hillenbrand"));
 
     private List<String> sortOrder;
 
