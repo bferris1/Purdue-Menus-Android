@@ -13,7 +13,7 @@
     <string name="title_settings">Paramètres</string>
     <string name="title_notifications">Notifications</string>
     <string name="previous_day_button_description">Jour Précédent</string>
-    <string name="description_favorite_button">préféré</string>
+    <string name="description_favorite_button">Indicateur Préféré</string>
     <string name="description_vegetarian_icon">Indicateur végétarien</string>
     <string name="title_activity_settings">Paramètres</string>
     <string name="preference_title_show_vegetarian_icons">Afficher des icônes végétariennes</string>

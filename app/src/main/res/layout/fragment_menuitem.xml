@@ -60,7 +60,7 @@
             app:visibleGone="@{menuItem.isVegetarian}"
             tools:visibility="visible" />
 
-        <ImageButton
+        <ImageView
             android:id="@+id/favorite_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
