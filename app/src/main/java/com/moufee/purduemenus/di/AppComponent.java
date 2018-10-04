@@ -8,13 +8,13 @@ import javax.inject.Singleton;
 
 import dagger.BindsInstance;
 import dagger.Component;
-import dagger.android.AndroidInjectionModule;
+import dagger.android.support.AndroidSupportInjectionModule;
 
 /**
  * Defines where dependency injection may be performed
  */
 @Singleton
-@Component(modules = {AndroidInjectionModule.class, AppModule.class, ActivityModule.class})
+@Component(modules = {AndroidSupportInjectionModule.class, AppModule.class, ActivityModule.class})
 public interface AppComponent {
 
     @Component.Builder

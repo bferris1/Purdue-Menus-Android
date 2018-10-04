@@ -56,17 +56,15 @@ class CustomOrderFragment : Fragment() {
             currentOrder = defaultOrder
         mAdapter.submitList(currentOrder)
         val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.DOWN or ItemTouchHelper.UP, 0) {
-            override fun onMove(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder?, target: RecyclerView.ViewHolder?): Boolean {
-                val fromPos = viewHolder?.adapterPosition
-                val toPos = target?.adapterPosition
-                if (fromPos != null && toPos != null) {
-                    val item = currentOrder.removeAt(fromPos)
-                    currentOrder.add(toPos, item)
+            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+                val fromPos = viewHolder.adapterPosition
+                val toPos = target.adapterPosition
+                val item = currentOrder.removeAt(fromPos)
+                currentOrder.add(toPos, item)
 //                    mAdapter.submitList(currentOrder)
-                    mAdapter.notifyItemMoved(fromPos, toPos)
-                    Log.d("SADF", "list $currentOrder")
-                    mSharedPreferences.edit().putString(KEY_PREF_DINING_COURT_ORDER, currentOrder.joinToString(",")).apply()
-                }
+                mAdapter.notifyItemMoved(fromPos, toPos)
+                Log.d("SADF", "list $currentOrder")
+                mSharedPreferences.edit().putString(KEY_PREF_DINING_COURT_ORDER, currentOrder.joinToString(",")).apply()
                 return true
             }
 
@@ -77,16 +75,16 @@ class CustomOrderFragment : Fragment() {
                 }
             }
 
-            override fun clearView(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder?) {
+            override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
                 super.clearView(recyclerView, viewHolder)
-                ViewCompat.setElevation(viewHolder?.itemView, 0f)
+                ViewCompat.setElevation(viewHolder.itemView, 0f)
             }
 
-            override fun onChildDraw(c: Canvas?, recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder?, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
-                ItemTouchHelper.Callback.getDefaultUIUtil().onDraw(c, recyclerView, viewHolder?.itemView, dX, dY, actionState, false)
+            override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
+                ItemTouchHelper.Callback.getDefaultUIUtil().onDraw(c, recyclerView, viewHolder.itemView, dX, dY, actionState, false)
             }
 
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int) {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
 
             }
         })
