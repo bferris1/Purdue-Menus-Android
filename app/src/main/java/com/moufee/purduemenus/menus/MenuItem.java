@@ -4,12 +4,14 @@ import android.support.annotation.Keep;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 /**
  * Created by Ben on 9/5/17.
  * Represent one item on the menu
  */
 @Keep
-public class MenuItem {
+public class MenuItem implements Serializable {
     @SerializedName("ID")
     private String id;
     private String name;
