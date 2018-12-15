@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.moufee.purduemenus.api.Webservice;
 import com.moufee.purduemenus.db.FavoriteDao;
 import com.moufee.purduemenus.util.Resource;
@@ -19,10 +18,11 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Type;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -120,50 +120,39 @@ public class UpdateMenuTask implements Runnable {
 
     private ArrayList<DiningCourtMenu> getMenusFromFile(String formattedDate) {
         File filesDir = mContext.getCacheDir();
-        File sourceFile = new File(filesDir, formattedDate + ".json");
+        File sourceFile = new File(filesDir, formattedDate + ".menus");
         ArrayList<DiningCourtMenu> result;
         if (!sourceFile.exists())
             return null;
-        FileReader sourceReader = null;
         try {
-            sourceReader = new FileReader(sourceFile);
-            Type type = new TypeToken<ArrayList<DiningCourtMenu>>() {
-            }.getType();
-            result = mGson.fromJson(sourceReader, type);
+            FileInputStream fileInputStream = new FileInputStream(sourceFile);
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+            result = (ArrayList<DiningCourtMenu>) objectInputStream.readObject();
             sortMenus(result);
+            objectInputStream.close();
+            fileInputStream.close();
         } catch (Exception e) {
-            try {
-                if (sourceReader != null)
-                    sourceReader.close();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
+            Log.e(TAG, "getMenusFromFile: error", e);
             return null;
         }
-
-        try {
-            sourceReader.close();
-        } catch (IOException e) {
-            Log.e(TAG, "getMenusFromFile: ", e);
-        }
-
         return result;
     }
 
     private void saveMenuToFile(String filename, List<DiningCourtMenu> menus) throws IOException {
         File filesDir = mContext.getCacheDir();
         File outputFile = new File(filesDir, filename);
-        FileWriter writer = new FileWriter(outputFile);
-        String json = mGson.toJson(menus);
-        writer.write(json);
-        writer.close();
+        FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+        objectOutputStream.writeObject(menus);
+        objectOutputStream.close();
+        fileOutputStream.close();
     }
 
     private void sortMenus(List<DiningCourtMenu> menus) {
 
         String[] customOrder = PreferenceManager.getDefaultSharedPreferences(mContext).getString("dining_court_order", "").split(",");
         Log.d(TAG, "sortMenus custom : " + Arrays.toString(customOrder));
-        if (customOrder.length  == DINING_COURTS.length)
+        if (customOrder.length == DINING_COURTS.length)
             Collections.sort(menus, new DiningCourtComparator(Arrays.asList(customOrder)));
         else
             Collections.sort(menus, new DiningCourtComparator());
@@ -194,7 +183,7 @@ public class UpdateMenuTask implements Runnable {
                         mFullMenu.postValue(Resource.success(new FullDayMenu(tempMenusList, mMenuDate, hasLateLunch(tempMenusList))));
                         //save to json
                         try {
-                            saveMenuToFile(dateString + ".json", tempMenusList);
+                            saveMenuToFile(dateString + ".menus", tempMenusList);
 
                         } catch (IOException e) {
                             Log.e(TAG, "onResponse: error saving to file ", e);
