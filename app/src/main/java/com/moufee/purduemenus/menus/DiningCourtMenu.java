@@ -18,6 +18,8 @@ import java.util.Set;
 @Keep
 public class DiningCourtMenu implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     private String location;
     private String date;
     private String notes;
@@ -78,6 +80,8 @@ public class DiningCourtMenu implements Serializable {
     @Keep
     public class Meal implements Serializable {
 
+        private static final long serialVersionUID = 1L;
+
         public String getId() {
             return id;
         }
@@ -137,6 +141,8 @@ public class DiningCourtMenu implements Serializable {
     @Keep
     public class Hours implements Serializable {
 
+        private static final long serialVersionUID = 1L;
+
         public LocalTime getStartTime() {
             return startTime;
         }
@@ -152,6 +158,8 @@ public class DiningCourtMenu implements Serializable {
 
     @Keep
     public class Station implements Serializable {
+
+        private static final long serialVersionUID = 1L;
 
 
         public String getName() {
