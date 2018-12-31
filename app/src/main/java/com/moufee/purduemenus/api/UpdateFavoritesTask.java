@@ -1,7 +1,6 @@
 package com.moufee.purduemenus.api;
 
 import android.content.SharedPreferences;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.moufee.purduemenus.db.FavoriteDao;
@@ -24,6 +23,7 @@ public class UpdateFavoritesTask extends FavoriteTransactionTask<Favorites> {
     private static final String TAG = "DOWNLOAD_FAV_TASK";
     private Webservice mWebservice;
     private FavoriteDao mFavoriteDao;
+    private String mTicket = null;
 
     public UpdateFavoritesTask(OkHttpClient httpClient, SharedPreferences sharedPreferences, Webservice webservice, FavoriteDao favoriteDao) {
         super(httpClient, sharedPreferences);
@@ -31,9 +31,14 @@ public class UpdateFavoritesTask extends FavoriteTransactionTask<Favorites> {
         mFavoriteDao = favoriteDao;
     }
 
+    public UpdateFavoritesTask setTicket(String ticket) {
+        this.mTicket = ticket;
+        return this;
+    }
+
     @Override
-    public Call<Favorites> getCall(@Nullable String ticket) {
-        return mWebservice.getFavorites(ticket);
+    public Call<Favorites> getCall() {
+        return mWebservice.getFavorites(mTicket);
     }
 
     @Override
@@ -53,7 +58,7 @@ public class UpdateFavoritesTask extends FavoriteTransactionTask<Favorites> {
                 localFavorites) {
             if (!remoteFavoritesSet.contains(favorite)) {
                 Log.d(TAG, "uploadFavorites: " + favorite);
-                mWebservice.addFavorite(favorite, null).enqueue(new Callback<ResponseBody>() {
+                mWebservice.addFavorite(favorite).enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                         Log.d(TAG, "onResponse: " + response);

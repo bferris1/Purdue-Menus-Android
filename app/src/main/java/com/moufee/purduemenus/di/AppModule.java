@@ -6,10 +6,13 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.franmontiel.persistentcookiejar.PersistentCookieJar;
+import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
+import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.moufee.purduemenus.api.ApiCookieJar;
+import com.moufee.purduemenus.api.FileCookiePersistor;
 import com.moufee.purduemenus.api.LocalTimeTypeConverter;
 import com.moufee.purduemenus.api.Webservice;
 import com.moufee.purduemenus.db.AppDatabase;
@@ -57,10 +60,10 @@ class AppModule {
 
     @Singleton
     @Provides
-    OkHttpClient provideHttpClient(ApiCookieJar cookieJar) {
+    OkHttpClient provideHttpClient(FileCookiePersistor fileCookiePersistor, Context context) {
         //todo: restore cookies or not?
         return new OkHttpClient.Builder()
-                .cookieJar(cookieJar)
+                .cookieJar(new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(context)))
                 .build();
     }
 

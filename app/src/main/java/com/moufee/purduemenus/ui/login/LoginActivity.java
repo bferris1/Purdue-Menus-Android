@@ -204,7 +204,7 @@ public class LoginActivity extends AppCompatActivity {
                 String ticket = ticketResponse.body().string().trim();
                 Log.d(TAG, "doInBackground: ticket: " + ticket);
 
-                mFavoritesRepository.updateFavoritesFromWeb();
+                mFavoritesRepository.updateFavoritesFromWeb(ticket);
 
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: http error", e);

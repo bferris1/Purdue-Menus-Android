@@ -63,8 +63,8 @@ public class FavoritesRepository {
         });
     }
 
-    public void updateFavoritesFromWeb() {
-        mAppExecutors.networkIO().execute(new UpdateFavoritesTask(mHttpClient, mSharedPreferences, mWebservice, mFavoriteDao));
+    public void updateFavoritesFromWeb(@Nullable String ticket) {
+        mAppExecutors.networkIO().execute(new UpdateFavoritesTask(mHttpClient, mSharedPreferences, mWebservice, mFavoriteDao).setTicket(ticket));
     }
 
     public void addFavorite(MenuItem item) {
@@ -73,14 +73,14 @@ public class FavoritesRepository {
         if (mSharedPreferences.getBoolean("logged_in", false))
             mAppExecutors.networkIO().execute(new FavoriteTransactionTask<ResponseBody>(mHttpClient, mSharedPreferences) {
                 @Override
-                public Call<ResponseBody> getCall(@Nullable String ticket) {
-                    return mWebservice.addFavorite(favorite, ticket);
+                public Call<ResponseBody> getCall() {
+                    return mWebservice.addFavorite(favorite);
                 }
 
                 @Override
                 public void onSuccess(Response<ResponseBody> response) {
                     Log.d(TAG, "onSuccess: " + response);
-                    updateFavoritesFromWeb();
+                    updateFavoritesFromWeb(null);
                 }
             });
     }
@@ -92,8 +92,8 @@ public class FavoritesRepository {
                 Log.d(TAG, "removeFavorite: deleting favorite" + favorite + " " + favorite.favoriteId);
                 mAppExecutors.networkIO().execute(new FavoriteTransactionTask<ResponseBody>(mHttpClient, mSharedPreferences) {
                     @Override
-                    public Call<ResponseBody> getCall(@Nullable String ticket) {
-                        return mWebservice.deleteFavorite(favorite.favoriteId, ticket);
+                    public Call<ResponseBody> getCall() {
+                        return mWebservice.deleteFavorite(favorite.favoriteId);
                     }
 
                     @Override
