@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -25,8 +24,8 @@ public class UpdateFavoritesTask extends FavoriteTransactionTask<Favorites> {
     private FavoriteDao mFavoriteDao;
     private String mTicket = null;
 
-    public UpdateFavoritesTask(OkHttpClient httpClient, SharedPreferences sharedPreferences, Webservice webservice, FavoriteDao favoriteDao) {
-        super(httpClient, sharedPreferences);
+    public UpdateFavoritesTask(SharedPreferences sharedPreferences, Webservice webservice, FavoriteDao favoriteDao) {
+        super(sharedPreferences);
         mWebservice = webservice;
         mFavoriteDao = favoriteDao;
     }

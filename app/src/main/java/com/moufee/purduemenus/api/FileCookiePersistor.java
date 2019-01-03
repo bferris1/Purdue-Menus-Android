@@ -22,6 +22,9 @@ import javax.inject.Inject;
 
 import okhttp3.Cookie;
 
+/**
+ * Not currently used
+ */
 public class FileCookiePersistor implements CookiePersistor {
 
     public static final String TAG = "FilePersistor";

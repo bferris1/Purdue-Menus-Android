@@ -3,19 +3,16 @@ package com.moufee.purduemenus.api;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Response;
 
 public abstract class FavoriteTransactionTask<T> implements Runnable {
 
 
-    private OkHttpClient mHttpClient;
     private SharedPreferences mSharedPreferences;
     private static final String TAG = "FavoriteTransaction";
 
-    public FavoriteTransactionTask(OkHttpClient httpClient, SharedPreferences sharedPreferences) {
-        mHttpClient = httpClient;
+    public FavoriteTransactionTask(SharedPreferences sharedPreferences) {
         mSharedPreferences = sharedPreferences;
     }
 

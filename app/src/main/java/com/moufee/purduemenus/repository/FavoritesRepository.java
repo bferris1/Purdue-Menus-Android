@@ -21,7 +21,6 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
-import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -36,16 +35,14 @@ public class FavoritesRepository {
     private FavoriteDao mFavoriteDao;
     private AppExecutors mAppExecutors;
     private Webservice mWebservice;
-    private OkHttpClient mHttpClient;
     private SharedPreferences mSharedPreferences;
     private static final String TAG = "FAVORITES_REPOSITORY";
 
     @Inject
-    public FavoritesRepository(FavoriteDao favoriteDao, AppExecutors appExecutors, Webservice webservice, OkHttpClient httpClient, SharedPreferences sharedPreferences) {
+    public FavoritesRepository(FavoriteDao favoriteDao, AppExecutors appExecutors, Webservice webservice, SharedPreferences sharedPreferences) {
         mFavoriteDao = favoriteDao;
         mAppExecutors = appExecutors;
         mWebservice = webservice;
-        mHttpClient = httpClient;
         mSharedPreferences = sharedPreferences;
     }
 
@@ -64,14 +61,14 @@ public class FavoritesRepository {
     }
 
     public void updateFavoritesFromWeb(@Nullable String ticket) {
-        mAppExecutors.networkIO().execute(new UpdateFavoritesTask(mHttpClient, mSharedPreferences, mWebservice, mFavoriteDao).setTicket(ticket));
+        mAppExecutors.networkIO().execute(new UpdateFavoritesTask(mSharedPreferences, mWebservice, mFavoriteDao).setTicket(ticket));
     }
 
     public void addFavorite(MenuItem item) {
         Favorite favorite = new Favorite(item.getName(), UUID.randomUUID().toString(), item.getId(), item.isVegetarian());
         mAppExecutors.diskIO().execute(() -> mFavoriteDao.insertFavorites(favorite));
         if (mSharedPreferences.getBoolean("logged_in", false))
-            mAppExecutors.networkIO().execute(new FavoriteTransactionTask<ResponseBody>(mHttpClient, mSharedPreferences) {
+            mAppExecutors.networkIO().execute(new FavoriteTransactionTask<ResponseBody>(mSharedPreferences) {
                 @Override
                 public Call<ResponseBody> getCall() {
                     return mWebservice.addFavorite(favorite);
@@ -90,7 +87,7 @@ public class FavoritesRepository {
             mAppExecutors.diskIO().execute(() -> {
                 Favorite favorite = mFavoriteDao.getFavoriteByItemId(item.getId());
                 Log.d(TAG, "removeFavorite: deleting favorite" + favorite + " " + favorite.favoriteId);
-                mAppExecutors.networkIO().execute(new FavoriteTransactionTask<ResponseBody>(mHttpClient, mSharedPreferences) {
+                mAppExecutors.networkIO().execute(new FavoriteTransactionTask<ResponseBody>(mSharedPreferences) {
                     @Override
                     public Call<ResponseBody> getCall() {
                         return mWebservice.deleteFavorite(favorite.favoriteId);
