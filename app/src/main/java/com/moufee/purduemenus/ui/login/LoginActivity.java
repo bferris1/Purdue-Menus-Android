@@ -181,11 +181,9 @@ public class LoginActivity extends AppCompatActivity {
                     return false;
                 }
                 // otherwise the credentials are valid
-                //todo: store this more securely and use constants for keys
                 mSharedPreferences.edit()
                         .putBoolean("logged_in", true)
                         .putString("username", mUsername)
-                        .putString("password", mPassword)
                         .apply();
                 String location = response.headers().get("Location");
                 Log.d(TAG, "doInBackground: location: " + location);
@@ -204,7 +202,7 @@ public class LoginActivity extends AppCompatActivity {
                 String ticket = ticketResponse.body().string().trim();
                 Log.d(TAG, "doInBackground: ticket: " + ticket);
 
-                mFavoritesRepository.updateFavoritesFromWeb();
+                mFavoritesRepository.updateFavoritesFromWeb(ticket);
 
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: http error", e);
