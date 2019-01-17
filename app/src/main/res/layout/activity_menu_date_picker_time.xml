@@ -92,16 +92,18 @@
                     android:id="@+id/date_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
-                    android:layout_marginStart="8dp"
                     android:onClick="@{() -> viewModel.currentDay()}"
+                    android:paddingLeft="28dp"
+                    android:paddingTop="16dp"
+                    android:paddingRight="28dp"
+                    android:paddingBottom="16dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toRightOf="@+id/button_previous_day"
                     app:layout_constraintRight_toLeftOf="@+id/button_next_day"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:text="Today"/>
+                    tools:text="Mon Jan 14" />
 
                 <ImageButton
                     android:id="@+id/button_previous_day"
