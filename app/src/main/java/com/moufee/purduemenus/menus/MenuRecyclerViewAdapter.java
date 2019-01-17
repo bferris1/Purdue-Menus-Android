@@ -41,14 +41,8 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     public void setStations(List<DiningCourtMenu.Station> stations) {
         this.stations = stations;
         int total = 0;
-        Iterator<DiningCourtMenu.Station> iterator = stations.iterator();
-        while (iterator.hasNext()) {
-            DiningCourtMenu.Station station = iterator.next();
-            if (station.getNumItems() == 0) {
-                iterator.remove();
-            } else {
-                total += station.getNumItems();
-            }
+        for (DiningCourtMenu.Station station : stations) {
+            total += station.getNumItems();
         }
         total += stations.size();
         mTotalItems = total;
