@@ -1,14 +1,14 @@
 package com.moufee.purduemenus.menus;
 
-import android.support.annotation.Keep;
-import android.support.annotation.Nullable;
-
 import org.joda.time.LocalTime;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+
+import androidx.annotation.Keep;
+import androidx.annotation.Nullable;
 
 /**
  * Mirrors JSON structure from API to allow easy deserialization

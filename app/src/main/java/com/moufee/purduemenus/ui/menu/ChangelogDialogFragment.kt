@@ -3,11 +3,10 @@ package com.moufee.purduemenus.ui.menu
 import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
 import com.moufee.purduemenus.BuildConfig
 import com.moufee.purduemenus.R
 
-class ChangelogDialogFragment : DialogFragment() {
+class ChangelogDialogFragment : androidx.fragment.app.DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder = AlertDialog.Builder(activity)

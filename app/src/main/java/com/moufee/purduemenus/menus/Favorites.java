@@ -1,11 +1,11 @@
 package com.moufee.purduemenus.menus;
 
-import android.support.annotation.Keep;
-
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.Keep;
 
 /**
  * A container for a list of favorites

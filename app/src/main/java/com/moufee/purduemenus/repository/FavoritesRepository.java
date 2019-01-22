@@ -1,9 +1,6 @@
 package com.moufee.purduemenus.repository;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Transformations;
 import android.content.SharedPreferences;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.moufee.purduemenus.api.FavoriteTransactionTask;
@@ -21,6 +18,9 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
+import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Transformations;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;

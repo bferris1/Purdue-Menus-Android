@@ -1,14 +1,14 @@
 package com.moufee.purduemenus.ui.menu;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-
 import com.moufee.purduemenus.menus.DiningCourtMenu;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 
 /**
  * Created by Ben on 26/09/2017.

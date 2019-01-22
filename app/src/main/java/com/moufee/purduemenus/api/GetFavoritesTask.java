@@ -1,8 +1,8 @@
 package com.moufee.purduemenus.api;
 
-import android.arch.lifecycle.MutableLiveData;
-
 import com.moufee.purduemenus.menus.Favorites;
+
+import androidx.lifecycle.MutableLiveData;
 
 public class GetFavoritesTask implements Runnable {
 

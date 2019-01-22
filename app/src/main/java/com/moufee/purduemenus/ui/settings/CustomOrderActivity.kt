@@ -1,8 +1,7 @@
 package com.moufee.purduemenus.ui.settings
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.moufee.purduemenus.R
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
@@ -13,11 +12,10 @@ import javax.inject.Inject
 class CustomOrderActivity : AppCompatActivity(), HasSupportFragmentInjector {
 
     @Inject
-    internal lateinit var mDispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
+    internal lateinit var mDispatchingAndroidInjector: DispatchingAndroidInjector<androidx.fragment.app.Fragment>
 
 
-
-    override fun supportFragmentInjector(): AndroidInjector<Fragment> {
+    override fun supportFragmentInjector(): AndroidInjector<androidx.fragment.app.Fragment> {
         return mDispatchingAndroidInjector
     }
 

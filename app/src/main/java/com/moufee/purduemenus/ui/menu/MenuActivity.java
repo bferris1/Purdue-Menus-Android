@@ -1,33 +1,23 @@
 package com.moufee.purduemenus.ui.menu;
 
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.databinding.DataBindingUtil;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.tabs.TabLayout;
 import com.moufee.purduemenus.BuildConfig;
-import com.moufee.purduemenus.MenusApp;
 import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.databinding.ActivityMenuDatePickerTimeBinding;
 import com.moufee.purduemenus.menus.DailyMenuViewModel;
@@ -46,6 +36,15 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.viewpager.widget.ViewPager;
 import dagger.android.AndroidInjection;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
@@ -105,7 +104,6 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
         });
         mViewModel.getSelectedMealIndex().observe(this, newMealIndex -> {
             if (newMealIndex != null) {
-                mBinding.setSelectedMealIndex(newMealIndex);
                 mMenuPagerAdapter.setMealIndex(newMealIndex);
                 updateServingTime();
             }
@@ -177,11 +175,10 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
         Log.d(TAG, "onCreate: oncreate called");
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
-        MenusApp app = (MenusApp) getApplication();
         setTitle(getString(R.string.app_name));
 
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_menu_date_picker_time);
-        mBinding.setSelectedMealIndex(0);
+        mBinding.setLifecycleOwner(this);
 
         mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(DailyMenuViewModel.class);
         mBinding.setViewModel(mViewModel);
@@ -205,7 +202,7 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
 //        displayChangelog();
 
         //receive network status updates, to trigger data update when connectivity is reestablished
-        //todo: integrate with Lifecycle
+        //todo: integrate with Lifecycle?
         registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
 
