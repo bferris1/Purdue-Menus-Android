@@ -10,6 +10,7 @@ import com.moufee.purduemenus.ui.menu.MenuItemHolder;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -22,7 +23,7 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     private List<DiningCourtMenu.Station> stations = new ArrayList<>();
     private Set<String> mFavoriteSet = new HashSet<>();
-    private int totalItems = 0;
+    private int mTotalItems = 0;
     private OnToggleFavoriteListener mFavoriteListener;
 
     private final static int VIEW_TYPE_HEADER = 0;
@@ -40,12 +41,11 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     public void setStations(List<DiningCourtMenu.Station> stations) {
         this.stations = stations;
         int total = 0;
-        for (DiningCourtMenu.Station station :
-                stations) {
+        for (DiningCourtMenu.Station station : stations) {
             total += station.getNumItems();
         }
         total += stations.size();
-        totalItems = total;
+        mTotalItems = total;
         notifyDataSetChanged();
     }
 
@@ -76,7 +76,7 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public int getItemCount() {
-        return totalItems;
+        return mTotalItems;
     }
 
     @Override

@@ -39,6 +39,8 @@
 
 -dontwarn org.joda.**
 
+-dontwarn okhttp3.internal.platform.*
+
 -dontwarn org.joda.convert.**
 -dontwarn org.joda.time.**
 -keep class org.joda.time.** { *; }

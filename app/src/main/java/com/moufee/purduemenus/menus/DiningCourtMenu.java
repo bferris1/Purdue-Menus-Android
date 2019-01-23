@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import org.joda.time.LocalTime;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,7 +16,9 @@ import java.util.Set;
  * Gson Constructs objects from JSON using these classes
  */
 @Keep
-public class DiningCourtMenu {
+public class DiningCourtMenu implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String location;
     private String date;
@@ -75,7 +78,9 @@ public class DiningCourtMenu {
     }
 
     @Keep
-    public class Meal {
+    public class Meal implements Serializable {
+
+        private static final long serialVersionUID = 1L;
 
         public String getId() {
             return id;
@@ -134,7 +139,9 @@ public class DiningCourtMenu {
     }
 
     @Keep
-    public class Hours {
+    public class Hours implements Serializable {
+
+        private static final long serialVersionUID = 1L;
 
         public LocalTime getStartTime() {
             return startTime;
@@ -150,7 +157,9 @@ public class DiningCourtMenu {
 
 
     @Keep
-    public class Station {
+    public class Station implements Serializable {
+
+        private static final long serialVersionUID = 1L;
 
 
         public String getName() {

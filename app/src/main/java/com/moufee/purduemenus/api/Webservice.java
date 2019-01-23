@@ -35,8 +35,8 @@ public interface Webservice {
     Call<Favorites> getFavorites(@Query("ticket") @Nullable String ticket);
 
     @POST("/menus/v2/favorites")
-    Call<ResponseBody> addFavorite(@Body Favorite favorite, @Query("ticket") @Nullable String ticket);
+    Call<ResponseBody> addFavorite(@Body Favorite favorite);
 
     @DELETE("/menus/v2/favorites/{favoriteID}")
-    Call<ResponseBody> deleteFavorite(@Path("favoriteID") String favoriteID, @Query("ticket") @Nullable String ticket);
+    Call<ResponseBody> deleteFavorite(@Path("favoriteID") String favoriteID);
 }

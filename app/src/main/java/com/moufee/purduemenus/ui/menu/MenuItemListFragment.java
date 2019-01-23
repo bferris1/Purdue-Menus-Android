@@ -108,7 +108,7 @@ public class MenuItemListFragment extends Fragment implements OnToggleFavoriteLi
         mNotServingTextView = view.findViewById(R.id.not_serving_textview);
         mMenuItemRecyclerView.setAdapter(mDataBoundAdapter);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(context);
-        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (context.getResources().getConfiguration().screenWidthDp > 500) {
             GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 2);
             layoutManager = gridLayoutManager;
             gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
