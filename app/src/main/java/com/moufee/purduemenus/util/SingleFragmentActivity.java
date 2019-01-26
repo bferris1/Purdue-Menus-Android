@@ -1,12 +1,12 @@
 package com.moufee.purduemenus.util;
 
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
-import android.app.Fragment;
-
-import android.support.v7.app.AppCompatActivity;
 
 import com.moufee.purduemenus.R;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 /**
  * Created by Ben on 31/05/2017.

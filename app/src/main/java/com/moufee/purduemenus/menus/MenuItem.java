@@ -1,10 +1,10 @@
 package com.moufee.purduemenus.menus;
 
-import android.support.annotation.Keep;
-
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+
+import androidx.annotation.Keep;
 
 /**
  * Created by Ben on 9/5/17.

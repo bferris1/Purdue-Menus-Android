@@ -9,8 +9,6 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 
 import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.repository.FavoritesRepository;
@@ -18,6 +16,8 @@ import com.moufee.purduemenus.ui.login.LoginActivity;
 
 import javax.inject.Inject;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import dagger.android.AndroidInjection;
 
 /**

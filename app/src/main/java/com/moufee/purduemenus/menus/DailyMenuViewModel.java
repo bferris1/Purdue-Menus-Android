@@ -1,12 +1,5 @@
 package com.moufee.purduemenus.menus;
 
-import android.arch.core.util.Function;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MediatorLiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Transformations;
-import android.arch.lifecycle.ViewModel;
-
 import com.moufee.purduemenus.repository.FavoritesRepository;
 import com.moufee.purduemenus.repository.MenuRepository;
 import com.moufee.purduemenus.util.DateTimeHelper;
@@ -17,6 +10,13 @@ import org.joda.time.DateTime;
 import java.util.Set;
 
 import javax.inject.Inject;
+
+import androidx.arch.core.util.Function;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
+import androidx.lifecycle.ViewModel;
 
 
 /**

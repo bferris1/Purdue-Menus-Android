@@ -1,13 +1,11 @@
 package com.moufee.purduemenus.ui.settings
 
-import android.support.v7.recyclerview.extensions.ListAdapter
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.RecyclerView
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import com.moufee.purduemenus.R
 
 
@@ -35,7 +33,7 @@ class DiningCourtOrderAdapter : ListAdapter<String, DiningCourtOrderAdapter.Dini
     }
 
 
-    inner class DiningCourtViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
+    inner class DiningCourtViewHolder(val mView: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(mView) {
         val mItemTextView: TextView = mView.findViewById(R.id.item_title)
 
     }

@@ -1,7 +1,8 @@
 package com.moufee.purduemenus.binding;
 
-import android.databinding.BindingAdapter;
 import android.view.View;
+
+import androidx.databinding.BindingAdapter;
 
 /**
  * Data Binding Adapters

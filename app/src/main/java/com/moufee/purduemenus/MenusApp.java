@@ -3,13 +3,13 @@ package com.moufee.purduemenus;
 import android.app.Activity;
 import android.app.Application;
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatDelegate;
 
 import com.moufee.purduemenus.di.DaggerAppComponent;
 import com.moufee.purduemenus.ui.settings.SettingsFragment;
 
 import javax.inject.Inject;
 
+import androidx.appcompat.app.AppCompatDelegate;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasActivityInjector;

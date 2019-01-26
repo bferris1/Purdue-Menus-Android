@@ -1,7 +1,5 @@
 package com.moufee.purduemenus.repository;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 
 import com.google.gson.Gson;
@@ -16,6 +14,9 @@ import org.joda.time.DateTime;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 
 /**

@@ -22,10 +22,6 @@ buildscript {
     }
 }
 
-ext.dagger_version = "2.17"
-ext.support_version = "28.0.0"
-ext.arch_version = "1.1.1"
-
 
 allprojects {
     repositories {

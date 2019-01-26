@@ -1,6 +1,5 @@
 package com.moufee.purduemenus.menus;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -10,9 +9,10 @@ import com.moufee.purduemenus.ui.menu.MenuItemHolder;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created by Ben on 9/7/17.

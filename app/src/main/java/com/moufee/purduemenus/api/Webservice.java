@@ -1,11 +1,10 @@
 package com.moufee.purduemenus.api;
 
-import android.support.annotation.Nullable;
-
 import com.moufee.purduemenus.menus.DiningCourtMenu;
 import com.moufee.purduemenus.menus.Favorite;
 import com.moufee.purduemenus.menus.Favorites;
 
+import androidx.annotation.Nullable;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
