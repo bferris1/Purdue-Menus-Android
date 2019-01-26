@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -92,5 +93,10 @@ class AppModule {
     @Provides
     FavoriteDao provideFavoriteDao(AppDatabase appDatabase) {
         return appDatabase.favoriteDao();
+    }
+
+    @Provides
+    FirebaseAnalytics provideAnalytics(Context context) {
+        return FirebaseAnalytics.getInstance(context);
     }
 }

@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.menus.DailyMenuViewModel;
 import com.moufee.purduemenus.menus.FullDayMenu;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -54,6 +56,8 @@ public class MenuItemListFragment extends Fragment implements OnToggleFavoriteLi
     ViewModelProvider.Factory mViewModelFactory;
     @Inject
     FavoritesRepository mFavoritesRepository;
+    @Inject
+    FirebaseAnalytics mFirebaseAnalytics;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -88,6 +92,7 @@ public class MenuItemListFragment extends Fragment implements OnToggleFavoriteLi
     public boolean toggleFavorite(MenuItem item) {
         if (mViewModel.getFavoriteSet().getValue() == null) return true;
         Log.d(TAG, "toggleFavorite: Adding Favorite " + item.getName() + " " + item.getId());
+        mFirebaseAnalytics.logEvent("toggle_favorite", null);
         if (!mViewModel.getFavoriteSet().getValue().contains(item.getId()))
             mFavoritesRepository.addFavorite(item);
         else
@@ -96,7 +101,7 @@ public class MenuItemListFragment extends Fragment implements OnToggleFavoriteLi
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_menuitem_list, container, false);
 

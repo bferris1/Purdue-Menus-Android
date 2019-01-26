@@ -10,6 +10,7 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.repository.FavoritesRepository;
 import com.moufee.purduemenus.ui.login.LoginActivity;
@@ -40,6 +41,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     SharedPreferences mSharedPreferences;
     @Inject
     FavoritesRepository mFavoritesRepository;
+    @Inject
+    FirebaseAnalytics mFirebaseAnalytics;
     private Preference mLoginPref;
 
     @Override
@@ -104,6 +107,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     }
 
     private void logout() {
+        mFirebaseAnalytics.logEvent("purdue_log_out", null);
         mSharedPreferences
                 .edit()
                 .putBoolean(KEY_PREF_LOGGED_IN, false)
