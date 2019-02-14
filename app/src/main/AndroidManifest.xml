@@ -11,6 +11,7 @@
         android:required="false" />
 
     <application
+
         android:name=".MenusApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher_adaptive"
@@ -45,6 +46,11 @@
             android:theme="@style/AppTheme.ActionBar"
             android:parentActivityName=".ui.settings.SettingsActivity"
             android:label="Dining Court Display Order"/>
+
+        <meta-data
+            android:name="google_analytics_adid_collection_enabled"
+            android:value="false" />
+
     </application>
 
 </manifest>

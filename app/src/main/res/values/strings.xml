@@ -85,6 +85,7 @@
     <string name="description_signed_in">You are signed in as %1$s</string>
     <string name="prompt_clear_local_favorites">Would you also like to clear your local favorites, or just stop synchronizing them?</string>
     <string name="title_prompt_clear_favorites">Clear Favorites?</string>
+    <string name="title_privacy_policy">Privacy Policy</string>
 
 
 </resources>

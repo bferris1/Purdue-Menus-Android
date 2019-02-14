@@ -5,12 +5,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.repository.FavoritesRepository;
 import com.moufee.purduemenus.ui.login.LoginActivity;
@@ -35,15 +35,15 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String KEY_PREF_PASSWORD = "password";
     public static final String KEY_PREF_DINING_COURT_ORDER = "dining_court_order";
     public static final String PREF_LOG_IN = "log_in";
+    public static final String KEY_PREF_PRIVACY_POLICY = "privacy_policy";
 
     private static final String TAG = "SettingsFragment";
     @Inject
     SharedPreferences mSharedPreferences;
     @Inject
     FavoritesRepository mFavoritesRepository;
-    @Inject
-    FirebaseAnalytics mFirebaseAnalytics;
     private Preference mLoginPref;
+    private Preference mPrivacyPolicyPref;
 
     @Override
     public void onAttach(Context context) {
@@ -66,6 +66,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         mLoginPref = findPreference(PREF_LOG_IN);
         Preference sortOrderPref = findPreference(KEY_PREF_DINING_COURT_ORDER);
+        mPrivacyPolicyPref = findPreference(KEY_PREF_PRIVACY_POLICY);
         sortOrderPref.setOnPreferenceClickListener(preference -> {
             startActivity(new Intent(getActivity(), CustomOrderActivity.class));
             return true;
@@ -85,6 +86,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 startActivity(intent);
                 return true;
             }
+        });
+
+        mPrivacyPolicyPref.setOnPreferenceClickListener(preference -> {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://docs.google.com/document/d/e/2PACX-1vStos4981Lkbh69nyVxnZrv8dVoXqSvcBuxWfB6hN4rEh7nT3Gnp-JeyS4-I-GIA-6p8x7m2UJ6xhpi/pub"));
+            startActivity(browserIntent);
+            return true;
         });
 
         mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
@@ -107,7 +114,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     }
 
     private void logout() {
-        mFirebaseAnalytics.logEvent("purdue_log_out", null);
         mSharedPreferences
                 .edit()
                 .putBoolean(KEY_PREF_LOGGED_IN, false)

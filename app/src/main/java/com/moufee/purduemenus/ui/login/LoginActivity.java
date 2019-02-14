@@ -14,7 +14,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.repository.FavoritesRepository;
 import com.moufee.purduemenus.util.AuthHelper;
@@ -219,12 +218,10 @@ public class LoginActivity extends AppCompatActivity {
             showProgress(false);
 
             if (success) {
-                FirebaseAnalytics.getInstance(getApplicationContext()).logEvent("purdue_login_success", null);
                 finish();
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
-                FirebaseAnalytics.getInstance(getApplicationContext()).logEvent("purdue_login_failure", null);
             }
         }
 
