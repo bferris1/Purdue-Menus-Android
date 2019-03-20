@@ -2,8 +2,8 @@
 <layout>
     <data>
         <variable
-            name="station"
-            type="com.moufee.purduemenus.menus.DiningCourtMenu.Station"/>
+            name="stationName"
+            type="String" />
     </data>
     <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -31,7 +31,7 @@
             android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"
             android:textAppearance="@style/RecyclerViewHeader"
-            android:text="@{station.name}"
+            android:text="@{stationName}"
             tools:text="Station Title"/>
 
     </RelativeLayout>
