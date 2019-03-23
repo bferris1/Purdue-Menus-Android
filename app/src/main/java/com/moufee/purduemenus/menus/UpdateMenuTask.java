@@ -100,24 +100,6 @@ public class UpdateMenuTask implements Runnable {
         return false;
     }
 
-    private void processFavorites(List<DiningCourtMenu> menus) {
-        for (int i = 0; i < menus.size(); i++) {
-            DiningCourtMenu diningCourtMenu = menus.get(i);
-            for (int j = 0; j < diningCourtMenu.getMeals().size(); j++) {
-                DiningCourtMenu.Meal meal = diningCourtMenu.getMeals().get(j);
-                for (int k = 0; k < meal.getStations().size(); k++) {
-                    DiningCourtMenu.Station station = meal.getStations().get(k);
-                    for (int l = 0; l < station.getItems().size(); l++) {
-                        MenuItem menuItem = station.getItems().get(l);
-                        if (mFavoriteDao.getFavoriteByItemId(menuItem.getId()) != null) {
-                            menuItem.setFavorite(true);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     private ArrayList<DiningCourtMenu> getMenusFromFile(String formattedDate) {
         File filesDir = mContext.getCacheDir();
         File sourceFile = new File(filesDir, formattedDate + ".menus");
