@@ -40,7 +40,7 @@ public class Favorite {
 
     @Override
     public boolean equals(Object obj) {
-        return obj != null && obj instanceof Favorite && ((Favorite) obj).itemId.equals(itemId);
+        return obj instanceof Favorite && ((Favorite) obj).itemId.equals(itemId);
     }
 
     @Override
