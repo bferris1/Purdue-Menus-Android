@@ -31,6 +31,7 @@ public class DailyMenuViewModel extends ViewModel {
     private final MutableLiveData<DateTime> mCurrentDate = new MutableLiveData<>();
     private final MutableLiveData<Integer> mSelectedMealIndex = new MutableLiveData<>();
     private final LiveData<Set<String>> mFavoriteSet;
+    private final LiveData<Resource<LocationsResponse>> mLocations;
     private final LiveData<Resource<FullDayMenu>> mFullMenu = Transformations.switchMap(mCurrentDate, new Function<DateTime, LiveData<Resource<FullDayMenu>>>() {
         @Override
         public LiveData<Resource<FullDayMenu>> apply(DateTime input) {
@@ -46,6 +47,7 @@ public class DailyMenuViewModel extends ViewModel {
         mFavoritesRepository = favoritesRepository;
         mFavoriteSet = mFavoritesRepository.getFavoriteIDSet();
         mSelectedMealIndex.setValue(DateTimeHelper.getCurrentMealIndex());
+        mLocations = menuRepository.getLocations();
         setDate(new DateTime());
     }
 

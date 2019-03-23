@@ -13,25 +13,16 @@ import androidx.annotation.Keep;
 @Keep
 public class MenuItem implements Serializable {
     @SerializedName("ID")
-    private String id;
-    private String name;
+    private String Id;
+    private String Name;
     private boolean isVegetarian;
-    private boolean isFavorite = false;
 
     public MenuItem(String name) {
-        this.name = name;
-    }
-
-    public boolean isFavorite() {
-        return isFavorite;
-    }
-
-    public void setFavorite(boolean favorite) {
-        isFavorite = favorite;
+        this.Name = name;
     }
 
     public String getName() {
-        return name;
+        return Name;
     }
 
     public boolean isVegetarian() {
@@ -39,11 +30,11 @@ public class MenuItem implements Serializable {
     }
 
     public String getId() {
-        return id;
+        return Id;
     }
 
     @Override
     public String toString() {
-        return id + " :" + name;
+        return Id + " :" + Name;
     }
 }

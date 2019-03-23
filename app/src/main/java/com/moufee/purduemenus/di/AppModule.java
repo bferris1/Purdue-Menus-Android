@@ -12,11 +12,14 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.moufee.purduemenus.api.FileCookiePersistor;
+import com.moufee.purduemenus.api.LocalTimeTypeAdapter;
 import com.moufee.purduemenus.api.LocalTimeTypeConverter;
 import com.moufee.purduemenus.api.Webservice;
 import com.moufee.purduemenus.db.AppDatabase;
 import com.moufee.purduemenus.db.FavoriteDao;
 import com.moufee.purduemenus.util.AppExecutors;
+import com.squareup.moshi.Moshi;
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory;
 
 import org.joda.time.LocalTime;
 
@@ -27,7 +30,7 @@ import dagger.Module;
 import dagger.Provides;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.moshi.MoshiConverterFactory;
 
 /**
  * Created by Ben on 28/07/2017.
@@ -39,14 +42,23 @@ class AppModule {
 
     @Singleton
     @Provides
-    Webservice provideWebService(AppExecutors executors, Gson gson, OkHttpClient client) {
+    Webservice provideWebService(AppExecutors executors, Moshi moshi, OkHttpClient client) {
         return new Retrofit.Builder()
                 .baseUrl("https://api.hfs.purdue.edu")
                 .client(client)
-                .addConverterFactory(GsonConverterFactory.create(gson))
+                .addConverterFactory(MoshiConverterFactory.create(moshi))
                 .callbackExecutor(executors.diskIO())
                 .build()
                 .create(Webservice.class);
+    }
+
+    @Singleton
+    @Provides
+    Moshi provideMoshi() {
+        return new Moshi.Builder()
+                .add(new LocalTimeTypeAdapter())
+                .add(new KotlinJsonAdapterFactory())
+                .build();
     }
 
     @Singleton
