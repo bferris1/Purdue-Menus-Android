@@ -13,9 +13,9 @@ import androidx.annotation.Keep;
 @Keep
 public class MenuItem implements Serializable {
     @SerializedName("ID")
-    private String Id;
+    private String ID;
     private String Name;
-    private boolean isVegetarian;
+    private boolean IsVegetarian;
 
     public MenuItem(String name) {
         this.Name = name;
@@ -26,15 +26,15 @@ public class MenuItem implements Serializable {
     }
 
     public boolean isVegetarian() {
-        return isVegetarian;
+        return IsVegetarian;
     }
 
     public String getId() {
-        return Id;
+        return ID;
     }
 
     @Override
     public String toString() {
-        return Id + " :" + Name;
+        return ID + " :" + Name;
     }
 }
