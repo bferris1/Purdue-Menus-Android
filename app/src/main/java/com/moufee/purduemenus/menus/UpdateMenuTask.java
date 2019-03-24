@@ -62,6 +62,8 @@ public class UpdateMenuTask implements Runnable {
         mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
+    //todo: what is this for? constructor too long?
+
     public UpdateMenuTask withDate(DateTime date) {
         this.mMenuDate = date;
         return this;
@@ -84,7 +86,7 @@ public class UpdateMenuTask implements Runnable {
     }
 
     private boolean shouldFetch() {
-        //todo: check if the menus from the file are too short, have a lot of null values, etc and decide when to fetch
+        //todo: check if the menus from the file are too short, have a lot of null values, etc and decide when to fetch?
         return true;
 //        DateTime now = new DateTime();
 //        Log.d(TAG, "shouldFetch: days: "+Days.daysBetween(now, mMenuDate).getDays());
