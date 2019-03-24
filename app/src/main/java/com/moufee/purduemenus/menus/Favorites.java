@@ -13,7 +13,7 @@ import androidx.annotation.Keep;
 @Keep
 public class Favorites {
     @Json(name = "Favorite")
-    private ArrayList<Favorite> mFavorites;
+    private List<Favorite> mFavorites;
 
     public List<Favorite> getFavorites() {
         return mFavorites;
