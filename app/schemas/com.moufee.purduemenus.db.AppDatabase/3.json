@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "dfd02e8661bd5ae8b3d1ad3af5724bd0",
+    "identityHash": "0c2643f616c956aac92ea0972deefde9",
     "entities": [
       {
         "tableName": "Favorite",
@@ -44,7 +44,7 @@
       },
       {
         "tableName": "Location",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`Name` TEXT NOT NULL, `LocationId` TEXT NOT NULL, `FormalName` TEXT NOT NULL, `displayOrder` INTEGER NOT NULL, PRIMARY KEY(`LocationId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`Name` TEXT NOT NULL, `LocationId` TEXT NOT NULL, `FormalName` TEXT NOT NULL, `displayOrder` INTEGER NOT NULL, `isHidden` INTEGER NOT NULL, PRIMARY KEY(`LocationId`))",
         "fields": [
           {
             "fieldPath": "Name",
@@ -69,6 +69,12 @@
             "columnName": "displayOrder",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "isHidden",
+            "columnName": "isHidden",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -84,7 +90,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"dfd02e8661bd5ae8b3d1ad3af5724bd0\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"0c2643f616c956aac92ea0972deefde9\")"
     ]
   }
 }

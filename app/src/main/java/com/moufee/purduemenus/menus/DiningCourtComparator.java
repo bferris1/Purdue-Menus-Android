@@ -3,7 +3,9 @@ package com.moufee.purduemenus.menus;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Sorts Dining Courts into a fixed order based on their name
@@ -14,21 +16,29 @@ public class DiningCourtComparator implements Comparator<DiningCourtMenu> {
 
     private List<String> sortOrder;
 
+    private List<Location> mLocationOrder;
+    private Map<String, Integer> mSortOrderMap = new HashMap<>();
+
     public DiningCourtComparator() {
         sortOrder = diningCourts;
     }
 
-    public DiningCourtComparator(List<String> sortOrder) {
-        this.sortOrder = sortOrder;
+    public DiningCourtComparator(List<Location> sortOrder) {
+        this.mLocationOrder = sortOrder;
+        for (Location location :
+                mLocationOrder) {
+            mSortOrderMap.put(location.getName(), location.getDisplayOrder());
+        }
     }
+
 
     @Override
     public int compare(DiningCourtMenu o1, DiningCourtMenu o2) {
         if (o1 == null || o2 == null)
             return 0;
-        int index1 = sortOrder.indexOf(o1.getLocation());
-        int index2 = sortOrder.indexOf(o2.getLocation());
-
+        Integer index1 = mSortOrderMap.get(o1.getLocation());
+        Integer index2 = mSortOrderMap.get(o2.getLocation());
+        if (index1 == null || index2 == null) return 0;
         if (index1 < index2)
             return -1;
         if (index1 > index2)

@@ -11,9 +11,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.moufee.purduemenus.R
+import com.moufee.purduemenus.db.LocationDao
 import com.moufee.purduemenus.menus.DiningCourtComparator
+import com.moufee.purduemenus.menus.Location
+import com.moufee.purduemenus.util.AppExecutors
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
@@ -30,10 +34,19 @@ const val KEY_PREF_DINING_COURT_ORDER = "dining_court_order"
 class CustomOrderFragment : androidx.fragment.app.Fragment() {
     private lateinit var mAdapter: DiningCourtOrderAdapter
     private val defaultOrder = DiningCourtComparator.diningCourts
-    private var currentOrder: MutableList<String> = ArrayList(defaultOrder)
 
     @Inject
     lateinit var mSharedPreferences: SharedPreferences
+
+    @Inject
+    lateinit var mLocationDao: LocationDao
+
+    @Inject
+    lateinit var mAppExecutors: AppExecutors
+
+    // not sure if this is a great practice, seems to work best for allowing reordering
+    var orderedLocations: MutableList<Location> = ArrayList()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,20 +62,17 @@ class CustomOrderFragment : androidx.fragment.app.Fragment() {
         val recyclerView: androidx.recyclerview.widget.RecyclerView = view.findViewById(R.id.dining_court_order_recyclerview)
         recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(activity)
         recyclerView.adapter = mAdapter
-        currentOrder = mSharedPreferences.getString(KEY_PREF_DINING_COURT_ORDER, "").split(",").toMutableList()
-        if (currentOrder.size != 5)
-            currentOrder = defaultOrder
-        mAdapter.submitList(currentOrder)
+        mLocationDao.getAll().observe(this, Observer {
+            mAdapter.submitList(it)
+            orderedLocations = it as MutableList<Location>
+        })
         val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.DOWN or ItemTouchHelper.UP, 0) {
             override fun onMove(recyclerView: androidx.recyclerview.widget.RecyclerView, viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, target: androidx.recyclerview.widget.RecyclerView.ViewHolder): Boolean {
                 val fromPos = viewHolder.adapterPosition
                 val toPos = target.adapterPosition
-                val item = currentOrder.removeAt(fromPos)
-                currentOrder.add(toPos, item)
-//                    mAdapter.submitList(currentOrder)
+                orderedLocations.add(toPos, orderedLocations.removeAt(fromPos))
                 mAdapter.notifyItemMoved(fromPos, toPos)
-                Log.d("SADF", "list $currentOrder")
-                mSharedPreferences.edit().putString(KEY_PREF_DINING_COURT_ORDER, currentOrder.joinToString(",")).apply()
+                Log.d("ASDF", "from $fromPos to $toPos")
                 return true
             }
 
@@ -75,6 +85,12 @@ class CustomOrderFragment : androidx.fragment.app.Fragment() {
 
             override fun clearView(recyclerView: androidx.recyclerview.widget.RecyclerView, viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder) {
                 super.clearView(recyclerView, viewHolder)
+                for ((i, location) in orderedLocations.withIndex()) {
+                    location.displayOrder = i
+                }
+                mAppExecutors.diskIO().execute {
+                    mLocationDao.updateLocations(orderedLocations)
+                }
                 ViewCompat.setElevation(viewHolder.itemView, 0f)
             }
 

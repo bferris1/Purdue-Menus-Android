@@ -6,9 +6,10 @@ import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.google.gson.Gson;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
+
 import com.moufee.purduemenus.api.Webservice;
-import com.moufee.purduemenus.db.FavoriteDao;
 import com.moufee.purduemenus.util.Resource;
 
 import org.joda.time.DateTime;
@@ -26,8 +27,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.MutableLiveData;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -44,21 +43,19 @@ public class UpdateMenuTask implements Runnable {
     private DateTime mMenuDate;
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd");
     private static final String TAG = "UpdateMenuTask";
-    private static final String[] DINING_COURTS = {"Earhart", "Ford", "Wiley", "Windsor", "Hillenbrand"};
+    //    private static final String[] DINING_COURTS = {"Earhart", "Ford", "Wiley", "Windsor", "Hillenbrand"};
     private boolean mFetchedFromFile = false;
     private Webservice mWebservice;
-    private Gson mGson;
-    private FavoriteDao mFavoriteDao;
     private ConnectivityManager mConnectivityManager;
+    private List<Location> mLocationList;
 
 
-    public UpdateMenuTask(MutableLiveData<Resource<FullDayMenu>> liveData, Context context, Webservice webservice, Gson gson, FavoriteDao favoriteDao) {
+    public UpdateMenuTask(MutableLiveData<Resource<FullDayMenu>> liveData, List<Location> locatiions, Context context, Webservice webservice) {
         this.mFullMenu = liveData;
+        mLocationList = locatiions;
         mContext = context;
         mWebservice = webservice;
         mMenuDate = new DateTime();
-        mGson = gson;
-        mFavoriteDao = favoriteDao;
         mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
@@ -136,10 +133,7 @@ public class UpdateMenuTask implements Runnable {
 
         String[] customOrder = PreferenceManager.getDefaultSharedPreferences(mContext).getString("dining_court_order", "").split(",");
         Log.d(TAG, "sortMenus custom : " + Arrays.toString(customOrder));
-        if (customOrder.length == DINING_COURTS.length)
-            Collections.sort(menus, new DiningCourtComparator(Arrays.asList(customOrder)));
-        else
-            Collections.sort(menus, new DiningCourtComparator());
+        Collections.sort(menus, new DiningCourtComparator(mLocationList));
     }
 
     private void fetchFromNetwork() {
@@ -151,10 +145,15 @@ public class UpdateMenuTask implements Runnable {
                 mFullMenu.postValue(Resource.error("Not connected to network", null));
             return;
         }
+        List<String> diningCourtNames = new ArrayList<>();
+        for (Location location :
+                mLocationList) {
+            diningCourtNames.add(location.getName());
+        }
         //this is similar to the initial implementation from the architecture components guide
         final List<DiningCourtMenu> tempMenusList = new ArrayList<>();
         final String dateString = DATE_TIME_FORMATTER.print(mMenuDate);
-        for (final String diningCourt : DINING_COURTS) {
+        for (final String diningCourt : diningCourtNames) {
             Call<DiningCourtMenu> menuCall = mWebservice.getMenu(diningCourt, dateString);
             menuCall.enqueue(new Callback<DiningCourtMenu>() {
                 @Override
@@ -162,7 +161,7 @@ public class UpdateMenuTask implements Runnable {
                     if (response.isSuccessful())
                         tempMenusList.add(response.body());
 
-                    if (tempMenusList.size() == DINING_COURTS.length) {
+                    if (tempMenusList.size() == diningCourtNames.size()) {
                         sortMenus(tempMenusList);
                         mFullMenu.postValue(Resource.success(new FullDayMenu(tempMenusList, mMenuDate, hasLateLunch(tempMenusList))));
                         //save to json

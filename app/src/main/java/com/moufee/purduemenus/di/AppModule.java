@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import androidx.room.Room;
+
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
@@ -17,6 +19,7 @@ import com.moufee.purduemenus.api.LocalTimeTypeConverter;
 import com.moufee.purduemenus.api.Webservice;
 import com.moufee.purduemenus.db.AppDatabase;
 import com.moufee.purduemenus.db.FavoriteDao;
+import com.moufee.purduemenus.db.LocationDao;
 import com.moufee.purduemenus.util.AppExecutors;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory;
@@ -25,7 +28,6 @@ import org.joda.time.LocalTime;
 
 import javax.inject.Singleton;
 
-import androidx.room.Room;
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.OkHttpClient;
@@ -100,10 +102,14 @@ class AppModule {
                 .build();
     }
 
-    @Singleton
     @Provides
     FavoriteDao provideFavoriteDao(AppDatabase appDatabase) {
         return appDatabase.favoriteDao();
+    }
+
+    @Provides
+    LocationDao provideLocationDao(AppDatabase appDatabase) {
+        return appDatabase.locationDao();
     }
 
 }
