@@ -18,6 +18,9 @@ interface LocationDao {
     @Update
     fun updateLocations(locations: List<Location>)
 
+    @Update
+    fun updateLocations(vararg locations: Location)
+
     @Delete
     fun delete(location: Location)
 

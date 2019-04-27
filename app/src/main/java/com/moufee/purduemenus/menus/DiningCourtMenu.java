@@ -1,9 +1,9 @@
 package com.moufee.purduemenus.menus;
 
+import androidx.annotation.Keep;
+
 import java.io.Serializable;
 import java.util.List;
-
-import androidx.annotation.Keep;
 
 /**
  * Mirrors JSON structure from API to allow easy deserialization
@@ -21,9 +21,7 @@ public class DiningCourtMenu implements Serializable {
     private List<Meal> Meals;
 
     public String getLocation() {
-        if (Location != null)
-            return Location;
-        return "NULL";
+        return Location != null ? Location : "NULL";
     }
 
     public String getDate() {

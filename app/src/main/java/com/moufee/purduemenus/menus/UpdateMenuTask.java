@@ -3,7 +3,6 @@ package com.moufee.purduemenus.menus;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -23,9 +22,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -43,16 +44,15 @@ public class UpdateMenuTask implements Runnable {
     private DateTime mMenuDate;
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd");
     private static final String TAG = "UpdateMenuTask";
-    //    private static final String[] DINING_COURTS = {"Earhart", "Ford", "Wiley", "Windsor", "Hillenbrand"};
     private boolean mFetchedFromFile = false;
     private Webservice mWebservice;
     private ConnectivityManager mConnectivityManager;
     private List<Location> mLocationList;
 
 
-    public UpdateMenuTask(MutableLiveData<Resource<FullDayMenu>> liveData, List<Location> locatiions, Context context, Webservice webservice) {
+    public UpdateMenuTask(MutableLiveData<Resource<FullDayMenu>> liveData, List<Location> locations, Context context, Webservice webservice) {
         this.mFullMenu = liveData;
-        mLocationList = locatiions;
+        mLocationList = locations;
         mContext = context;
         mWebservice = webservice;
         mMenuDate = new DateTime();
@@ -129,10 +129,23 @@ public class UpdateMenuTask implements Runnable {
         fileOutputStream.close();
     }
 
-    private void sortMenus(List<DiningCourtMenu> menus) {
+    // todo: move this logic to ViewModel?
 
-        String[] customOrder = PreferenceManager.getDefaultSharedPreferences(mContext).getString("dining_court_order", "").split(",");
-        Log.d(TAG, "sortMenus custom : " + Arrays.toString(customOrder));
+    private void sortMenus(List<DiningCourtMenu> menus) {
+        Log.d(TAG, "sortMenus: " + menus.toString());
+        Map<String, Location> locationMap = new HashMap<>();
+        for (int i = 0; i < mLocationList.size(); i++) {
+            Location location = mLocationList.get(i);
+            locationMap.put(location.getName(), location);
+        }
+
+        Iterator<DiningCourtMenu> iterator = menus.iterator();
+        while (iterator.hasNext()) {
+            DiningCourtMenu menu = iterator.next();
+            if (locationMap.get(menu.getLocation()).isHidden()) {
+                iterator.remove();
+            }
+        }
         Collections.sort(menus, new DiningCourtComparator(mLocationList));
     }
 

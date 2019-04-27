@@ -6,9 +6,7 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.google.gson.Gson;
 import com.moufee.purduemenus.api.Webservice;
-import com.moufee.purduemenus.db.FavoriteDao;
 import com.moufee.purduemenus.db.LocationDao;
 import com.moufee.purduemenus.menus.FullDayMenu;
 import com.moufee.purduemenus.menus.Location;
@@ -40,19 +38,15 @@ public class MenuRepository {
     private static final String TAG = "MenuRepository";
 
     private Webservice mWebservice;
-    private Gson mGson;
     private Context mApplicationContext;
     private AppExecutors mAppExecutors;
-    private FavoriteDao mFavoriteDao;
     private LocationDao mLocationDao;
 
     @Inject
-    public MenuRepository(Webservice webservice, Gson gson, Context applicationContext, AppExecutors appExecutors, FavoriteDao favoriteDao, LocationDao locationDao) {
+    public MenuRepository(Webservice webservice, Context applicationContext, AppExecutors appExecutors, LocationDao locationDao) {
         mWebservice = webservice;
-        mGson = gson;
         mApplicationContext = applicationContext;
         mAppExecutors = appExecutors;
-        mFavoriteDao = favoriteDao;
         mLocationDao = locationDao;
     }
 
@@ -78,6 +72,14 @@ public class MenuRepository {
             }
         });
         return mLocationDao.getAll();
+    }
+
+    public void updateLocations(Location... locations) {
+        mAppExecutors.diskIO().execute(() -> mLocationDao.updateLocations(locations));
+    }
+
+    public void updateLocations(List<Location> locations) {
+        mAppExecutors.diskIO().execute(() -> mLocationDao.updateLocations(locations));
     }
 
 
