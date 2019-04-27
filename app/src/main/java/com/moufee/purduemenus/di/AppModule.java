@@ -10,12 +10,8 @@ import androidx.room.Room;
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.moufee.purduemenus.api.FileCookiePersistor;
 import com.moufee.purduemenus.api.LocalTimeTypeAdapter;
-import com.moufee.purduemenus.api.LocalTimeTypeConverter;
 import com.moufee.purduemenus.api.Webservice;
 import com.moufee.purduemenus.db.AppDatabase;
 import com.moufee.purduemenus.db.FavoriteDao;
@@ -23,8 +19,6 @@ import com.moufee.purduemenus.db.LocationDao;
 import com.moufee.purduemenus.util.AppExecutors;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory;
-
-import org.joda.time.LocalTime;
 
 import javax.inject.Singleton;
 
@@ -61,15 +55,6 @@ class AppModule {
                 .add(new LocalTimeTypeAdapter())
                 .add(new KotlinJsonAdapterFactory())
                 .build();
-    }
-
-    @Singleton
-    @Provides
-    Gson provideGson() {
-        return new GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
-                .registerTypeAdapter(LocalTime.class, new LocalTimeTypeConverter())
-                .create();
     }
 
     @Singleton
