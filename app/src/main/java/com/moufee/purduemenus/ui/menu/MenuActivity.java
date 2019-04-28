@@ -21,7 +21,7 @@ import com.moufee.purduemenus.BuildConfig;
 import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.databinding.ActivityMenuDatePickerTimeBinding;
 import com.moufee.purduemenus.menus.DailyMenuViewModel;
-import com.moufee.purduemenus.menus.DiningCourtMenu;
+import com.moufee.purduemenus.menus.Hours;
 import com.moufee.purduemenus.ui.settings.CustomOrderFragmentKt;
 import com.moufee.purduemenus.ui.settings.SettingsActivity;
 import com.moufee.purduemenus.util.ConstantsKt;
@@ -152,7 +152,7 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
         String timeString;
         try {
             int diningCourtIndex = mBinding.menuViewPager.getCurrentItem();
-            DiningCourtMenu.Hours hours = mViewModel.getFullMenu().getValue().data.getMenu(diningCourtIndex).getMeal(mViewModel.getSelectedMealIndex().getValue()).getHours();
+            Hours hours = mViewModel.getFullMenu().getValue().data.getMenu(diningCourtIndex).getMeal(mViewModel.getSelectedMealIndex().getValue()).getHours();
             startTime = hours.getStartTime();
             endTime = hours.getEndTime();
             timeString = mTimeFormatter.print(startTime) + " - " + mTimeFormatter.print(endTime);

@@ -11,14 +11,15 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+
 import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.repository.FavoritesRepository;
 import com.moufee.purduemenus.ui.login.LoginActivity;
 
 import javax.inject.Inject;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import dagger.android.AndroidInjection;
 
 /**
@@ -89,7 +90,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         });
 
         mPrivacyPolicyPref.setOnPreferenceClickListener(preference -> {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://docs.google.com/document/d/e/2PACX-1vStos4981Lkbh69nyVxnZrv8dVoXqSvcBuxWfB6hN4rEh7nT3Gnp-JeyS4-I-GIA-6p8x7m2UJ6xhpi/pub"));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://android.menus.purdue.tools/privacy"));
             startActivity(browserIntent);
             return true;
         });

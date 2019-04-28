@@ -5,29 +5,28 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import androidx.room.Room;
+
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.moufee.purduemenus.api.FileCookiePersistor;
-import com.moufee.purduemenus.api.LocalTimeTypeConverter;
+import com.moufee.purduemenus.api.LocalTimeTypeAdapter;
 import com.moufee.purduemenus.api.Webservice;
 import com.moufee.purduemenus.db.AppDatabase;
 import com.moufee.purduemenus.db.FavoriteDao;
+import com.moufee.purduemenus.db.LocationDao;
 import com.moufee.purduemenus.util.AppExecutors;
-
-import org.joda.time.LocalTime;
+import com.squareup.moshi.Moshi;
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory;
 
 import javax.inject.Singleton;
 
-import androidx.room.Room;
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.moshi.MoshiConverterFactory;
 
 /**
  * Created by Ben on 28/07/2017.
@@ -39,11 +38,11 @@ class AppModule {
 
     @Singleton
     @Provides
-    Webservice provideWebService(AppExecutors executors, Gson gson, OkHttpClient client) {
+    Webservice provideWebService(AppExecutors executors, Moshi moshi, OkHttpClient client) {
         return new Retrofit.Builder()
                 .baseUrl("https://api.hfs.purdue.edu")
                 .client(client)
-                .addConverterFactory(GsonConverterFactory.create(gson))
+                .addConverterFactory(MoshiConverterFactory.create(moshi))
                 .callbackExecutor(executors.diskIO())
                 .build()
                 .create(Webservice.class);
@@ -51,11 +50,11 @@ class AppModule {
 
     @Singleton
     @Provides
-    Gson provideGson() {
-        return new GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
-                .registerTypeAdapter(LocalTime.class, new LocalTimeTypeConverter())
-                .create();
+    Moshi provideMoshi() {
+        return new Moshi.Builder()
+                .add(new LocalTimeTypeAdapter())
+                .add(new KotlinJsonAdapterFactory())
+                .build();
     }
 
     @Singleton
@@ -83,15 +82,19 @@ class AppModule {
     @Provides
     AppDatabase provideAppDatabase(Context applicationContext) {
         return Room.databaseBuilder(applicationContext, AppDatabase.class, "menus-database")
-                .addMigrations(AppDatabase.MIGRATION_1_2)
+                .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3)
                 .fallbackToDestructiveMigration()
                 .build();
     }
 
-    @Singleton
     @Provides
     FavoriteDao provideFavoriteDao(AppDatabase appDatabase) {
         return appDatabase.favoriteDao();
+    }
+
+    @Provides
+    LocationDao provideLocationDao(AppDatabase appDatabase) {
+        return appDatabase.locationDao();
     }
 
 }

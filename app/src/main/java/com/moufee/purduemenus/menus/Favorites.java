@@ -1,6 +1,6 @@
 package com.moufee.purduemenus.menus;
 
-import com.google.gson.annotations.SerializedName;
+import com.squareup.moshi.Json;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +12,8 @@ import androidx.annotation.Keep;
  */
 @Keep
 public class Favorites {
-    @SerializedName("Favorite")
-    private ArrayList<Favorite> mFavorites;
+    @Json(name = "Favorite")
+    private List<Favorite> mFavorites;
 
     public List<Favorite> getFavorites() {
         return mFavorites;

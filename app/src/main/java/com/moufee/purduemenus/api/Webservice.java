@@ -3,6 +3,7 @@ package com.moufee.purduemenus.api;
 import com.moufee.purduemenus.menus.DiningCourtMenu;
 import com.moufee.purduemenus.menus.Favorite;
 import com.moufee.purduemenus.menus.Favorites;
+import com.moufee.purduemenus.menus.LocationsResponse;
 
 import androidx.annotation.Nullable;
 import okhttp3.ResponseBody;
@@ -26,6 +27,12 @@ public interface Webservice {
     })
     @GET("/menus/v2/locations/{location}/{date}")
     Call<DiningCourtMenu> getMenu(@Path("location") String diningCourtName, @Path("date") String date);
+
+    @Headers({
+            "Accept: text/json"
+    })
+    @GET("/menus/v2/locations")
+    Call<LocationsResponse> getLocations();
 
     @Headers({
             "Accept: text/json"

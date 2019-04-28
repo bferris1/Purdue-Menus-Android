@@ -3,12 +3,12 @@ package com.moufee.purduemenus.menus;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.google.gson.Gson;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
+
 import com.moufee.purduemenus.api.Webservice;
-import com.moufee.purduemenus.db.FavoriteDao;
 import com.moufee.purduemenus.util.Resource;
 
 import org.joda.time.DateTime;
@@ -22,12 +22,12 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.MutableLiveData;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -44,23 +44,22 @@ public class UpdateMenuTask implements Runnable {
     private DateTime mMenuDate;
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd");
     private static final String TAG = "UpdateMenuTask";
-    private static final String[] DINING_COURTS = {"Earhart", "Ford", "Wiley", "Windsor", "Hillenbrand"};
     private boolean mFetchedFromFile = false;
     private Webservice mWebservice;
-    private Gson mGson;
-    private FavoriteDao mFavoriteDao;
     private ConnectivityManager mConnectivityManager;
+    private List<Location> mLocationList;
 
 
-    public UpdateMenuTask(MutableLiveData<Resource<FullDayMenu>> liveData, Context context, Webservice webservice, Gson gson, FavoriteDao favoriteDao) {
+    public UpdateMenuTask(MutableLiveData<Resource<FullDayMenu>> liveData, List<Location> locations, Context context, Webservice webservice) {
         this.mFullMenu = liveData;
+        mLocationList = locations;
         mContext = context;
         mWebservice = webservice;
         mMenuDate = new DateTime();
-        mGson = gson;
-        mFavoriteDao = favoriteDao;
         mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
+
+    //todo: what is this for? constructor too long?
 
     public UpdateMenuTask withDate(DateTime date) {
         this.mMenuDate = date;
@@ -84,7 +83,7 @@ public class UpdateMenuTask implements Runnable {
     }
 
     private boolean shouldFetch() {
-        //todo: check if the menus from the file are too short, have a lot of null values, etc and decide when to fetch
+        //todo: check if the menus from the file are too short, have a lot of null values, etc and decide when to fetch?
         return true;
 //        DateTime now = new DateTime();
 //        Log.d(TAG, "shouldFetch: days: "+Days.daysBetween(now, mMenuDate).getDays());
@@ -98,24 +97,6 @@ public class UpdateMenuTask implements Runnable {
                 return true;
         }
         return false;
-    }
-
-    private void processFavorites(List<DiningCourtMenu> menus) {
-        for (int i = 0; i < menus.size(); i++) {
-            DiningCourtMenu diningCourtMenu = menus.get(i);
-            for (int j = 0; j < diningCourtMenu.getMeals().size(); j++) {
-                DiningCourtMenu.Meal meal = diningCourtMenu.getMeals().get(j);
-                for (int k = 0; k < meal.getStations().size(); k++) {
-                    DiningCourtMenu.Station station = meal.getStations().get(k);
-                    for (int l = 0; l < station.getItems().size(); l++) {
-                        MenuItem menuItem = station.getItems().get(l);
-                        if (mFavoriteDao.getFavoriteByItemId(menuItem.getId()) != null) {
-                            menuItem.setFavorite(true);
-                        }
-                    }
-                }
-            }
-        }
     }
 
     private ArrayList<DiningCourtMenu> getMenusFromFile(String formattedDate) {
@@ -148,14 +129,24 @@ public class UpdateMenuTask implements Runnable {
         fileOutputStream.close();
     }
 
-    private void sortMenus(List<DiningCourtMenu> menus) {
+    // todo: move this logic to ViewModel?
 
-        String[] customOrder = PreferenceManager.getDefaultSharedPreferences(mContext).getString("dining_court_order", "").split(",");
-        Log.d(TAG, "sortMenus custom : " + Arrays.toString(customOrder));
-        if (customOrder.length == DINING_COURTS.length)
-            Collections.sort(menus, new DiningCourtComparator(Arrays.asList(customOrder)));
-        else
-            Collections.sort(menus, new DiningCourtComparator());
+    private void sortMenus(List<DiningCourtMenu> menus) {
+        Log.d(TAG, "sortMenus: " + menus.toString());
+        Map<String, Location> locationMap = new HashMap<>();
+        for (int i = 0; i < mLocationList.size(); i++) {
+            Location location = mLocationList.get(i);
+            locationMap.put(location.getName(), location);
+        }
+
+        Iterator<DiningCourtMenu> iterator = menus.iterator();
+        while (iterator.hasNext()) {
+            DiningCourtMenu menu = iterator.next();
+            if (locationMap.get(menu.getLocation()).isHidden()) {
+                iterator.remove();
+            }
+        }
+        Collections.sort(menus, new DiningCourtComparator(mLocationList));
     }
 
     private void fetchFromNetwork() {
@@ -167,10 +158,15 @@ public class UpdateMenuTask implements Runnable {
                 mFullMenu.postValue(Resource.error("Not connected to network", null));
             return;
         }
+        List<String> diningCourtNames = new ArrayList<>();
+        for (Location location :
+                mLocationList) {
+            diningCourtNames.add(location.getName());
+        }
         //this is similar to the initial implementation from the architecture components guide
         final List<DiningCourtMenu> tempMenusList = new ArrayList<>();
         final String dateString = DATE_TIME_FORMATTER.print(mMenuDate);
-        for (final String diningCourt : DINING_COURTS) {
+        for (final String diningCourt : diningCourtNames) {
             Call<DiningCourtMenu> menuCall = mWebservice.getMenu(diningCourt, dateString);
             menuCall.enqueue(new Callback<DiningCourtMenu>() {
                 @Override
@@ -178,7 +174,7 @@ public class UpdateMenuTask implements Runnable {
                     if (response.isSuccessful())
                         tempMenusList.add(response.body());
 
-                    if (tempMenusList.size() == DINING_COURTS.length) {
+                    if (tempMenusList.size() == diningCourtNames.size()) {
                         sortMenus(tempMenusList);
                         mFullMenu.postValue(Resource.success(new FullDayMenu(tempMenusList, mMenuDate, hasLateLunch(tempMenusList))));
                         //save to json

@@ -1,41 +1,48 @@
 package com.moufee.purduemenus.ui.settings
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.moufee.purduemenus.R
+import com.moufee.purduemenus.databinding.FragmentDiningCourtListItemBinding
+import com.moufee.purduemenus.menus.Location
 
 
-class DiningCourtOrderAdapter : ListAdapter<String, DiningCourtOrderAdapter.DiningCourtViewHolder> {
+class DiningCourtOrderAdapter(val listener: OnLocationChangedListener) : ListAdapter<Location, DiningCourtOrderAdapter.DiningCourtViewHolder>(
+        object : DiffUtil.ItemCallback<Location>() {
+            override fun areItemsTheSame(oldItem: Location, newItem: Location): Boolean {
+                return oldItem.LocationId == newItem.LocationId
+            }
 
-
-    constructor() : super(
-            object : DiffUtil.ItemCallback<String>() {
-                override fun areItemsTheSame(oldItem: String, newItem: String): Boolean {
-                    return oldItem == newItem
-                }
-
-                override fun areContentsTheSame(oldItem: String, newItem: String): Boolean {
-                    return oldItem == newItem
-                }
-            })
+            override fun areContentsTheSame(oldItem: Location, newItem: Location): Boolean {
+                return oldItem.FormalName == newItem.FormalName && oldItem.isHidden == newItem.isHidden
+            }
+        }) {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DiningCourtViewHolder {
-        return DiningCourtViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.fragment_simple_list_item, parent, false))
+        val layoutInflater = LayoutInflater.from(parent.context)
+        val binding = FragmentDiningCourtListItemBinding.inflate(layoutInflater, parent, false)
+        return DiningCourtViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: DiningCourtViewHolder, position: Int) {
-        holder.mItemTextView.text = getItem(position)
+        holder.bind(getItem(position))
     }
 
 
-    inner class DiningCourtViewHolder(val mView: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(mView) {
-        val mItemTextView: TextView = mView.findViewById(R.id.item_title)
+    inner class DiningCourtViewHolder(var binding: FragmentDiningCourtListItemBinding) : androidx.recyclerview.widget.RecyclerView.ViewHolder(binding.root) {
 
+        fun bind(location: Location) {
+            binding.location = location
+            binding.listener = listener
+            binding.executePendingBindings()
+        }
+
+    }
+
+    interface OnLocationChangedListener {
+        fun onLocationVisibilityChanged(location: Location)
     }
 
 }

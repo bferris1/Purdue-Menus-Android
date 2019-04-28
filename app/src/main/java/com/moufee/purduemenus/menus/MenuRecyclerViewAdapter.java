@@ -38,9 +38,9 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
         notifyDataSetChanged();
     }
 
-    public void setStations(List<DiningCourtMenu.Station> stations) {
+    public void setStations(List<Station> stations) {
         mListItems.clear();
-        for (DiningCourtMenu.Station station : stations) {
+        for (Station station : stations) {
             if (station.getNumItems() > 0) {
                 mListItems.add(station.getName());
                 mListItems.addAll(station.getItems());

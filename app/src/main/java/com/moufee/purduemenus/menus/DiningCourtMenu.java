@@ -1,14 +1,9 @@
 package com.moufee.purduemenus.menus;
 
-import org.joda.time.LocalTime;
+import androidx.annotation.Keep;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-
-import androidx.annotation.Keep;
-import androidx.annotation.Nullable;
+import java.util.List;
 
 /**
  * Mirrors JSON structure from API to allow easy deserialization
@@ -20,40 +15,38 @@ public class DiningCourtMenu implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private String location;
-    private String date;
-    private String notes;
-    private ArrayList<Meal> meals;
+    private String Location;
+    private String Date;
+    private String Notes;
+    private List<Meal> Meals;
 
     public String getLocation() {
-        if (location != null)
-            return location;
-        return "NULL";
+        return Location != null ? Location : "NULL";
     }
 
     public String getDate() {
-        return date;
+        return Date;
     }
 
     public String getNotes() {
-        return notes;
+        return Notes;
     }
 
-    public ArrayList<Meal> getMeals() {
-        return meals;
+    public List<Meal> getMeals() {
+        return Meals;
     }
 
     /**
      * Gets the meal associated with the provided index
-     * Index 3 is dinner, but some dining courts only have three meals (up to index 2)
+     * Index 3 is dinner, but some dining courts only have three Meals (up to index 2)
      *
      * @param mealIndex the index of the meal to get
      * @return the Meal associated with the provided index
      */
     public Meal getMeal(int mealIndex) {
-        if (meals != null && meals.size() > 0) {
+        if (Meals != null && Meals.size() > 0) {
             for (Meal meal :
-                    meals) {
+                    Meals) {
                 if (meal.getOrder() == mealIndex + 1)
                     return meal;
             }
@@ -63,126 +56,19 @@ public class DiningCourtMenu implements Serializable {
     }
 
     public boolean servesLateLunch() {
-        if (meals != null)
+        if (Meals != null)
             for (Meal meal :
-                    meals) {
+                    Meals) {
                 if (meal.getName().equals("Late Lunch") && meal.isOpen())
                     return true;
             }
         return false;
-//        return meals != null && meals.size() == 4 && meals.get(2).isOpen();
+//        return Meals != null && Meals.size() == 4 && Meals.get(2).isOpen();
     }
 
     public boolean isServing(int mealIndex) {
-        return meals != null && getMeal(mealIndex) != null && getMeal(mealIndex).isOpen();
+        return Meals != null && getMeal(mealIndex) != null && getMeal(mealIndex).isOpen();
     }
 
-    @Keep
-    public class Meal implements Serializable {
-
-        private static final long serialVersionUID = 1L;
-
-        public String getId() {
-            return id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public int getOrder() {
-            return order;
-        }
-
-        public String getStatus() {
-            return status;
-        }
-
-        public Hours getHours() {
-            return hours;
-        }
-
-        public int getNumFavorites(@Nullable Set<String> favoriteIDs) {
-
-            if (favoriteIDs == null)
-                return 0;
-
-            int count = 0;
-            Set<String> countedFavorites = new HashSet<>();
-            for (Station station :
-                    stations) {
-                for (MenuItem item :
-                        station.items) {
-                    if (favoriteIDs.contains(item.getId()) && !countedFavorites.contains(item.getId())) {
-                        count++;
-                        countedFavorites.add(item.getId());
-                    }
-                }
-            }
-            return count;
-        }
-
-        public ArrayList<Station> getStations() {
-            return stations;
-        }
-
-        public boolean isOpen() {
-            return status != null && status.equals("Open");
-        }
-
-        private String id;
-        private String name;
-        private int order;
-        private String status;
-        private Hours hours;
-        private ArrayList<Station> stations;
-    }
-
-    @Keep
-    public class Hours implements Serializable {
-
-        private static final long serialVersionUID = 1L;
-
-        public LocalTime getStartTime() {
-            return startTime;
-        }
-
-        public LocalTime getEndTime() {
-            return endTime;
-        }
-
-        private LocalTime startTime;
-        private LocalTime endTime;
-    }
-
-
-    @Keep
-    public class Station implements Serializable {
-
-        private static final long serialVersionUID = 1L;
-
-
-        public String getName() {
-            return name;
-        }
-
-        public ArrayList<MenuItem> getItems() {
-            return items;
-        }
-
-        public int getNumItems() {
-            if (items == null)
-                return 0;
-            return items.size();
-        }
-
-        public MenuItem getItem(int index) {
-            return items.get(index);
-        }
-
-        private String name;
-        private ArrayList<MenuItem> items;
-
-    }
 
 }
