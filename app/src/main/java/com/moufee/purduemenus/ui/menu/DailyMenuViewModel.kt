@@ -1,6 +1,8 @@
-package com.moufee.purduemenus.menus
+package com.moufee.purduemenus.ui.menu
 
 import androidx.lifecycle.*
+import com.moufee.purduemenus.menus.FullDayMenu
+import com.moufee.purduemenus.menus.Location
 import com.moufee.purduemenus.repository.FavoritesRepository
 import com.moufee.purduemenus.repository.MenuRepository
 import com.moufee.purduemenus.util.DateTimeHelper

@@ -12,7 +12,7 @@
             type="int"/>
         <variable
             name="viewModel"
-            type="com.moufee.purduemenus.menus.DailyMenuViewModel"/>
+            type="com.moufee.purduemenus.ui.menu.DailyMenuViewModel" />
         <variable
             name="menusResource"
             type="com.moufee.purduemenus.util.Resource"/>

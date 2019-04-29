@@ -15,12 +15,21 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.viewpager.widget.ViewPager;
+
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.moufee.purduemenus.BuildConfig;
 import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.databinding.ActivityMenuDatePickerTimeBinding;
-import com.moufee.purduemenus.menus.DailyMenuViewModel;
 import com.moufee.purduemenus.menus.Hours;
 import com.moufee.purduemenus.ui.settings.CustomOrderFragmentKt;
 import com.moufee.purduemenus.ui.settings.SettingsActivity;
@@ -36,15 +45,6 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.viewpager.widget.ViewPager;
 import dagger.android.AndroidInjection;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;

@@ -3,7 +3,7 @@ package com.moufee.purduemenus.di;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.moufee.purduemenus.menus.DailyMenuViewModel;
+import com.moufee.purduemenus.ui.menu.DailyMenuViewModel;
 import com.moufee.purduemenus.ui.settings.LocationSettingsViewModel;
 
 import dagger.Binds;
