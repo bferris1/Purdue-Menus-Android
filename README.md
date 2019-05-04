@@ -13,9 +13,9 @@ It was created to address several issues with the official Purdue Mobile Menus a
 The current priorities for development are:
 1. Adding support for the locations endpoint
     - [x] Implement retrieval of relevant location information
-    - [ ] Store Locations list and sorting preferences locally
-    - [ ] Use locations list to retrieve menus
-    - [ ] Possibly allow locations to be hidden
+    - [x] Store Locations list and sorting preferences locally
+    - [x] Use locations list to retrieve menus
+    - [x] Possibly allow locations to be hidden
 2. Improving the program structure (and testing)
     - [x] restructuring the app to fully utilize Android Dependency Injection with Dagger 2
     - [ ] writing tests for individual components
