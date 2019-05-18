@@ -13,10 +13,20 @@ public class FullDayMenu {
     private DateTime mDate;
     private boolean mLateLunchServed;
 
-    public FullDayMenu(List<DiningCourtMenu> diningCourtMenus, DateTime date, boolean lateLunchServed) {
+    public FullDayMenu(List<DiningCourtMenu> diningCourtMenus, DateTime date) {
         mMenus = diningCourtMenus;
         mDate = date;
-        mLateLunchServed = lateLunchServed;
+        mLateLunchServed = hasLateLunch();
+    }
+
+    private boolean hasLateLunch() {
+        for (DiningCourtMenu menu :
+                mMenus) {
+            if (menu.servesLateLunch()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public int getNumMenus() {

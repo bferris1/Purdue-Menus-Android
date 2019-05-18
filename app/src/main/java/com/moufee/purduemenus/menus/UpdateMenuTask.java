@@ -72,7 +72,7 @@ public class UpdateMenuTask implements Runnable {
         ArrayList<DiningCourtMenu> fileMenus = getMenusFromFile(DATE_TIME_FORMATTER.print(mMenuDate));
         if (fileMenus != null) {
             mFetchedFromFile = true;
-            mFullMenu.postValue(Resource.success(new FullDayMenu(fileMenus, mMenuDate, hasLateLunch(fileMenus))));
+            mFullMenu.postValue(Resource.success(new FullDayMenu(fileMenus, mMenuDate)));
             Log.d(TAG, "getFullMenu: Read from file!");
         } else {
             mFullMenu.postValue(Resource.loading(null));
@@ -88,15 +88,6 @@ public class UpdateMenuTask implements Runnable {
 //        DateTime now = new DateTime();
 //        Log.d(TAG, "shouldFetch: days: "+Days.daysBetween(now, mMenuDate).getDays());
 //        return Math.abs(Days.daysBetween(now, mMenuDate).getDays()) > 5;
-    }
-
-    private boolean hasLateLunch(List<DiningCourtMenu> menus) {
-        for (DiningCourtMenu menu :
-                menus) {
-            if (menu.servesLateLunch())
-                return true;
-        }
-        return false;
     }
 
     private ArrayList<DiningCourtMenu> getMenusFromFile(String formattedDate) {
@@ -176,7 +167,7 @@ public class UpdateMenuTask implements Runnable {
 
                     if (tempMenusList.size() == diningCourtNames.size()) {
                         sortMenus(tempMenusList);
-                        mFullMenu.postValue(Resource.success(new FullDayMenu(tempMenusList, mMenuDate, hasLateLunch(tempMenusList))));
+                        mFullMenu.postValue(Resource.success(new FullDayMenu(tempMenusList, mMenuDate)));
                         //save to json
                         try {
                             saveMenuToFile(dateString + ".menus", tempMenusList);
