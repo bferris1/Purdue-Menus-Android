@@ -74,6 +74,10 @@ public class MenuRepository {
         return mLocationDao.getAll();
     }
 
+    public LiveData<List<Location>> getVisibleLocations() {
+        return mLocationDao.getVisible();
+    }
+
     public void updateLocations(Location... locations) {
         mAppExecutors.diskIO().execute(() -> mLocationDao.updateLocations(locations));
     }

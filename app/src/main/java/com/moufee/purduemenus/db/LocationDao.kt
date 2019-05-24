@@ -12,6 +12,9 @@ interface LocationDao {
     @Query("SELECT * from location ORDER BY displayOrder")
     fun getAllList(): List<Location>
 
+    @Query("SELECT * from location WHERE isHidden = 0 ORDER BY displayOrder")
+    fun getVisible(): LiveData<List<Location>>
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertAll(locations: List<Location>)
 

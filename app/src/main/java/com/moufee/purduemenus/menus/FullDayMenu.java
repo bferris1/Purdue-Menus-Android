@@ -2,26 +2,41 @@ package com.moufee.purduemenus.menus;
 
 import org.joda.time.DateTime;
 
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Contains all the menus for all campus dining courts for one day
  */
 
-public class FullDayMenu {
-    private List<DiningCourtMenu> mMenus;
+public class FullDayMenu implements Serializable {
+    private Map<String, DiningCourtMenu> mMenuMap = new HashMap<>();
     private DateTime mDate;
     private boolean mLateLunchServed;
 
     public FullDayMenu(List<DiningCourtMenu> diningCourtMenus, DateTime date) {
-        mMenus = diningCourtMenus;
+//        mMenus = diningCourtMenus;
         mDate = date;
         mLateLunchServed = hasLateLunch();
+        for (DiningCourtMenu menu :
+                diningCourtMenus) {
+            mMenuMap.put(menu.getLocation(), menu);
+        }
+    }
+
+    public Map<String, DiningCourtMenu> getMenuMap() {
+        return mMenuMap;
+    }
+
+    public DiningCourtMenu getMenu(String location) {
+        return mMenuMap.get(location);
     }
 
     private boolean hasLateLunch() {
         for (DiningCourtMenu menu :
-                mMenus) {
+                mMenuMap.values()) {
             if (menu.servesLateLunch()) {
                 return true;
             }
@@ -30,23 +45,7 @@ public class FullDayMenu {
     }
 
     public int getNumMenus() {
-        return mMenus.size();
-    }
-
-    public List<DiningCourtMenu> getMenus() {
-        return mMenus;
-    }
-
-    /**
-     * Gets a  menu from a designated index
-     *
-     * @param index, the index of the {@link DiningCourtMenu} to get
-     * @return a {@link DiningCourtMenu}, or null if none exists
-     */
-    public DiningCourtMenu getMenu(int index) {
-        if (mMenus != null && index < mMenus.size())
-            return mMenus.get(index);
-        return null;
+        return mMenuMap.size();
     }
 
     public boolean isLateLunchServed() {

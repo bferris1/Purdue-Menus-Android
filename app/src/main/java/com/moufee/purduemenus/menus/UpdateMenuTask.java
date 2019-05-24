@@ -5,12 +5,13 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
+import com.moufee.purduemenus.api.MenuDownloader;
 import com.moufee.purduemenus.api.Webservice;
 import com.moufee.purduemenus.util.Resource;
 
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -27,10 +28,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * Created by Ben on 03/08/2017.
@@ -69,10 +66,10 @@ public class UpdateMenuTask implements Runnable {
     @Override
     public void run() {
 //        mFullMenu.postValue(Resource.<FullDayMenu>loading(null));
-        ArrayList<DiningCourtMenu> fileMenus = getMenusFromFile(DATE_TIME_FORMATTER.print(mMenuDate));
+        FullDayMenu fileMenus = getMenusFromFile(DATE_TIME_FORMATTER.print(mMenuDate));
         if (fileMenus != null) {
             mFetchedFromFile = true;
-            mFullMenu.postValue(Resource.success(new FullDayMenu(fileMenus, mMenuDate)));
+            mFullMenu.postValue(Resource.success(fileMenus));
             Log.d(TAG, "getFullMenu: Read from file!");
         } else {
             mFullMenu.postValue(Resource.loading(null));
@@ -90,17 +87,16 @@ public class UpdateMenuTask implements Runnable {
 //        return Math.abs(Days.daysBetween(now, mMenuDate).getDays()) > 5;
     }
 
-    private ArrayList<DiningCourtMenu> getMenusFromFile(String formattedDate) {
+    private FullDayMenu getMenusFromFile(String formattedDate) {
         File filesDir = mContext.getCacheDir();
         File sourceFile = new File(filesDir, formattedDate + ".menus");
-        ArrayList<DiningCourtMenu> result;
+        FullDayMenu result;
         if (!sourceFile.exists())
             return null;
         try {
             FileInputStream fileInputStream = new FileInputStream(sourceFile);
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-            result = (ArrayList<DiningCourtMenu>) objectInputStream.readObject();
-            sortMenus(result);
+            result = (FullDayMenu) objectInputStream.readObject();
             objectInputStream.close();
             fileInputStream.close();
         } catch (Exception e) {
@@ -110,12 +106,12 @@ public class UpdateMenuTask implements Runnable {
         return result;
     }
 
-    private void saveMenuToFile(String filename, List<DiningCourtMenu> menus) throws IOException {
+    private void saveMenuToFile(String filename, FullDayMenu menu) throws IOException {
         File filesDir = mContext.getCacheDir();
         File outputFile = new File(filesDir, filename);
         FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-        objectOutputStream.writeObject(menus);
+        objectOutputStream.writeObject(menu);
         objectOutputStream.close();
         fileOutputStream.close();
     }
@@ -155,42 +151,28 @@ public class UpdateMenuTask implements Runnable {
             diningCourtNames.add(location.getName());
         }
         //this is similar to the initial implementation from the architecture components guide
-        final List<DiningCourtMenu> tempMenusList = new ArrayList<>();
         final String dateString = DATE_TIME_FORMATTER.print(mMenuDate);
-        for (final String diningCourt : diningCourtNames) {
-            Call<DiningCourtMenu> menuCall = mWebservice.getMenu(diningCourt, dateString);
-            menuCall.enqueue(new Callback<DiningCourtMenu>() {
-                @Override
-                public void onResponse(@NonNull Call<DiningCourtMenu> call, @NonNull Response<DiningCourtMenu> response) {
-                    if (response.isSuccessful())
-                        tempMenusList.add(response.body());
+        new MenuDownloader(mWebservice, mContext) {
+            @Override
+            public void onComplete(@NotNull FullDayMenu fullDayMenu) {
+                mFullMenu.postValue(Resource.success(fullDayMenu));
+                //save to json
+                try {
+                    saveMenuToFile(dateString + ".menus", fullDayMenu);
 
-                    if (tempMenusList.size() == diningCourtNames.size()) {
-                        sortMenus(tempMenusList);
-                        mFullMenu.postValue(Resource.success(new FullDayMenu(tempMenusList, mMenuDate)));
-                        //save to json
-                        try {
-                            saveMenuToFile(dateString + ".menus", tempMenusList);
-
-                        } catch (IOException e) {
-                            Log.e(TAG, "onResponse: error saving to file ", e);
-                            mFullMenu.postValue(Resource.error(e.getMessage() != null ? e.getMessage() : "an error occurred while saving to file", null));
-                        }
-                    }
+                } catch (IOException e) {
+                    Log.e(TAG, "onResponse: error saving to file ", e);
+                    mFullMenu.postValue(Resource.error(e.getMessage() != null ? e.getMessage() : "an error occurred while saving to file", null));
                 }
+            }
 
-                @Override
-                public void onFailure(Call<DiningCourtMenu> call, Throwable t) {
-                    //todo: handle failure
-                    Log.e(TAG, "onFailure: Network error", t);
-                    if (mFullMenu.getValue() != null)
-                        mFullMenu.postValue(Resource.error("Network Error", mFullMenu.getValue().data));
-                    else
-                        mFullMenu.postValue(Resource.error(t.getMessage(), null));
-                }
-            });
-
-
-        }
+            @Override
+            public void onFailure(@NotNull String reason) {
+                if (mFullMenu.getValue() != null)
+                    mFullMenu.postValue(Resource.error("Network Error", mFullMenu.getValue().data));
+                else
+                    mFullMenu.postValue(Resource.error(reason, null));
+            }
+        }.getMenus(mMenuDate, mLocationList);
     }
 }

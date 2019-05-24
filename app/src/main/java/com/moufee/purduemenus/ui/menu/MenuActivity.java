@@ -109,6 +109,8 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
             }
         });
 
+        mViewModel.getLocations().observe(this, locations -> mMenuPagerAdapter.setLocationList(locations));
+
         mViewModel.getFavoriteSet().observe(this, strings -> mMenuPagerAdapter.setFavoritesSet(strings));
 
         mViewModel.getFullMenu().observe(this, fullDayMenuResource -> {
@@ -119,7 +121,7 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
                     case SUCCESS:
                         mBinding.setMenu(fullDayMenuResource.data);
                         if (fullDayMenuResource.data != null)
-                            mMenuPagerAdapter.setMenus(fullDayMenuResource.data.getMenus());
+                            mMenuPagerAdapter.setMenus(fullDayMenuResource.data.getMenuMap());
                         updateLateLunch(fullDayMenuResource.data.isLateLunchServed());
                         updateServingTime();
                         break;
@@ -127,7 +129,7 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
                         break;
                     case ERROR:
                         if (fullDayMenuResource.data != null) {
-                            mMenuPagerAdapter.setMenus(fullDayMenuResource.data.getMenus());
+                            mMenuPagerAdapter.setMenus(fullDayMenuResource.data.getMenuMap());
                         } else {
                             Snackbar.make(mBinding.activityMenuCoordinatorLayout, getString(R.string.network_error_message), Snackbar.LENGTH_SHORT).show();
                         }
@@ -152,7 +154,9 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
         String timeString;
         try {
             int diningCourtIndex = mBinding.menuViewPager.getCurrentItem();
-            Hours hours = mViewModel.getFullMenu().getValue().data.getMenu(diningCourtIndex).getMeal(mViewModel.getSelectedMealIndex().getValue()).getHours();
+            // todo: figure out all these null pointer warnings (convert to Kotlin and/or restructure data)
+            String selectedLocation = mViewModel.getLocations().getValue().get(diningCourtIndex).getName();
+            Hours hours = mViewModel.getFullMenu().getValue().data.getMenu(selectedLocation).getMeal(mViewModel.getSelectedMealIndex().getValue()).getHours();
             startTime = hours.getStartTime();
             endTime = hours.getEndTime();
             timeString = mTimeFormatter.print(startTime) + " - " + mTimeFormatter.print(endTime);

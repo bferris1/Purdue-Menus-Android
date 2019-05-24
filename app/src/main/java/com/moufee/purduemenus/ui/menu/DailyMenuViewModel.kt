@@ -10,7 +10,8 @@ import com.moufee.purduemenus.util.Resource
 import org.joda.time.DateTime
 import javax.inject.Inject
 
-
+// todo: move this somewhere else?
+// this is built-in functionality with RxJava, but not architecture components
 fun <A, B> combineLatest(a: LiveData<A>, b: LiveData<B>): LiveData<Pair<A, B>> {
     return MediatorLiveData<Pair<A, B>>().apply {
         var lastA: A? = null
@@ -43,10 +44,8 @@ constructor(private val mMenuRepository: MenuRepository, mFavoritesRepository: F
     private val mSelectedMealIndex = MutableLiveData<Int>()
 
     val favoriteSet: LiveData<Set<String>> = mFavoritesRepository.favoriteIDSet
-    private val locations: LiveData<List<Location>>
+    val locations: LiveData<List<Location>>
     private val mFullMenu: LiveData<Resource<FullDayMenu>>
-
-    private val updatedMenu = MediatorLiveData<Resource<FullDayMenu>>()
 
     val selectedMealIndex: LiveData<Int>
         get() = mSelectedMealIndex
@@ -60,12 +59,14 @@ constructor(private val mMenuRepository: MenuRepository, mFavoritesRepository: F
 
     init {
         mSelectedMealIndex.value = DateTimeHelper.getCurrentMealIndex()
-        locations = mMenuRepository.locations
+        locations = mMenuRepository.visibleLocations
         setDate(DateTime())
-        mFullMenu = Transformations.switchMap(combineLatest(mCurrentDate, locations)) { mMenuRepository.getMenus(it.first, it.second) }
+        mFullMenu = Transformations.switchMap(combineLatest(mCurrentDate, locations)) {
+            mMenuRepository.getMenus(it.first, it.second)
 
-
+        }
     }
+
 
     fun setSelectedMealIndex(index: Int) {
         mSelectedMealIndex.value = index
