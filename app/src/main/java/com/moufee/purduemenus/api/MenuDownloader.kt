@@ -4,21 +4,22 @@ import android.content.Context
 import com.moufee.purduemenus.menus.DiningCourtMenu
 import com.moufee.purduemenus.menus.FullDayMenu
 import com.moufee.purduemenus.menus.Location
+import io.reactivex.Single
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import javax.inject.Inject
+import javax.inject.Singleton
 
-abstract class MenuDownloader constructor(val webservice: Webservice, private val context: Context) {
+@Singleton
+class MenuDownloader @Inject constructor(val webservice: Webservice, private val context: Context) {
 
     private val formatter = DateTimeFormat.forPattern("yyyy-MM-dd")
 
-    fun getMenus(date: DateTime, locations: List<Location>) {
+    fun getMenus(date: DateTime, locations: List<Location>): Single<FullDayMenu> {
         val locationNames = locations.map { it.Name }
-        val retrievedMenus = ArrayList<DiningCourtMenu>()
-        var numFailures = 0
-        for (location in locationNames) {
+        val requests: List<Single<DiningCourtMenu>> = locationNames.map { webservice.getMenu(it, formatter.print(date)) }
+        return Single.zip(requests) { arrayOfAnys -> FullDayMenu((arrayOfAnys.map { it as DiningCourtMenu }).toList(), date) }
+        /*for (location in locationNames) {
             webservice.getMenu(location, formatter.print(date)).enqueue(object : Callback<DiningCourtMenu?> {
                 override fun onFailure(call: Call<DiningCourtMenu?>, t: Throwable) {
                     // handle some failure when others complete successfully
@@ -37,11 +38,6 @@ abstract class MenuDownloader constructor(val webservice: Webservice, private va
                     }
                 }
             })
-        }
+        }*/
     }
-
-    abstract fun onComplete(fullDayMenu: FullDayMenu)
-
-    abstract fun onFailure(reason: String)
-
 }

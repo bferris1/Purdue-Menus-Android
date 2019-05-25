@@ -1,11 +1,13 @@
 package com.moufee.purduemenus.api;
 
+import androidx.annotation.Nullable;
+
 import com.moufee.purduemenus.menus.DiningCourtMenu;
 import com.moufee.purduemenus.menus.Favorite;
 import com.moufee.purduemenus.menus.Favorites;
 import com.moufee.purduemenus.menus.LocationsResponse;
 
-import androidx.annotation.Nullable;
+import io.reactivex.Single;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -26,7 +28,7 @@ public interface Webservice {
             "Accept: text/json"
     })
     @GET("/menus/v2/locations/{location}/{date}")
-    Call<DiningCourtMenu> getMenu(@Path("location") String diningCourtName, @Path("date") String date);
+    Single<DiningCourtMenu> getMenu(@Path("location") String diningCourtName, @Path("date") String date);
 
     @Headers({
             "Accept: text/json"

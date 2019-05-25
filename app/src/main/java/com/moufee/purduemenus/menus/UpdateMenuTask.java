@@ -8,10 +8,8 @@ import android.util.Log;
 import androidx.lifecycle.MutableLiveData;
 
 import com.moufee.purduemenus.api.MenuDownloader;
-import com.moufee.purduemenus.api.Webservice;
 import com.moufee.purduemenus.util.Resource;
 
-import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -29,6 +27,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.disposables.Disposable;
+
 /**
  * Created by Ben on 03/08/2017.
  * A task to update LiveData and cache
@@ -42,16 +42,17 @@ public class UpdateMenuTask implements Runnable {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd");
     private static final String TAG = "UpdateMenuTask";
     private boolean mFetchedFromFile = false;
-    private Webservice mWebservice;
+    private MenuDownloader mMenuDownloader;
     private ConnectivityManager mConnectivityManager;
     private List<Location> mLocationList;
+    private Disposable mDisposable;
 
 
-    public UpdateMenuTask(MutableLiveData<Resource<FullDayMenu>> liveData, List<Location> locations, Context context, Webservice webservice) {
+    public UpdateMenuTask(MutableLiveData<Resource<FullDayMenu>> liveData, List<Location> locations, Context context, MenuDownloader menuDownloader) {
         this.mFullMenu = liveData;
         mLocationList = locations;
         mContext = context;
-        mWebservice = webservice;
+        mMenuDownloader = menuDownloader;
         mMenuDate = new DateTime();
         mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
@@ -89,7 +90,7 @@ public class UpdateMenuTask implements Runnable {
 
     private FullDayMenu getMenusFromFile(String formattedDate) {
         File filesDir = mContext.getCacheDir();
-        File sourceFile = new File(filesDir, formattedDate + ".menus");
+        File sourceFile = new File(filesDir, formattedDate + ".fdm");
         FullDayMenu result;
         if (!sourceFile.exists())
             return null;
@@ -152,27 +153,24 @@ public class UpdateMenuTask implements Runnable {
         }
         //this is similar to the initial implementation from the architecture components guide
         final String dateString = DATE_TIME_FORMATTER.print(mMenuDate);
-        new MenuDownloader(mWebservice, mContext) {
-            @Override
-            public void onComplete(@NotNull FullDayMenu fullDayMenu) {
-                mFullMenu.postValue(Resource.success(fullDayMenu));
-                //save to json
-                try {
-                    saveMenuToFile(dateString + ".menus", fullDayMenu);
 
-                } catch (IOException e) {
-                    Log.e(TAG, "onResponse: error saving to file ", e);
-                    mFullMenu.postValue(Resource.error(e.getMessage() != null ? e.getMessage() : "an error occurred while saving to file", null));
-                }
-            }
-
-            @Override
-            public void onFailure(@NotNull String reason) {
+        mDisposable = mMenuDownloader.getMenus(mMenuDate, mLocationList).subscribe((fullDayMenu, throwable) -> {
+            if (throwable != null) {
                 if (mFullMenu.getValue() != null)
                     mFullMenu.postValue(Resource.error("Network Error", mFullMenu.getValue().data));
                 else
-                    mFullMenu.postValue(Resource.error(reason, null));
+                    mFullMenu.postValue(Resource.error(throwable.getMessage(), null));
+                return;
             }
-        }.getMenus(mMenuDate, mLocationList);
+            mFullMenu.postValue(Resource.success(fullDayMenu));
+            try {
+                saveMenuToFile(dateString + ".fdm", fullDayMenu);
+
+            } catch (IOException e) {
+                Log.e(TAG, "onResponse: error saving to file ", e);
+                mFullMenu.postValue(Resource.error(e.getMessage() != null ? e.getMessage() : "an error occurred while saving to file", null));
+            }
+        });
+
     }
 }

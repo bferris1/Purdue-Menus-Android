@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.moufee.purduemenus.api.MenuDownloader;
 import com.moufee.purduemenus.api.Webservice;
 import com.moufee.purduemenus.db.LocationDao;
 import com.moufee.purduemenus.menus.FullDayMenu;
@@ -41,19 +42,21 @@ public class MenuRepository {
     private Context mApplicationContext;
     private AppExecutors mAppExecutors;
     private LocationDao mLocationDao;
+    private MenuDownloader mMenuDownloader;
 
     @Inject
-    public MenuRepository(Webservice webservice, Context applicationContext, AppExecutors appExecutors, LocationDao locationDao) {
+    public MenuRepository(Webservice webservice, Context applicationContext, AppExecutors appExecutors, LocationDao locationDao, MenuDownloader menuDownloader) {
         mWebservice = webservice;
         mApplicationContext = applicationContext;
         mAppExecutors = appExecutors;
         mLocationDao = locationDao;
+        mMenuDownloader = menuDownloader;
     }
 
     public LiveData<Resource<FullDayMenu>> getMenus(DateTime dateTime, List<Location> locations) {
         MutableLiveData<Resource<FullDayMenu>> data = new MutableLiveData<>();
         if (locations == null) return data;
-        UpdateMenuTask task = new UpdateMenuTask(data, locations, mApplicationContext, mWebservice).withDate(dateTime);
+        UpdateMenuTask task = new UpdateMenuTask(data, locations, mApplicationContext, mMenuDownloader).withDate(dateTime);
         mAppExecutors.diskIO().execute(task);
         return data;
     }
