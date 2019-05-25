@@ -50,4 +50,5 @@
     <string name="action_only_logout">Se déconnecter seulement</string>
     <string name="title_privacy_policy">Politique de confidentialité</string>
     <string name="desc_toggle_visibility">basculer la visibilité</string>
+    <string name="pref_title_dark_mode">Mode Sombre</string>
 </resources>
