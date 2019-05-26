@@ -1,6 +1,5 @@
 package com.moufee.purduemenus.api
 
-import android.content.Context
 import com.moufee.purduemenus.menus.DiningCourtMenu
 import com.moufee.purduemenus.menus.FullDayMenu
 import com.moufee.purduemenus.menus.Location
@@ -11,7 +10,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class MenuDownloader @Inject constructor(val webservice: Webservice, private val context: Context) {
+class MenuDownloader @Inject constructor(val webservice: Webservice) {
 
     private val formatter = DateTimeFormat.forPattern("yyyy-MM-dd")
 
