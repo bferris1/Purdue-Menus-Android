@@ -138,6 +138,7 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
                         if (fullDayMenuResource.data != null) {
                             mMenuPagerAdapter.setMenus(fullDayMenuResource.data.getMenuMap());
                         } else {
+                            Log.e(TAG, "setListeners: " + fullDayMenuResource.message);
                             Snackbar.make(mBinding.activityMenuCoordinatorLayout, getString(R.string.network_error_message), Snackbar.LENGTH_SHORT).show();
                         }
                         break;

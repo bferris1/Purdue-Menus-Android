@@ -14,6 +14,7 @@ class MenuDownloader @Inject constructor(val webservice: Webservice) {
 
     private val formatter = DateTimeFormat.forPattern("yyyy-MM-dd")
 
+    //todo: handle mix of successful and failed calls
     fun getMenus(date: DateTime, locations: List<Location>): Single<FullDayMenu> {
         val locationNames = locations.map { it.Name }
         val requests: List<Single<DiningCourtMenu>> = locationNames.map { webservice.getMenu(it, formatter.print(date)) }

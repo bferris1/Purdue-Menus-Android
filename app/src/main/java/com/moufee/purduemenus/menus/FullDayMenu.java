@@ -12,6 +12,7 @@ import java.util.Map;
  */
 
 public class FullDayMenu implements Serializable {
+    private static final long serialVersionUID = 1L;
     private Map<String, DiningCourtMenu> mMenuMap = new HashMap<>();
     private DateTime mDate;
     private boolean mLateLunchServed;
@@ -46,6 +47,10 @@ public class FullDayMenu implements Serializable {
 
     public int getNumMenus() {
         return mMenuMap.size();
+    }
+
+    public DateTime getDate() {
+        return mDate;
     }
 
     public boolean isLateLunchServed() {

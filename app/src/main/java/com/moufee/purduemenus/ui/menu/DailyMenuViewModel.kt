@@ -62,8 +62,9 @@ constructor(private val mMenuRepository: MenuRepository, mFavoritesRepository: F
         locations = mMenuRepository.visibleLocations
         setDate(DateTime())
         mFullMenu = Transformations.switchMap(combineLatest(mCurrentDate, locations)) {
-            mMenuRepository.getMenus(it.first, it.second)
-
+            if (it.second.size > 0)
+                return@switchMap mMenuRepository.getMenus(it.first, it.second)
+            return@switchMap null
         }
     }
 

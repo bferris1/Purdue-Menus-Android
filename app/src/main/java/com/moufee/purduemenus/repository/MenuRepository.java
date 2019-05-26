@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.moufee.purduemenus.api.MenuCache;
 import com.moufee.purduemenus.api.MenuDownloader;
 import com.moufee.purduemenus.api.Webservice;
 import com.moufee.purduemenus.db.LocationDao;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import retrofit2.Response;
@@ -43,20 +45,23 @@ public class MenuRepository {
     private AppExecutors mAppExecutors;
     private LocationDao mLocationDao;
     private MenuDownloader mMenuDownloader;
+    private MenuCache mMenuCache;
+    private Provider<UpdateMenuTask> mMenuTaskProvider;
 
     @Inject
-    public MenuRepository(Webservice webservice, Context applicationContext, AppExecutors appExecutors, LocationDao locationDao, MenuDownloader menuDownloader) {
+    public MenuRepository(Webservice webservice, Context applicationContext, AppExecutors appExecutors, LocationDao locationDao, MenuDownloader menuDownloader, MenuCache menuCache) {
         mWebservice = webservice;
         mApplicationContext = applicationContext;
         mAppExecutors = appExecutors;
         mLocationDao = locationDao;
         mMenuDownloader = menuDownloader;
+        mMenuCache = menuCache;
     }
 
     public LiveData<Resource<FullDayMenu>> getMenus(DateTime dateTime, List<Location> locations) {
         MutableLiveData<Resource<FullDayMenu>> data = new MutableLiveData<>();
         if (locations == null) return data;
-        UpdateMenuTask task = new UpdateMenuTask(data, locations, mApplicationContext, mMenuDownloader).withDate(dateTime);
+        UpdateMenuTask task = new UpdateMenuTask(data, locations, mApplicationContext, mMenuDownloader, mMenuCache).withDate(dateTime);
         mAppExecutors.diskIO().execute(task);
         return data;
     }
@@ -77,7 +82,10 @@ public class MenuRepository {
         return mLocationDao.getAll();
     }
 
+    // the first time this is called when the app is first installed (has no data) it will emit an empty list
+    // this empty list gets sent
     public LiveData<List<Location>> getVisibleLocations() {
+        updateLocationsFromNetwork();
         return mLocationDao.getVisible();
     }
 
@@ -87,6 +95,21 @@ public class MenuRepository {
 
     public void updateLocations(List<Location> locations) {
         mAppExecutors.diskIO().execute(() -> mLocationDao.updateLocations(locations));
+    }
+
+    private void updateLocationsFromNetwork() {
+        mAppExecutors.networkIO().execute(() -> {
+            try {
+                Response<LocationsResponse> response = mWebservice.getLocations().execute();
+                if (response.isSuccessful()) {
+                    Log.d(TAG, "getLocations: " + response.body().getLocation());
+                    mLocationDao.insertAll(response.body().getLocation());
+                } else {
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
 

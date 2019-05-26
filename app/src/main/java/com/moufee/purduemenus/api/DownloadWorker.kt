@@ -1,15 +1,12 @@
 package com.moufee.purduemenus.api
 
 import android.content.Context
+import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.moufee.purduemenus.db.LocationDao
 import com.moufee.purduemenus.di.ChildWorkerFactory
 import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormat
-import java.io.File
-import java.io.FileOutputStream
-import java.io.ObjectOutputStream
 import javax.inject.Inject
 
 
@@ -17,10 +14,10 @@ class DownloadWorker(
         val webservice: Webservice,
         private val locationDao: LocationDao,
         private val downloader: MenuDownloader,
+        private val menuCache: MenuCache,
         private val appContext: Context,
         private val workerParams: WorkerParameters) : Worker(appContext, workerParams) {
     override fun doWork(): Result {
-        val formatter = DateTimeFormat.forPattern("yyyy-MM-dd")
         //do the work
         //download menus day by day and save to disk
         // need a Webservice at least
@@ -31,23 +28,19 @@ class DownloadWorker(
         var current = today
         while (current.isBefore(oneWeek.toInstant())) {
             val menu = downloader.getMenus(current, locations).blockingGet()
-            val filesDir = appContext.getCacheDir()
-            //todo: refactor save to be reused
-            val outputFile = File(filesDir, formatter.print(current) + ".fdm")
-            val fileOutputStream = FileOutputStream(outputFile)
-            val objectOutputStream = ObjectOutputStream(fileOutputStream)
-            objectOutputStream.writeObject(menu)
-            objectOutputStream.close()
-            fileOutputStream.close()
-            current = current.plusDays(1)
+            try {
+                menuCache.put(menu)
+            } catch (e: Exception) {
+                Log.e("DownloadWorker", "error:", e)
+            }
         }
         return Result.success()
     }
 
 
-    class Factory @Inject constructor(val webservice: Webservice, private val locationDao: LocationDao, private val downloader: MenuDownloader) : ChildWorkerFactory {
+    class Factory @Inject constructor(val webservice: Webservice, private val locationDao: LocationDao, private val downloader: MenuDownloader, private val menuCache: MenuCache) : ChildWorkerFactory {
         override fun create(appContext: Context, params: WorkerParameters): Worker {
-            return DownloadWorker(webservice, locationDao, downloader, appContext, params)
+            return DownloadWorker(webservice = webservice, locationDao = locationDao, downloader = downloader, menuCache = menuCache, appContext = appContext, workerParams = params)
         }
     }
 }
