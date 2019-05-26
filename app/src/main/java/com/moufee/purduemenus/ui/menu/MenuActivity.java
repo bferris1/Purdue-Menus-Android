@@ -24,11 +24,17 @@ import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
+import androidx.work.Constraints;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.moufee.purduemenus.BuildConfig;
 import com.moufee.purduemenus.R;
+import com.moufee.purduemenus.api.DownloadWorker;
 import com.moufee.purduemenus.databinding.ActivityMenuDatePickerTimeBinding;
 import com.moufee.purduemenus.menus.Hours;
 import com.moufee.purduemenus.ui.settings.CustomOrderFragmentKt;
@@ -42,6 +48,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -228,7 +235,12 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
         };
         mBinding.menuViewPager.addOnPageChangeListener(mOnPageChangeListener);
 
-
+        WorkManager workManager = WorkManager.getInstance(this);
+        Constraints constraints = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).setRequiresBatteryNotLow(true).build();
+        PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(DownloadWorker.class, 1, TimeUnit.DAYS)
+                .setConstraints(constraints)
+                .build();
+        workManager.enqueueUniquePeriodicWork("downloader", ExistingPeriodicWorkPolicy.KEEP, request);
     }
 
     void displayChangelog() {

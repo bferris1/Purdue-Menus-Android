@@ -4,12 +4,16 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.SharedPreferences;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.work.Configuration;
+
 import com.moufee.purduemenus.di.DaggerAppComponent;
+import com.moufee.purduemenus.di.MenusWorkerFactory;
 import com.moufee.purduemenus.ui.settings.SettingsFragment;
 
 import javax.inject.Inject;
 
-import androidx.appcompat.app.AppCompatDelegate;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasActivityInjector;
@@ -20,7 +24,7 @@ import dagger.android.HasActivityInjector;
  * Sets night mode according to preferences when the app starts
  */
 
-public class MenusApp extends Application implements HasActivityInjector {
+public class MenusApp extends Application implements HasActivityInjector, Configuration.Provider {
 
     @Inject
     DispatchingAndroidInjector<Activity> mDispatchingAndroidInjector;
@@ -31,6 +35,15 @@ public class MenusApp extends Application implements HasActivityInjector {
     @Override
     public AndroidInjector<Activity> activityInjector() {
         return mDispatchingAndroidInjector;
+    }
+
+    @Inject
+    MenusWorkerFactory mWorkerFactory;
+
+    @NonNull
+    @Override
+    public Configuration getWorkManagerConfiguration() {
+        return new Configuration.Builder().setWorkerFactory(mWorkerFactory).build();
     }
 
     @Override
