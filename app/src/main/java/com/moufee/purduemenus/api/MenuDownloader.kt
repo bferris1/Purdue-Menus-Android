@@ -19,25 +19,5 @@ class MenuDownloader @Inject constructor(val webservice: Webservice, private val
         val locationNames = locations.map { it.Name }
         val requests: List<Single<DiningCourtMenu>> = locationNames.map { webservice.getMenu(it, formatter.print(date)) }
         return Single.zip(requests) { arrayOfAnys -> FullDayMenu((arrayOfAnys.map { it as DiningCourtMenu }).toList(), date) }
-        /*for (location in locationNames) {
-            webservice.getMenu(location, formatter.print(date)).enqueue(object : Callback<DiningCourtMenu?> {
-                override fun onFailure(call: Call<DiningCourtMenu?>, t: Throwable) {
-                    // handle some failure when others complete successfully
-                    numFailures++
-                    if (retrievedMenus.size + numFailures == locations.size) {
-                        // all calls have completed or failed
-                        onComplete(FullDayMenu(retrievedMenus, date))
-                    }
-                }
-
-                override fun onResponse(call: Call<DiningCourtMenu?>, response: Response<DiningCourtMenu?>) {
-                    response.body()?.let { retrievedMenus.add(it) }
-                    if (retrievedMenus.size + numFailures == locations.size) {
-                        // all calls have completed or failed
-                        onComplete(FullDayMenu(retrievedMenus, date))
-                    }
-                }
-            })
-        }*/
     }
 }
