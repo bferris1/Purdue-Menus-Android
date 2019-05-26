@@ -1,13 +1,10 @@
 package com.moufee.purduemenus.repository;
 
-import android.content.Context;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.moufee.purduemenus.api.MenuCache;
-import com.moufee.purduemenus.api.MenuDownloader;
 import com.moufee.purduemenus.api.Webservice;
 import com.moufee.purduemenus.db.LocationDao;
 import com.moufee.purduemenus.menus.FullDayMenu;
@@ -41,27 +38,22 @@ public class MenuRepository {
     private static final String TAG = "MenuRepository";
 
     private Webservice mWebservice;
-    private Context mApplicationContext;
     private AppExecutors mAppExecutors;
     private LocationDao mLocationDao;
-    private MenuDownloader mMenuDownloader;
-    private MenuCache mMenuCache;
     private Provider<UpdateMenuTask> mMenuTaskProvider;
 
     @Inject
-    public MenuRepository(Webservice webservice, Context applicationContext, AppExecutors appExecutors, LocationDao locationDao, MenuDownloader menuDownloader, MenuCache menuCache) {
+    public MenuRepository(Webservice webservice, AppExecutors appExecutors, LocationDao locationDao, Provider<UpdateMenuTask> menuTaskProvider) {
         mWebservice = webservice;
-        mApplicationContext = applicationContext;
         mAppExecutors = appExecutors;
         mLocationDao = locationDao;
-        mMenuDownloader = menuDownloader;
-        mMenuCache = menuCache;
+        mMenuTaskProvider = menuTaskProvider;
     }
 
     public LiveData<Resource<FullDayMenu>> getMenus(DateTime dateTime, List<Location> locations) {
         MutableLiveData<Resource<FullDayMenu>> data = new MutableLiveData<>();
         if (locations == null) return data;
-        UpdateMenuTask task = new UpdateMenuTask(data, locations, mApplicationContext, mMenuDownloader, mMenuCache).withDate(dateTime);
+        UpdateMenuTask task = mMenuTaskProvider.get().forLocations(locations).forDate(dateTime).setLiveData(data);
         mAppExecutors.diskIO().execute(task);
         return data;
     }

@@ -18,6 +18,8 @@ import org.joda.time.format.DateTimeFormatter;
 import java.io.IOException;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.reactivex.disposables.Disposable;
 
 /**
@@ -37,10 +39,8 @@ public class UpdateMenuTask implements Runnable {
     private List<Location> mLocationList;
     private MenuCache mMenuCache;
 
-
-    public UpdateMenuTask(MutableLiveData<Resource<FullDayMenu>> liveData, List<Location> locations, Context context, MenuDownloader menuDownloader, MenuCache menuCache) {
-        this.mFullMenu = liveData;
-        mLocationList = locations;
+    @Inject
+    public UpdateMenuTask(Context context, MenuDownloader menuDownloader, MenuCache menuCache) {
         mMenuDownloader = menuDownloader;
         mMenuCache = menuCache;
         mMenuDate = new DateTime();
@@ -49,13 +49,26 @@ public class UpdateMenuTask implements Runnable {
 
     //todo: what is this for? constructor too long?
 
-    public UpdateMenuTask withDate(DateTime date) {
+    public UpdateMenuTask forDate(DateTime date) {
         this.mMenuDate = date;
+        return this;
+    }
+
+    public UpdateMenuTask forLocations(List<Location> locations) {
+        this.mLocationList = locations;
+        return this;
+    }
+
+    public UpdateMenuTask setLiveData(MutableLiveData<Resource<FullDayMenu>> liveData) {
+        this.mFullMenu = liveData;
         return this;
     }
 
     @Override
     public void run() {
+        if (mLocationList == null || mFullMenu == null) {
+            return;
+        }
         if (mLocationList.size() == 0) {
             return;
         }
