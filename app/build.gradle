@@ -3,6 +3,11 @@ apply plugin: "com.android.application"
 android {
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
+
+    useLibrary 'android.test.runner'
+    useLibrary 'android.test.base'
+    useLibrary 'android.test.mock'
+
     defaultConfig {
         applicationId "com.moufee.purduemenus"
         minSdkVersion 16
@@ -40,6 +45,9 @@ android {
         sourceCompatibility 1.8
         incremental = true
     }
+    testOptions {
+        unitTests.includeAndroidResources = true
+    }
     sourceSets {
         androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
     }
@@ -76,7 +84,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
 
-    androidTestImplementation 'androidx.test:core:1.1.0'
+    androidTestImplementation 'androidx.test:core:1.2.0'
 
     // Room
     implementation "androidx.room:room-runtime:$room_version"
@@ -104,9 +112,31 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-moshi:2.5.0"
 
 
+    // Core library
+    androidTestImplementation 'androidx.test:core:1.2.0'
+
+
+    // AndroidJUnitRunner and JUnit Rules
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test:rules:1.2.0'
+
+    // Assertions
+    androidTestImplementation 'androidx.test.ext:junit:1.1.0'
+    androidTestImplementation 'androidx.test.ext:truth:1.1.0'
+    testImplementation 'com.google.truth:truth:0.42'
+
+//    // Espresso dependencies
+//    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+//    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.1.1'
+//    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.1.1'
+//    androidTestImplementation 'androidx.test.espresso:espresso-accessibility:3.1.1'
+//    androidTestImplementation 'androidx.test.espresso:espresso-web:3.1.1'
+//    androidTestImplementation 'androidx.test.espresso.idling:idling-concurrent:3.1.1'
+
 
     implementation "joda-time:joda-time:2.9.9"
     testImplementation "junit:junit:4.12"
+    testImplementation 'org.mockito:mockito-core:2.19.0'
 
     implementation 'com.github.franmontiel:PersistentCookieJar:v1.0.1'
 
