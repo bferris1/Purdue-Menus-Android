@@ -53,8 +53,8 @@ class DatabaseTest {
     @Test
     fun testLocation() {
         val location = Location("Windsor", "WIND", "Windsor Dining Court", 0)
-        locationDao.insertAll(location)
-        val allLocations: List<Location> = locationDao.getall();
+        locationDao.insertAll(listOf(location))
+        val allLocations: List<Location> = locationDao.getAllList()
         assertThat(allLocations.size, equalTo(1))
         assertThat(allLocations[0].FormalName, equalTo("Windsor Dining Court"))
         assertThat(allLocations[0].LocationId, equalTo("WIND"))
