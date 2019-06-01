@@ -17,7 +17,11 @@ class MenuDownloader @Inject constructor(val webservice: Webservice) {
     //todo: handle mix of successful and failed calls
     fun getMenus(date: DateTime, locations: List<Location>): Single<FullDayMenu> {
         val locationNames = locations.map { it.Name }
-        val requests: List<Single<DiningCourtMenu>> = locationNames.map { webservice.getMenu(it, formatter.print(date)) }
-        return Single.zip(requests) { arrayOfAnys -> FullDayMenu((arrayOfAnys.map { it as DiningCourtMenu }).toList(), date) }
+        val requests: List<Single<Any>> = locationNames.map { (webservice.getMenu(it, formatter.print(date)) as Single<Any>).onErrorReturn { Any() } }
+        return Single.zip(requests) { arrayOfAnys ->
+            FullDayMenu((arrayOfAnys.mapNotNull {
+                if (it is DiningCourtMenu) it else null
+            }), date)
+        }
     }
 }

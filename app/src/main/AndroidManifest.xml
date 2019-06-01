@@ -22,6 +22,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <uses-library
+            android:name="android.test.runner"
+            android:required="false" />
+
         <provider
             android:name="androidx.work.impl.WorkManagerInitializer"
             android:authorities="${applicationId}.workmanager-init"
