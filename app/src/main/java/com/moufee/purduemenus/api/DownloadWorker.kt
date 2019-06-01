@@ -29,10 +29,12 @@ class DownloadWorker(
         while (current.isBefore(oneWeek.toInstant())) {
             val menu = downloader.getMenus(current, locations).blockingGet()
             try {
+                Log.d(TAG, "Caching menu" + menu.date.toString())
                 menuCache.put(menu)
             } catch (e: Exception) {
                 Log.e("DownloadWorker", "error:", e)
             }
+            current = current.plusDays(1)
         }
         return Result.success()
     }
