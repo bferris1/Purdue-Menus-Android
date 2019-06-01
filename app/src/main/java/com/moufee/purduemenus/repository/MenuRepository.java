@@ -54,7 +54,7 @@ public class MenuRepository {
         MutableLiveData<Resource<FullDayMenu>> data = new MutableLiveData<>();
         if (locations == null) return data;
         UpdateMenuTask task = mMenuTaskProvider.get().forLocations(locations).forDate(dateTime).setLiveData(data);
-        mAppExecutors.diskIO().execute(task);
+        mAppExecutors.networkIO().execute(task);
         return data;
     }
 

@@ -19,13 +19,13 @@ package com.moufee.purduemenus.util;
 import android.os.Handler;
 import android.os.Looper;
 
+import androidx.annotation.NonNull;
+
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
-import androidx.annotation.NonNull;
 
 /**
  * Global executor pools for the whole application.
@@ -50,7 +50,7 @@ public class AppExecutors {
 
     @Inject
     public AppExecutors() {
-        this(Executors.newSingleThreadExecutor(), Executors.newFixedThreadPool(3),
+        this(Executors.newSingleThreadExecutor(), Executors.newCachedThreadPool(),
                 new MainThreadExecutor());
     }
 
