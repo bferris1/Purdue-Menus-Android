@@ -81,20 +81,8 @@ public class UpdateMenuTask implements Runnable {
         } else {
             mFullMenu.postValue(Resource.loading(null));
         }
-        if (fileMenus == null || shouldFetch()) {
-            fetchFromNetwork();
-        }
+        fetchFromNetwork();
     }
-
-    private boolean shouldFetch() {
-        //todo: check if the menus from the file are too short, have a lot of null values, etc and decide when to fetch?
-        return true;
-//        DateTime now = new DateTime();
-//        Log.d(TAG, "shouldFetch: days: "+Days.daysBetween(now, mMenuDate).getDays());
-//        return Math.abs(Days.daysBetween(now, mMenuDate).getDays()) > 5;
-    }
-
-    // todo: move this logic to ViewModel?
 
     private void fetchFromNetwork() {
         NetworkInfo networkInfo = mConnectivityManager.getActiveNetworkInfo();
