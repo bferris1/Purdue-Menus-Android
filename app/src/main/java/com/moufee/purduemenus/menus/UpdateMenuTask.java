@@ -12,8 +12,6 @@ import com.moufee.purduemenus.api.MenuDownloader;
 import com.moufee.purduemenus.util.Resource;
 
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import java.io.IOException;
 import java.util.List;
@@ -27,11 +25,11 @@ import io.reactivex.disposables.Disposable;
  * A task to update LiveData and cache
  */
 
+//todo: potentially move this functionality to MenusRepository
 public class UpdateMenuTask implements Runnable {
 
     private MutableLiveData<Resource<FullDayMenu>> mFullMenu;
     private DateTime mMenuDate;
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd");
     private static final String TAG = "UpdateMenuTask";
     private boolean mFetchedFromFile = false;
     private MenuDownloader mMenuDownloader;
@@ -46,8 +44,6 @@ public class UpdateMenuTask implements Runnable {
         mMenuDate = new DateTime();
         mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
-
-    //todo: what is this for? constructor too long?
 
     public UpdateMenuTask forDate(DateTime date) {
         this.mMenuDate = date;

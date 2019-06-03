@@ -1,5 +1,6 @@
 package com.moufee.purduemenus.api
 
+import android.util.Log
 import com.moufee.purduemenus.menus.DiningCourtMenu
 import com.moufee.purduemenus.menus.FullDayMenu
 import com.moufee.purduemenus.menus.Location
@@ -16,7 +17,12 @@ class MenuDownloader @Inject constructor(val webservice: Webservice) {
 
     fun getMenus(date: DateTime, locations: List<Location>): Single<FullDayMenu> {
         val locationNames = locations.map { it.Name }
-        val requests: List<Single<Any>> = locationNames.map { (webservice.getMenu(it, formatter.print(date)) as Single<Any>).onErrorReturn { Any() } }
+        val requests: List<Single<Any>> = locationNames.map { location ->
+            (webservice.getMenu(location, formatter.print(date)) as Single<Any>).onErrorReturn {
+                Log.e("MenuDownloader", "Error downloading menu", it)
+                Any()
+            }
+        }
         return Single.zip(requests) { arrayOfAnys ->
             FullDayMenu((arrayOfAnys.mapNotNull {
                 if (it is DiningCourtMenu) it else null

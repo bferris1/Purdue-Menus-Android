@@ -54,23 +54,13 @@ public class MenuRepository {
         MutableLiveData<Resource<FullDayMenu>> data = new MutableLiveData<>();
         if (locations == null) return data;
         UpdateMenuTask task = mMenuTaskProvider.get().forLocations(locations).forDate(dateTime).setLiveData(data);
+        //todo: potential way to enqueue new requests with higher priority? and/or cancel and re-enqueue current task?
         mAppExecutors.networkIO().execute(task);
         return data;
     }
 
     public LiveData<List<Location>> getLocations() {
-        mAppExecutors.networkIO().execute(() -> {
-            try {
-                Response<LocationsResponse> response = mWebservice.getLocations().execute();
-                if (response.isSuccessful()) {
-                    Log.d(TAG, "getLocations: " + response.body().getLocation());
-                    mLocationDao.insertAll(response.body().getLocation());
-                } else {
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+        updateLocationsFromNetwork();
         return mLocationDao.getAll();
     }
 
@@ -97,6 +87,7 @@ public class MenuRepository {
                     Log.d(TAG, "getLocations: " + response.body().getLocation());
                     mLocationDao.insertAll(response.body().getLocation());
                 } else {
+                    Log.e(TAG, "Locations request failed." + response.message());
                 }
             } catch (IOException e) {
                 e.printStackTrace();
