@@ -21,17 +21,19 @@ The current priorities for development are:
     - [ ] writing tests for individual components
     - [ ] moving all view-related data to ViewModel
 3. Improving the way data is retrieved
-    - [ ] using NetworkBoundResource or similar class to mediate local caching and decouple components
-        - maybe use library like [Store](https://github.com/NYTimes/Store)
-    - [ ] improved thread management for background operations (Executors, etc)
-    - [ ] deciding if data should be refreshed from network after a cache hit
+    - [ ] break UpdateMenusTask into components
+    - [ ] improved thread management for background operations (Executors, etc) - make sure the latest retrieval task has priority over previously queued operations
+    - [ ] deciding if data should be refreshed from network after a cache hit - currently it is always refreshed
+    -  maybe use a library like [Store](https://github.com/NYTimes/Store) to help manage menu retrieval and caching. It uses RxJava, which could fit in well with the current implementation
     - [ ] improved exception handling for network/JSON parsing exceptions
 4. Implementing the favorites system
     - [x] Login (store cookie) and retrieve favorites
     - [x] Store favorites locally in a suitable format (Room database)
     - [x] Add/remove favorites locally
     - [x] Synchronize favorites between local database and the menus API
-5. Updating data periodically in the background
-    - Sending notifications when selected items are served
-    - Allow users to specify notification times
+5. Adding Favorite Item Notifications
+    - [x] Periodically cache the next week's menus in the background
+    - [ ] Send notifications when favorite items are served
+        - [ ] Allow users to specify notification times
+    - [ ] Create a Favorites Summary Activity to be launched from the notification
 
