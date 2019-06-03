@@ -24,11 +24,17 @@ import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
+import androidx.work.Constraints;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.moufee.purduemenus.BuildConfig;
 import com.moufee.purduemenus.R;
+import com.moufee.purduemenus.api.DownloadWorker;
 import com.moufee.purduemenus.databinding.ActivityMenuDatePickerTimeBinding;
 import com.moufee.purduemenus.menus.Hours;
 import com.moufee.purduemenus.ui.settings.CustomOrderFragmentKt;
@@ -42,6 +48,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -109,6 +116,8 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
             }
         });
 
+        mViewModel.getLocations().observe(this, locations -> mMenuPagerAdapter.setLocationList(locations));
+
         mViewModel.getFavoriteSet().observe(this, strings -> mMenuPagerAdapter.setFavoritesSet(strings));
 
         mViewModel.getFullMenu().observe(this, fullDayMenuResource -> {
@@ -119,7 +128,7 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
                     case SUCCESS:
                         mBinding.setMenu(fullDayMenuResource.data);
                         if (fullDayMenuResource.data != null)
-                            mMenuPagerAdapter.setMenus(fullDayMenuResource.data.getMenus());
+                            mMenuPagerAdapter.setMenus(fullDayMenuResource.data.getMenuMap());
                         updateLateLunch(fullDayMenuResource.data.isLateLunchServed());
                         updateServingTime();
                         break;
@@ -127,8 +136,9 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
                         break;
                     case ERROR:
                         if (fullDayMenuResource.data != null) {
-                            mMenuPagerAdapter.setMenus(fullDayMenuResource.data.getMenus());
+                            mMenuPagerAdapter.setMenus(fullDayMenuResource.data.getMenuMap());
                         } else {
+                            Log.e(TAG, "setListeners: " + fullDayMenuResource.message);
                             Snackbar.make(mBinding.activityMenuCoordinatorLayout, getString(R.string.network_error_message), Snackbar.LENGTH_SHORT).show();
                         }
                         break;
@@ -152,7 +162,9 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
         String timeString;
         try {
             int diningCourtIndex = mBinding.menuViewPager.getCurrentItem();
-            Hours hours = mViewModel.getFullMenu().getValue().data.getMenu(diningCourtIndex).getMeal(mViewModel.getSelectedMealIndex().getValue()).getHours();
+            // todo: figure out all these null pointer warnings (convert to Kotlin and/or restructure data)
+            String selectedLocation = mViewModel.getLocations().getValue().get(diningCourtIndex).getName();
+            Hours hours = mViewModel.getFullMenu().getValue().data.getMenu(selectedLocation).getMeal(mViewModel.getSelectedMealIndex().getValue()).getHours();
             startTime = hours.getStartTime();
             endTime = hours.getEndTime();
             timeString = mTimeFormatter.print(startTime) + " - " + mTimeFormatter.print(endTime);
@@ -224,7 +236,12 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
         };
         mBinding.menuViewPager.addOnPageChangeListener(mOnPageChangeListener);
 
-
+        WorkManager workManager = WorkManager.getInstance(this);
+        Constraints constraints = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).setRequiresBatteryNotLow(true).build();
+        PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(DownloadWorker.class, 1, TimeUnit.DAYS)
+                .setConstraints(constraints)
+                .build();
+        workManager.enqueueUniquePeriodicWork("downloader", ExistingPeriodicWorkPolicy.KEEP, request);
     }
 
     void displayChangelog() {

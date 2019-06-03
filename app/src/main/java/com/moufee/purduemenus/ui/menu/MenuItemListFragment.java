@@ -44,7 +44,7 @@ public class MenuItemListFragment extends Fragment implements OnToggleFavoriteLi
     private static final String TAG = "MENU_ITEM_LIST_FRAGMENT";
 
     // TODO: restructure so that all data stays in ViewModel (data binding?)
-    private int mDiningCourtIndex = 0;
+    String mDiningCourtName;
     private int mMealIndex = 0;
     private OnListFragmentInteractionListener mListener;
     private RecyclerView mMenuItemRecyclerView;
@@ -66,10 +66,10 @@ public class MenuItemListFragment extends Fragment implements OnToggleFavoriteLi
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static MenuItemListFragment newInstance(int diningCourtIndex, int mealIndex) {
+    public static MenuItemListFragment newInstance(String diningCourtName, int mealIndex) {
         MenuItemListFragment fragment = new MenuItemListFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_DINING_COURT_INDEX, diningCourtIndex);
+        args.putString(ARG_DINING_COURT_INDEX, diningCourtName);
         args.putInt(ARG_MEAL_INDEX, mealIndex);
         fragment.setArguments(args);
         return fragment;
@@ -81,7 +81,7 @@ public class MenuItemListFragment extends Fragment implements OnToggleFavoriteLi
         mDataBoundAdapter = new MenuRecyclerViewAdapter(this);
 
         if (getArguments() != null) {
-            mDiningCourtIndex = getArguments().getInt(ARG_DINING_COURT_INDEX);
+            mDiningCourtName = getArguments().getString(ARG_DINING_COURT_INDEX);
             mMealIndex = getArguments().getInt(ARG_MEAL_INDEX);
         }
     }
@@ -128,13 +128,13 @@ public class MenuItemListFragment extends Fragment implements OnToggleFavoriteLi
     private void setListener() {
         mViewModel.getFullMenu().observe(this, fullDayMenuResource -> {
             try {
-                if (fullDayMenuResource != null && fullDayMenuResource.data != null && fullDayMenuResource.data.getMenu(mDiningCourtIndex).isServing(mMealIndex)) {
-                    mDataBoundAdapter.setStations(fullDayMenuResource.data.getMenu(mDiningCourtIndex).getMeal(mMealIndex).getStations());
+                if (fullDayMenuResource != null && fullDayMenuResource.data != null && fullDayMenuResource.data.getMenu(mDiningCourtName).isServing(mMealIndex)) {
+                    mDataBoundAdapter.setStations(fullDayMenuResource.data.getMenu(mDiningCourtName).getMeal(mMealIndex).getStations());
                     mMenuItemRecyclerView.setVisibility(View.VISIBLE);
                     mNotServingTextView.setVisibility(View.GONE);
                 } else {
                     mMenuItemRecyclerView.setVisibility(View.GONE);
-                    mNotServingTextView.setText(fullDayMenuResource.data.getMenu(mDiningCourtIndex).getMeal(mMealIndex).getStatus());
+                    mNotServingTextView.setText(fullDayMenuResource.data.getMenu(mDiningCourtName).getMeal(mMealIndex).getStatus());
                     mNotServingTextView.setVisibility(View.VISIBLE);
                 }
             } catch (Exception e) {
@@ -154,14 +154,14 @@ public class MenuItemListFragment extends Fragment implements OnToggleFavoriteLi
             mMealIndex = integer;
             Resource<FullDayMenu> fullDayMenuResource = mViewModel.getFullMenu().getValue();
             try {
-                if (fullDayMenuResource != null && fullDayMenuResource.data != null && fullDayMenuResource.data.getMenu(mDiningCourtIndex).isServing(mMealIndex)) {
+                if (fullDayMenuResource != null && fullDayMenuResource.data != null && fullDayMenuResource.data.getMenu(mDiningCourtName).isServing(mMealIndex)) {
 //                        DiningCourtMenu.Meal meal = fullDayMenuResource.data.getMenu(mDiningCourtIndex).getMeal(mMealIndex);
-                    mDataBoundAdapter.setStations(mViewModel.getFullMenu().getValue().data.getMenu(mDiningCourtIndex).getMeal(mMealIndex).getStations());
+                    mDataBoundAdapter.setStations(mViewModel.getFullMenu().getValue().data.getMenu(mDiningCourtName).getMeal(mMealIndex).getStations());
                     mMenuItemRecyclerView.setVisibility(View.VISIBLE);
                     mNotServingTextView.setVisibility(View.GONE);
                 } else {
                     mMenuItemRecyclerView.setVisibility(View.GONE);
-                    mNotServingTextView.setText(fullDayMenuResource.data.getMenu(mDiningCourtIndex).getMeal(mMealIndex).getStatus());
+                    mNotServingTextView.setText(fullDayMenuResource.data.getMenu(mDiningCourtName).getMeal(mMealIndex).getStatus());
                     mNotServingTextView.setVisibility(View.VISIBLE);
                 }
             } catch (Exception e) {

@@ -31,9 +31,6 @@
         android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:context=".ui.menu.MenuActivity">
@@ -209,7 +206,7 @@
                     android:enabled="@{menusResource.data != null}"
                     android:onClick="@{() -> viewModel.setSelectedMealIndex(0)}"
                     android:text="@string/breakfast"
-                    app:selected="@{viewModel.selectedMealIndex == 0}"
+                    app:selected="@{safeUnbox(viewModel.selectedMealIndex) == 0}"
                     tools:text="Breakfast" />
 
                 <Button
@@ -223,7 +220,7 @@
                     android:onClick="@{() -> viewModel.setSelectedMealIndex(1)}"
                     android:padding="0dp"
                     android:text="@string/lunch"
-                    app:selected="@{viewModel.selectedMealIndex == 1}"
+                    app:selected="@{safeUnbox(viewModel.selectedMealIndex) == 1}"
                     tools:text="Lunch" />
 
                 <Button
@@ -239,7 +236,7 @@
                     android:onClick="@{() -> viewModel.setSelectedMealIndex(2)}"
                     android:padding="0dp"
                     android:text="@string/late_lunch"
-                    app:selected="@{viewModel.selectedMealIndex == 2}"
+                    app:selected="@{safeUnbox(viewModel.selectedMealIndex) == 2}"
                     app:visibleGone="@{menu.isLateLunchServed}"
                     tools:text="Late Lunch"
                     tools:visibility="visible" />
@@ -254,7 +251,7 @@
                     android:enabled="@{menusResource.data != null}"
                     android:onClick="@{() -> viewModel.setSelectedMealIndex(3)}"
                     android:text="@string/dinner"
-                    app:selected="@{viewModel.selectedMealIndex == 3}"
+                    app:selected="@{safeUnbox(viewModel.selectedMealIndex) == 3}"
                     tools:text="Dinner" />
             </LinearLayout>
 

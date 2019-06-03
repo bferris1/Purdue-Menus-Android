@@ -5,148 +5,79 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
-import com.moufee.purduemenus.api.Webservice;
+import com.moufee.purduemenus.api.MenuCache;
+import com.moufee.purduemenus.api.MenuDownloader;
 import com.moufee.purduemenus.util.Resource;
 
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import javax.inject.Inject;
+
+import io.reactivex.disposables.Disposable;
 
 /**
  * Created by Ben on 03/08/2017.
  * A task to update LiveData and cache
  */
 
+//todo: potentially move this functionality to MenusRepository
 public class UpdateMenuTask implements Runnable {
 
     private MutableLiveData<Resource<FullDayMenu>> mFullMenu;
-    private Context mContext;
     private DateTime mMenuDate;
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd");
     private static final String TAG = "UpdateMenuTask";
     private boolean mFetchedFromFile = false;
-    private Webservice mWebservice;
+    private MenuDownloader mMenuDownloader;
     private ConnectivityManager mConnectivityManager;
     private List<Location> mLocationList;
+    private MenuCache mMenuCache;
 
-
-    public UpdateMenuTask(MutableLiveData<Resource<FullDayMenu>> liveData, List<Location> locations, Context context, Webservice webservice) {
-        this.mFullMenu = liveData;
-        mLocationList = locations;
-        mContext = context;
-        mWebservice = webservice;
+    @Inject
+    public UpdateMenuTask(Context context, MenuDownloader menuDownloader, MenuCache menuCache) {
+        mMenuDownloader = menuDownloader;
+        mMenuCache = menuCache;
         mMenuDate = new DateTime();
         mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
-    //todo: what is this for? constructor too long?
-
-    public UpdateMenuTask withDate(DateTime date) {
+    public UpdateMenuTask forDate(DateTime date) {
         this.mMenuDate = date;
+        return this;
+    }
+
+    public UpdateMenuTask forLocations(List<Location> locations) {
+        this.mLocationList = locations;
+        return this;
+    }
+
+    public UpdateMenuTask setLiveData(MutableLiveData<Resource<FullDayMenu>> liveData) {
+        this.mFullMenu = liveData;
         return this;
     }
 
     @Override
     public void run() {
-//        mFullMenu.postValue(Resource.<FullDayMenu>loading(null));
-        ArrayList<DiningCourtMenu> fileMenus = getMenusFromFile(DATE_TIME_FORMATTER.print(mMenuDate));
+        if (mLocationList == null || mFullMenu == null) {
+            return;
+        }
+        if (mLocationList.size() == 0) {
+            return;
+        }
+        // we don't post loading status unless it's a cache miss
+        FullDayMenu fileMenus = mMenuCache.get(mMenuDate);
         if (fileMenus != null) {
             mFetchedFromFile = true;
-            mFullMenu.postValue(Resource.success(new FullDayMenu(fileMenus, mMenuDate, hasLateLunch(fileMenus))));
+            mFullMenu.postValue(Resource.success(fileMenus));
             Log.d(TAG, "getFullMenu: Read from file!");
         } else {
             mFullMenu.postValue(Resource.loading(null));
         }
-        if (fileMenus == null || shouldFetch()) {
-            fetchFromNetwork();
-        }
-    }
-
-    private boolean shouldFetch() {
-        //todo: check if the menus from the file are too short, have a lot of null values, etc and decide when to fetch?
-        return true;
-//        DateTime now = new DateTime();
-//        Log.d(TAG, "shouldFetch: days: "+Days.daysBetween(now, mMenuDate).getDays());
-//        return Math.abs(Days.daysBetween(now, mMenuDate).getDays()) > 5;
-    }
-
-    private boolean hasLateLunch(List<DiningCourtMenu> menus) {
-        for (DiningCourtMenu menu :
-                menus) {
-            if (menu.servesLateLunch())
-                return true;
-        }
-        return false;
-    }
-
-    private ArrayList<DiningCourtMenu> getMenusFromFile(String formattedDate) {
-        File filesDir = mContext.getCacheDir();
-        File sourceFile = new File(filesDir, formattedDate + ".menus");
-        ArrayList<DiningCourtMenu> result;
-        if (!sourceFile.exists())
-            return null;
-        try {
-            FileInputStream fileInputStream = new FileInputStream(sourceFile);
-            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-            result = (ArrayList<DiningCourtMenu>) objectInputStream.readObject();
-            sortMenus(result);
-            objectInputStream.close();
-            fileInputStream.close();
-        } catch (Exception e) {
-            Log.e(TAG, "getMenusFromFile: error", e);
-            return null;
-        }
-        return result;
-    }
-
-    private void saveMenuToFile(String filename, List<DiningCourtMenu> menus) throws IOException {
-        File filesDir = mContext.getCacheDir();
-        File outputFile = new File(filesDir, filename);
-        FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-        objectOutputStream.writeObject(menus);
-        objectOutputStream.close();
-        fileOutputStream.close();
-    }
-
-    // todo: move this logic to ViewModel?
-
-    private void sortMenus(List<DiningCourtMenu> menus) {
-        Log.d(TAG, "sortMenus: " + menus.toString());
-        Map<String, Location> locationMap = new HashMap<>();
-        for (int i = 0; i < mLocationList.size(); i++) {
-            Location location = mLocationList.get(i);
-            locationMap.put(location.getName(), location);
-        }
-
-        Iterator<DiningCourtMenu> iterator = menus.iterator();
-        while (iterator.hasNext()) {
-            DiningCourtMenu menu = iterator.next();
-            if (locationMap.get(menu.getLocation()).isHidden()) {
-                iterator.remove();
-            }
-        }
-        Collections.sort(menus, new DiningCourtComparator(mLocationList));
+        fetchFromNetwork();
     }
 
     private void fetchFromNetwork() {
@@ -158,48 +89,26 @@ public class UpdateMenuTask implements Runnable {
                 mFullMenu.postValue(Resource.error("Not connected to network", null));
             return;
         }
-        List<String> diningCourtNames = new ArrayList<>();
-        for (Location location :
-                mLocationList) {
-            diningCourtNames.add(location.getName());
-        }
-        //this is similar to the initial implementation from the architecture components guide
-        final List<DiningCourtMenu> tempMenusList = new ArrayList<>();
-        final String dateString = DATE_TIME_FORMATTER.print(mMenuDate);
-        for (final String diningCourt : diningCourtNames) {
-            Call<DiningCourtMenu> menuCall = mWebservice.getMenu(diningCourt, dateString);
-            menuCall.enqueue(new Callback<DiningCourtMenu>() {
-                @Override
-                public void onResponse(@NonNull Call<DiningCourtMenu> call, @NonNull Response<DiningCourtMenu> response) {
-                    if (response.isSuccessful())
-                        tempMenusList.add(response.body());
+        Log.d(TAG, "fetchFromNetwork: " + mLocationList);
 
-                    if (tempMenusList.size() == diningCourtNames.size()) {
-                        sortMenus(tempMenusList);
-                        mFullMenu.postValue(Resource.success(new FullDayMenu(tempMenusList, mMenuDate, hasLateLunch(tempMenusList))));
-                        //save to json
-                        try {
-                            saveMenuToFile(dateString + ".menus", tempMenusList);
+        //todo: figure out if this needs to  be retained
+        //I'm thinking this can be ignored since we still want to cache even if it won't be displayed
+        Disposable disposable = mMenuDownloader.getMenus(mMenuDate, mLocationList).subscribe((fullDayMenu, throwable) -> {
+            if (throwable != null) {
+                if (mFullMenu.getValue() != null)
+                    mFullMenu.postValue(Resource.error("Network Error", mFullMenu.getValue().data));
+                else
+                    mFullMenu.postValue(Resource.error(throwable.getMessage(), null));
+                return;
+            }
+            mFullMenu.postValue(Resource.success(fullDayMenu));
+            try {
+                mMenuCache.put(fullDayMenu);
+            } catch (IOException e) {
+                Log.e(TAG, "onResponse: error saving to file ", e);
+                mFullMenu.postValue(Resource.error(e.getMessage() != null ? e.getMessage() : "An error occurred while saving to file.", null));
+            }
+        });
 
-                        } catch (IOException e) {
-                            Log.e(TAG, "onResponse: error saving to file ", e);
-                            mFullMenu.postValue(Resource.error(e.getMessage() != null ? e.getMessage() : "an error occurred while saving to file", null));
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<DiningCourtMenu> call, Throwable t) {
-                    //todo: handle failure
-                    Log.e(TAG, "onFailure: Network error", t);
-                    if (mFullMenu.getValue() != null)
-                        mFullMenu.postValue(Resource.error("Network Error", mFullMenu.getValue().data));
-                    else
-                        mFullMenu.postValue(Resource.error(t.getMessage(), null));
-                }
-            });
-
-
-        }
     }
 }

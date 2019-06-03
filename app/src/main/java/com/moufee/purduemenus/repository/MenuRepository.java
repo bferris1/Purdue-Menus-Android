@@ -1,6 +1,5 @@
 package com.moufee.purduemenus.repository;
 
-import android.content.Context;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -21,6 +20,7 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import retrofit2.Response;
@@ -38,40 +38,37 @@ public class MenuRepository {
     private static final String TAG = "MenuRepository";
 
     private Webservice mWebservice;
-    private Context mApplicationContext;
     private AppExecutors mAppExecutors;
     private LocationDao mLocationDao;
+    private Provider<UpdateMenuTask> mMenuTaskProvider;
 
     @Inject
-    public MenuRepository(Webservice webservice, Context applicationContext, AppExecutors appExecutors, LocationDao locationDao) {
+    public MenuRepository(Webservice webservice, AppExecutors appExecutors, LocationDao locationDao, Provider<UpdateMenuTask> menuTaskProvider) {
         mWebservice = webservice;
-        mApplicationContext = applicationContext;
         mAppExecutors = appExecutors;
         mLocationDao = locationDao;
+        mMenuTaskProvider = menuTaskProvider;
     }
 
     public LiveData<Resource<FullDayMenu>> getMenus(DateTime dateTime, List<Location> locations) {
         MutableLiveData<Resource<FullDayMenu>> data = new MutableLiveData<>();
         if (locations == null) return data;
-        UpdateMenuTask task = new UpdateMenuTask(data, locations, mApplicationContext, mWebservice).withDate(dateTime);
-        mAppExecutors.diskIO().execute(task);
+        UpdateMenuTask task = mMenuTaskProvider.get().forLocations(locations).forDate(dateTime).setLiveData(data);
+        //todo: potential way to enqueue new requests with higher priority? and/or cancel and re-enqueue current task?
+        mAppExecutors.networkIO().execute(task);
         return data;
     }
 
     public LiveData<List<Location>> getLocations() {
-        mAppExecutors.networkIO().execute(() -> {
-            try {
-                Response<LocationsResponse> response = mWebservice.getLocations().execute();
-                if (response.isSuccessful()) {
-                    Log.d(TAG, "getLocations: " + response.body().getLocation());
-                    mLocationDao.insertAll(response.body().getLocation());
-                } else {
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+        updateLocationsFromNetwork();
         return mLocationDao.getAll();
+    }
+
+    // the first time this is called when the app is first installed (has no data) it will emit an empty list
+    // this empty list gets sent
+    public LiveData<List<Location>> getVisibleLocations() {
+        updateLocationsFromNetwork();
+        return mLocationDao.getVisible();
     }
 
     public void updateLocations(Location... locations) {
@@ -80,6 +77,22 @@ public class MenuRepository {
 
     public void updateLocations(List<Location> locations) {
         mAppExecutors.diskIO().execute(() -> mLocationDao.updateLocations(locations));
+    }
+
+    private void updateLocationsFromNetwork() {
+        mAppExecutors.networkIO().execute(() -> {
+            try {
+                Response<LocationsResponse> response = mWebservice.getLocations().execute();
+                if (response.isSuccessful()) {
+                    Log.d(TAG, "getLocations: " + response.body().getLocation());
+                    mLocationDao.insertAll(response.body().getLocation());
+                } else {
+                    Log.e(TAG, "Locations request failed." + response.message());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
 

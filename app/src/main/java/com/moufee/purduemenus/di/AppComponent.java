@@ -14,7 +14,7 @@ import dagger.android.support.AndroidSupportInjectionModule;
  * Defines where dependency injection may be performed
  */
 @Singleton
-@Component(modules = {AndroidSupportInjectionModule.class, AppModule.class, ActivityModule.class})
+@Component(modules = {AndroidSupportInjectionModule.class, AppModule.class, ActivityModule.class, WorkerModule.class})
 public interface AppComponent {
 
     @Component.Builder
