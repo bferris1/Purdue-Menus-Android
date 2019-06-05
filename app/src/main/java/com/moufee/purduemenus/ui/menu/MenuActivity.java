@@ -184,7 +184,6 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate: oncreate called");
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         setTitle(getString(R.string.app_name));
@@ -284,7 +283,6 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG, "onDestroy: ");
         unregisterReceiver(mNetworkReceiver);
         mBinding.menuViewPager.removeOnPageChangeListener(mOnPageChangeListener);
         mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
