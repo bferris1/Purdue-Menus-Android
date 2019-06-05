@@ -13,7 +13,7 @@
 
         <variable
             name="listener"
-            type="com.moufee.purduemenus.menus.OnToggleFavoriteListener" />
+            type="com.moufee.purduemenus.ui.menu.OnToggleFavoriteListener" />
 
         <variable
             name="isFavorite"

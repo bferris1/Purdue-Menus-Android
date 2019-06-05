@@ -20,8 +20,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.menus.FullDayMenu;
 import com.moufee.purduemenus.menus.MenuItem;
-import com.moufee.purduemenus.menus.MenuRecyclerViewAdapter;
-import com.moufee.purduemenus.menus.OnToggleFavoriteListener;
 import com.moufee.purduemenus.repository.FavoritesRepository;
 import com.moufee.purduemenus.util.Resource;
 

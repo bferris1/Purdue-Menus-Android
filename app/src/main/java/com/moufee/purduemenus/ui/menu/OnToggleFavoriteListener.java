@@ -1,4 +1,6 @@
-package com.moufee.purduemenus.menus;
+package com.moufee.purduemenus.ui.menu;
+
+import com.moufee.purduemenus.menus.MenuItem;
 
 /**
  * Created by Ben on 3/5/18.

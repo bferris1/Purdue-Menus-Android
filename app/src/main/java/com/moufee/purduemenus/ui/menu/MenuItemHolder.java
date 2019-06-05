@@ -1,10 +1,9 @@
 package com.moufee.purduemenus.ui.menu;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.moufee.purduemenus.databinding.FragmentMenuitemBinding;
 import com.moufee.purduemenus.menus.MenuItem;
-import com.moufee.purduemenus.menus.OnToggleFavoriteListener;
-
-import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created by Ben on 14/07/2017.

@@ -1,19 +1,20 @@
-package com.moufee.purduemenus.menus;
+package com.moufee.purduemenus.ui.menu;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.moufee.purduemenus.databinding.FragmentMenuitemBinding;
 import com.moufee.purduemenus.databinding.StationHeaderBinding;
-import com.moufee.purduemenus.ui.menu.MenuItemHolder;
+import com.moufee.purduemenus.menus.MenuItem;
+import com.moufee.purduemenus.menus.Station;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created by Ben on 9/7/17.

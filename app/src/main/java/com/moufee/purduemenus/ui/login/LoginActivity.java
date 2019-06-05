@@ -14,13 +14,14 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.repository.FavoritesRepository;
 import com.moufee.purduemenus.util.AuthHelper;
 
 import javax.inject.Inject;
 
-import androidx.appcompat.app.AppCompatActivity;
 import dagger.android.AndroidInjection;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -28,6 +29,7 @@ import okhttp3.Response;
 
 /**
  * A login screen that offers login via username/password.
+ * todo: I think this could be cleaned up a bit, this is mostly the Android Studio template
  */
 public class LoginActivity extends AppCompatActivity {
 

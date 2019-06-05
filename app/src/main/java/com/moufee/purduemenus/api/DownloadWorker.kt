@@ -18,15 +18,13 @@ class DownloadWorker(
         private val appContext: Context,
         private val workerParams: WorkerParameters) : Worker(appContext, workerParams) {
     override fun doWork(): Result {
-        //do the work
         //download menus day by day and save to disk
-        // need a Webservice at least
-        // need to a Downloader class that gets all menus and specifies what to do next
         val locations = locationDao.getAllList()
         val today = DateTime.now()
         val oneWeek = today.plusDays(7)
         var current = today
         while (current.isBefore(oneWeek.toInstant())) {
+            // todo: don't block here?
             val menu = downloader.getMenus(current, locations).blockingGet()
             try {
                 Log.d(TAG, "Caching menu" + menu.date.toString())
