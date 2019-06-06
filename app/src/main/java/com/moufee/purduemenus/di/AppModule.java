@@ -62,7 +62,7 @@ class AppModule {
     @Singleton
     @Provides
     OkHttpClient provideHttpClient(FileCookiePersistor fileCookiePersistor, Context context) {
-        //todo: restore cookies or not?
+        //todo: maybe don't use shared prefs, possibly use custom implementation
         return new OkHttpClient.Builder()
                 .cookieJar(new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(context)))
                 .build();
