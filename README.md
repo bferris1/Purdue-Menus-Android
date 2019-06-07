@@ -25,6 +25,7 @@ The current priorities for development are:
     - [ ] improved thread management for background operations (Executors, etc) - make sure the latest retrieval task has priority over previously queued operations
     - [ ] deciding if data should be refreshed from network after a cache hit - currently it is always refreshed
     -  maybe use a library like [Store](https://github.com/NYTimes/Store) to help manage menu retrieval and caching. It uses RxJava, which could fit in well with the current implementation
+    - or, use Kotlin coroutines together with architecture components to handle network operations and caching
     - [ ] improved exception handling for network/JSON parsing exceptions
 4. Implementing the favorites system
     - [x] Login (store cookie) and retrieve favorites
