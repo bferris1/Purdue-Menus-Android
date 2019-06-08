@@ -9,7 +9,7 @@ import javax.inject.Inject
 class LocationSettingsViewModel
 @Inject
 constructor(menuRepository: MenuRepository) : ViewModel() {
-    val locations: LiveData<MutableList<Location>> = menuRepository.locations
+    val locations: LiveData<List<Location>> = menuRepository.locations
 
     var orderedLocations: MutableList<Location> = ArrayList()
 

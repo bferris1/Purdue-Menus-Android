@@ -121,7 +121,7 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
         mViewModel.getFavoriteSet().observe(this, strings -> mMenuPagerAdapter.setFavoritesSet(strings));
 
         mViewModel.getFullMenu().observe(this, fullDayMenuResource -> {
-            mBinding.setMenusResource(fullDayMenuResource == null ? null : fullDayMenuResource);
+            mBinding.setMenusResource(fullDayMenuResource);
             //done: loading state
             if (fullDayMenuResource != null) {
                 switch (fullDayMenuResource.status) {
@@ -153,6 +153,7 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
         }
     }
 
+    //todo: remove this method from activity, use Kotlin and data binding
     private void updateServingTime() {
         boolean showServingTimes = mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_SHOW_SERVING_TIMES, true);
         mBinding.setShowServingTimes(showServingTimes);

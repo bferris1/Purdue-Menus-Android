@@ -1,10 +1,8 @@
 package com.moufee.purduemenus.menus;
 
-import com.google.gson.annotations.SerializedName;
+import androidx.annotation.Keep;
 
 import java.io.Serializable;
-
-import androidx.annotation.Keep;
 
 /**
  * Created by Ben on 9/5/17.
@@ -12,7 +10,6 @@ import androidx.annotation.Keep;
  */
 @Keep
 public class MenuItem implements Serializable {
-    @SerializedName("ID")
     private String ID;
     private String Name;
     private boolean IsVegetarian;
