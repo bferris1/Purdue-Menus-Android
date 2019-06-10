@@ -1,26 +1,23 @@
 package com.moufee.purduemenus.repository
 
-import android.util.Log
-
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
 import com.moufee.purduemenus.api.MenuCache
 import com.moufee.purduemenus.api.MenuDownloader
-
 import com.moufee.purduemenus.api.Webservice
 import com.moufee.purduemenus.db.LocationDao
 import com.moufee.purduemenus.menus.FullDayMenu
 import com.moufee.purduemenus.menus.Location
 import com.moufee.purduemenus.util.AppExecutors
 import com.moufee.purduemenus.util.Resource
-
+import kotlinx.coroutines.Dispatchers
 import org.joda.time.DateTime
-
+import timber.log.Timber
 import java.io.IOException
-
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.EmptyCoroutineContext
 
 
 /**
@@ -51,26 +48,26 @@ constructor(private val mWebservice: Webservice, private val mAppExecutors: AppE
         val data = MutableLiveData<Resource<FullDayMenu>>()
         if (locations == null)
             return data
-        return liveData {
+        return liveData(EmptyCoroutineContext + Dispatchers.IO) {
 
             try {
                 val fileMenus = menuCache.get(dateTime)
                 if (fileMenus != null) {
                     emit(Resource.success<FullDayMenu>(fileMenus))
-                    Log.d(TAG, "getFullMenu: Read from file!")
+                    Timber.d("getFullMenu: Read from file!")
                 } else {
                     emit(Resource.loading<FullDayMenu>(null))
                 }
             } catch (t: Throwable) {
                 emit(Resource.loading<FullDayMenu>(null))
-                Log.e(TAG, "Error reading from cache.", t)
+                Timber.e(t)
             }
             try {
                 val fullMenu = menuDownloader.getMenus(dateTime, locations)
                 emit(Resource.success(fullMenu))
                 menuCache.put(fullMenu)
             } catch (t: Throwable) {
-                Log.e(TAG, "Network or Write Error", t)
+                Timber.e(t)
             }
 
         }
@@ -89,21 +86,14 @@ constructor(private val mWebservice: Webservice, private val mAppExecutors: AppE
             try {
                 val response = mWebservice.getLocations().execute()
                 if (response.isSuccessful) {
-                    Log.d(TAG, "getLocations: " + response.body()!!.Location)
+                    Timber.d("getLocations: ${response.body()?.Location}")
                     mLocationDao.insertAll(response.body()!!.Location)
                 } else {
-                    Log.e(TAG, "Locations request failed." + response.message())
+                    Timber.e("Locations request failed. ${response.message()}")
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
             }
         }
     }
-
-    companion object {
-
-        private val TAG = "MenuRepository"
-    }
-
-
 }
