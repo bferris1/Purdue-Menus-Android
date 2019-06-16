@@ -1,54 +1,49 @@
 package com.moufee.purduemenus.api
 
 import android.content.Context
-import android.util.Log
 import com.moufee.purduemenus.menus.FullDayMenu
+import com.squareup.moshi.Moshi
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
-import java.io.*
+import java.io.File
+import java.io.FileReader
+import java.io.FileWriter
+import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 
 const val TAG = "MenuCache"
 
 @Singleton
-class MenuCache @Inject constructor(val context: Context) {
+class MenuCache @Inject constructor(val context: Context, val moshi: Moshi) {
 
     private val formatter = DateTimeFormat.forPattern("yyyy-MM-dd")
+    private val jsonAdapter = moshi.adapter<FullDayMenu>(FullDayMenu::class.java)
 
     fun get(dateTime: DateTime): FullDayMenu? {
         val date = formatter.print(dateTime)
-        val filename = "$date.fdm"
+        val filename = "$date.fdm.json"
         val filesDir = context.cacheDir
         val sourceFile = File(filesDir, filename)
-        val result: FullDayMenu
         if (!sourceFile.exists())
             return null
-        try {
-            val fileInputStream = FileInputStream(sourceFile)
-            val objectInputStream = ObjectInputStream(fileInputStream)
-            result = objectInputStream.readObject() as FullDayMenu
-            objectInputStream.close()
-            fileInputStream.close()
-        } catch (e: Exception) {
-            Log.e(TAG, "get: error", e)
-            return null
-        }
-        return result
+        return FileReader(sourceFile).use { fileReader ->
+            fileReader.readText()
+        }.let { jsonAdapter.fromJson(it) }
+
     }
 
     //todo: unchecked exception?
     @Synchronized
     @Throws(IOException::class)
     fun put(menu: FullDayMenu) {
+
         val date = formatter.print(menu.date)
-        val filename = "$date.fdm"
+        val filename = "$date.fdm.json"
         val filesDir = context.cacheDir
         val outputFile = File(filesDir, filename)
-        val fileOutputStream = FileOutputStream(outputFile)
-        val objectOutputStream = ObjectOutputStream(fileOutputStream)
-        objectOutputStream.writeObject(menu)
-        objectOutputStream.close()
-        fileOutputStream.close()
+        FileWriter(outputFile).use {
+            it.write(jsonAdapter.toJson(menu))
+        }
     }
 }
