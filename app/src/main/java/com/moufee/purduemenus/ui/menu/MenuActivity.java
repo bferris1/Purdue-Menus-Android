@@ -57,7 +57,7 @@ import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.support.HasSupportFragmentInjector;
 
-public class MenuActivity extends AppCompatActivity implements HasSupportFragmentInjector, MenuItemListFragment.OnListFragmentInteractionListener {
+public class MenuActivity extends AppCompatActivity implements HasSupportFragmentInjector {
 
     private static String TAG = "MENU_ACTIVITY";
 
@@ -92,12 +92,6 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
             }
         }
     };
-
-
-    @Override
-    public void onListFragmentInteraction(com.moufee.purduemenus.menus.MenuItem item) {
-
-    }
 
     @Override
     public AndroidInjector<Fragment> supportFragmentInjector() {
