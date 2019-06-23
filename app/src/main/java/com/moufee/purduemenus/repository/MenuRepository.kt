@@ -45,15 +45,14 @@ constructor(private val mWebservice: Webservice, private val mAppExecutors: AppE
         }
 
     fun getMenus(dateTime: DateTime, locations: List<Location>?): LiveData<Resource<FullDayMenu>> {
-        val data = MutableLiveData<Resource<FullDayMenu>>()
         if (locations == null)
-            return data
+            return MutableLiveData()
         return liveData(EmptyCoroutineContext + Dispatchers.IO) {
-
+            var fullMenu: FullDayMenu? = null
             try {
-                val fileMenus = menuCache.get(dateTime)
-                if (fileMenus != null) {
-                    emit(Resource.success<FullDayMenu>(fileMenus))
+                fullMenu = menuCache.get(dateTime)
+                if (fullMenu != null) {
+                    emit(Resource.success(fullMenu))
                     Timber.d("getFullMenu: Read from file!")
                 } else {
                     emit(Resource.loading<FullDayMenu>(null))
@@ -63,11 +62,12 @@ constructor(private val mWebservice: Webservice, private val mAppExecutors: AppE
                 Timber.e(t)
             }
             try {
-                val fullMenu = menuDownloader.getMenus(dateTime, locations)
+                fullMenu = menuDownloader.getMenus(dateTime, locations)
                 emit(Resource.success(fullMenu))
                 menuCache.put(fullMenu)
             } catch (t: Throwable) {
                 Timber.e(t)
+                emit(Resource.error("Network Error", fullMenu))
             }
 
         }
