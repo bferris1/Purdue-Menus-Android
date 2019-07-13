@@ -11,7 +11,9 @@ import com.moufee.purduemenus.menus.FullDayMenu
 import com.moufee.purduemenus.menus.Location
 import com.moufee.purduemenus.util.AppExecutors
 import com.moufee.purduemenus.util.Resource
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.joda.time.DateTime
 import timber.log.Timber
 import java.io.IOException
@@ -82,12 +84,18 @@ constructor(private val mWebservice: Webservice, private val mAppExecutors: AppE
     }
 
     private fun updateLocationsFromNetwork() {
-        mAppExecutors.networkIO().execute {
+        val locationsDefaultOrder = mapOf("Earhart" to 0, "Windsor" to 1, "Wiley" to 2, "Ford" to 3, "Hillenbrand" to 4)
+        CoroutineScope(EmptyCoroutineContext + Dispatchers.IO).launch {
             try {
                 val response = mWebservice.getLocations().execute()
-                if (response.isSuccessful) {
+                val body = response.body()
+                if (response.isSuccessful && body != null) {
+                    for (location in body.Location) {
+                        location.displayOrder = locationsDefaultOrder[location.Name] ?: 10
+                    }
                     Timber.d("getLocations: ${response.body()?.Location}")
-                    mLocationDao.insertAll(response.body()!!.Location)
+                    mLocationDao.insertAll(body.Location)
+                    //todo: remove superfluous local locations?
                 } else {
                     Timber.e("Locations request failed. ${response.message()}")
                 }
