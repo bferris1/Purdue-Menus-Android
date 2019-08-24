@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasActivityInjector;
+import timber.log.Timber;
 
 /**
  * The Application for this App
@@ -50,6 +51,9 @@ public class MenusApp extends Application implements HasActivityInjector, Config
     public void onCreate() {
 
         DaggerAppComponent.builder().application(this).build().inject(this);
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+        }
 
         switch (mSharedPreferences.getString(SettingsFragment.KEY_PREF_USE_NIGHT_MODE, "")) {
             case "mode_off":

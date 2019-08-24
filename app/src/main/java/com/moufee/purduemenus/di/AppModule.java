@@ -10,6 +10,7 @@ import androidx.room.Room;
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
+import com.moufee.purduemenus.api.DateTimeTypeAdapter;
 import com.moufee.purduemenus.api.FileCookiePersistor;
 import com.moufee.purduemenus.api.LocalTimeTypeAdapter;
 import com.moufee.purduemenus.api.Webservice;
@@ -26,7 +27,6 @@ import dagger.Module;
 import dagger.Provides;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
 /**
@@ -42,7 +42,6 @@ class AppModule {
     Webservice provideWebService(AppExecutors executors, Moshi moshi, OkHttpClient client) {
         return new Retrofit.Builder()
                 .baseUrl("https://api.hfs.purdue.edu")
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .client(client)
                 .addConverterFactory(MoshiConverterFactory.create(moshi))
                 .callbackExecutor(executors.diskIO())
@@ -55,6 +54,7 @@ class AppModule {
     Moshi provideMoshi() {
         return new Moshi.Builder()
                 .add(new LocalTimeTypeAdapter())
+                .add(new DateTimeTypeAdapter())
                 .add(new KotlinJsonAdapterFactory())
                 .build();
     }

@@ -32,8 +32,6 @@ import dagger.android.support.AndroidSupportInjection;
 /**
  * A Fragment that contains a list of menu items for one Meal at one Dining Court
  * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
  */
 public class MenuItemListFragment extends Fragment implements OnToggleFavoriteListener {
 
@@ -44,7 +42,6 @@ public class MenuItemListFragment extends Fragment implements OnToggleFavoriteLi
     // TODO: restructure so that all data stays in ViewModel (data binding?)
     String mDiningCourtName;
     private int mMealIndex = 0;
-    private OnListFragmentInteractionListener mListener;
     private RecyclerView mMenuItemRecyclerView;
     private TextView mNotServingTextView;
     private MenuRecyclerViewAdapter mDataBoundAdapter;
@@ -177,12 +174,6 @@ public class MenuItemListFragment extends Fragment implements OnToggleFavoriteLi
     public void onAttach(Context context) {
         AndroidSupportInjection.inject(this);
         super.onAttach(context);
-        if (context instanceof OnListFragmentInteractionListener) {
-            mListener = (OnListFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnListFragmentInteractionListener");
-        }
         if (context instanceof AppCompatActivity) {
             mViewModel = ViewModelProviders.of((AppCompatActivity) context, mViewModelFactory).get(DailyMenuViewModel.class);
             setListener();
@@ -193,22 +184,5 @@ public class MenuItemListFragment extends Fragment implements OnToggleFavoriteLi
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-
-        void onListFragmentInteraction(MenuItem item);
     }
 }
