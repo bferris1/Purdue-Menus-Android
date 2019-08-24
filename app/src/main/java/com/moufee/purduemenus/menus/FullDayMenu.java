@@ -19,12 +19,12 @@ public class FullDayMenu implements Serializable {
 
     public FullDayMenu(List<DiningCourtMenu> diningCourtMenus, DateTime date) {
         mDate = date;
-        mLateLunchServed = hasLateLunch();
         if (diningCourtMenus != null)
             for (DiningCourtMenu menu :
                     diningCourtMenus) {
                 mMenuMap.put(menu.getLocation(), menu);
             }
+        mLateLunchServed = hasLateLunch();
     }
 
     public Map<String, DiningCourtMenu> getMenuMap() {
