@@ -265,7 +265,7 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
             case R.id.action_feedback:
                 Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
                 emailIntent.setData(Uri.parse("mailto:")); // only email apps should handle this
-                emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"feedback@purdue.tools"}); // recipients
+                emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"support@benferris.tech"}); // recipients
                 emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Purdue Menus Feedback");
                 if (emailIntent.resolveActivity(getPackageManager()) != null) {
                     startActivity(emailIntent);
