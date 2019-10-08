@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Canvas
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,8 +20,8 @@ import com.moufee.purduemenus.menus.DiningCourtComparator
 import com.moufee.purduemenus.menus.Location
 import com.moufee.purduemenus.repository.MenuRepository
 import dagger.android.support.AndroidSupportInjection
+import timber.log.Timber
 import javax.inject.Inject
-
 
 /**
  * A simple [Fragment] subclass.
@@ -67,7 +66,7 @@ class CustomOrderFragment : androidx.fragment.app.Fragment() {
             mAdapter.submitList(mViewModel.orderedLocations)
         }
         mViewModel.locations.observe(this, Observer {
-            Log.d("ASDF", it.toString())
+            Timber.d(it.toString())
             // initialize once: after this, orderedLocations is the single source of truth for the location info
             // if we update it every time the liveData changes, updates may happen out of order with respect to UI changes, resulting in bad data being saved to DB
             // maybe there is a better way to handle this?
@@ -82,7 +81,7 @@ class CustomOrderFragment : androidx.fragment.app.Fragment() {
                 val toPos = target.adapterPosition
                 mViewModel.orderedLocations.add(toPos, mViewModel.orderedLocations.removeAt(fromPos))
                 mAdapter.notifyItemMoved(fromPos, toPos)
-                Log.d("ASDF", "from $fromPos to $toPos")
+                Timber.d("from $fromPos to $toPos")
                 return true
             }
 
@@ -114,7 +113,7 @@ class CustomOrderFragment : androidx.fragment.app.Fragment() {
         return view
     }
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         if (context is FragmentActivity) {
             mViewModel = ViewModelProviders.of(context, mViewModelFactory).get((LocationSettingsViewModel::class.java))

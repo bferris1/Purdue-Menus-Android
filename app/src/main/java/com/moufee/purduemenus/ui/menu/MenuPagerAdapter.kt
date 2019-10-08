@@ -6,18 +6,14 @@ import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.PagerAdapter
 import com.moufee.purduemenus.menus.DiningCourtMenu
 import com.moufee.purduemenus.menus.Location
-import java.util.ArrayList
-import java.util.HashMap
+import java.util.*
 import kotlin.collections.HashSet
-import kotlin.collections.List
-import kotlin.collections.Map
-import kotlin.collections.Set
 
 /**
  * Created by Ben on 26/09/2017.
  */
 
-class MenuPagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
+class MenuPagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     private var diningCourtMap: Map<String, DiningCourtMenu> = HashMap()
     private var locationList: List<Location> = ArrayList()
