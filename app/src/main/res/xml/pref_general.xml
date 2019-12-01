@@ -23,7 +23,7 @@
         android:summary="Drag and drop to customize." />
 
     <ListPreference
-        android:defaultValue="@string/pref_night_mode_off"
+        android:defaultValue="@string/pref_night_mode_auto"
         android:entries="@array/pref_nightMode_entries"
         android:entryValues="@array/pref_nightMode_values"
         android:key="night_mode"

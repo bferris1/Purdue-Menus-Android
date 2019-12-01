@@ -95,7 +95,8 @@ constructor(private val mWebservice: Webservice, private val mAppExecutors: AppE
                     }
                     Timber.d("getLocations: ${response.body()?.Location}")
                     mLocationDao.insertAll(body.Location)
-                    //todo: remove superfluous local locations?
+                    val currentLocations = mLocationDao.getAllList()
+                    currentLocations.forEach { current -> if (body.Location.find { it.LocationId == current.LocationId } == null) mLocationDao.delete(current) }
                 } else {
                     Timber.e("Locations request failed. ${response.message()}")
                 }

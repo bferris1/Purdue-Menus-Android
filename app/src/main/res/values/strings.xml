@@ -37,7 +37,7 @@
     <string name="pref_night_mode_auto" translatable="false">mode_auto</string>
 
     <string name="off">Off</string>
-    <string name="auto">Auto</string>
+    <string name="auto">Use System Setting</string>
     <string name="on">On</string>
 
 
