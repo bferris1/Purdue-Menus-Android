@@ -19,7 +19,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
@@ -55,9 +54,9 @@ import javax.inject.Inject;
 import dagger.android.AndroidInjection;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
-import dagger.android.support.HasSupportFragmentInjector;
+import dagger.android.HasAndroidInjector;
 
-public class MenuActivity extends AppCompatActivity implements HasSupportFragmentInjector {
+public class MenuActivity extends AppCompatActivity implements HasAndroidInjector {
 
     private static String TAG = "MENU_ACTIVITY";
 
@@ -70,7 +69,7 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
     @Inject
     SharedPreferences mSharedPreferences;
     @Inject
-    DispatchingAndroidInjector<Fragment> mDispatchingAndroidInjector;
+    DispatchingAndroidInjector<Object> mDispatchingAndroidInjector;
     @Inject
     ViewModelProvider.Factory mViewModelFactory;
 
@@ -94,7 +93,7 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
     };
 
     @Override
-    public AndroidInjector<Fragment> supportFragmentInjector() {
+    public AndroidInjector<Object> androidInjector() {
         return mDispatchingAndroidInjector;
     }
 

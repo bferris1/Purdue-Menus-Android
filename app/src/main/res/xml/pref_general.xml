@@ -1,4 +1,5 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <!--<SwitchPreference
         android:defaultValue="true"
@@ -8,21 +9,25 @@
         android:title="@string/preference_title_show_vegetarian_icons"/>-->
 
     <SwitchPreference
+        app:iconSpaceReserved="false"
         android:defaultValue="true"
         android:key="show_serving_times"
         android:title="@string/pref_show_serving_times" />
 
     <SwitchPreference
+        app:iconSpaceReserved="false"
         android:defaultValue="true"
         android:key="show_favorite_count"
         android:title="@string/pref_title_show_favorite_count" />
 
     <Preference
+        app:iconSpaceReserved="false"
         android:key="dining_court_order"
         android:title="Manage Dining Court Display Order"
         android:summary="Drag and drop to customize." />
 
     <ListPreference
+        app:iconSpaceReserved="false"
         android:defaultValue="@string/pref_night_mode_auto"
         android:entries="@array/pref_nightMode_entries"
         android:entryValues="@array/pref_nightMode_values"
@@ -32,11 +37,13 @@
 
 
     <Preference
+        app:iconSpaceReserved="false"
         android:key="log_in"
         android:summary="@string/pref_summary_not_logged_in"
         android:title="@string/pref_log_in" />
 
     <Preference
+        app:iconSpaceReserved="false"
         android:key="privacy_policy"
         android:title="@string/title_privacy_policy" />
 

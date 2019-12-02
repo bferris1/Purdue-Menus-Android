@@ -6,16 +6,16 @@ import com.moufee.purduemenus.R
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
-import dagger.android.support.HasSupportFragmentInjector
+import dagger.android.HasAndroidInjector
 import javax.inject.Inject
 
-class CustomOrderActivity : AppCompatActivity(), HasSupportFragmentInjector {
+class CustomOrderActivity : AppCompatActivity(), HasAndroidInjector {
 
     @Inject
-    internal lateinit var mDispatchingAndroidInjector: DispatchingAndroidInjector<androidx.fragment.app.Fragment>
+    internal lateinit var mDispatchingAndroidInjector: DispatchingAndroidInjector<Any>
 
 
-    override fun supportFragmentInjector(): AndroidInjector<androidx.fragment.app.Fragment> {
+    override fun androidInjector(): AndroidInjector<Any> {
         return mDispatchingAndroidInjector
     }
 
