@@ -9,7 +9,7 @@ import androidx.work.Configuration;
 
 import com.moufee.purduemenus.di.DaggerAppComponent;
 import com.moufee.purduemenus.di.MenusWorkerFactory;
-import com.moufee.purduemenus.ui.settings.SettingsFragment;
+import com.moufee.purduemenus.ui.settings.SettingsFragmentKt;
 
 import javax.inject.Inject;
 
@@ -54,7 +54,7 @@ public class MenusApp extends Application implements HasAndroidInjector, Configu
             Timber.plant(new Timber.DebugTree());
         }
 
-        switch (mSharedPreferences.getString(SettingsFragment.KEY_PREF_USE_NIGHT_MODE, "")) {
+        switch (mSharedPreferences.getString(SettingsFragmentKt.KEY_PREF_USE_NIGHT_MODE, "")) {
             case "mode_off":
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                 break;

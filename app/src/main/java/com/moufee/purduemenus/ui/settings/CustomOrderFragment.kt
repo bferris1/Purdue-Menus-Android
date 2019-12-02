@@ -29,8 +29,6 @@ import javax.inject.Inject
  * create an instance of this fragment.
  *
  */
-const val KEY_PREF_DINING_COURT_ORDER = "dining_court_order"
-
 
 class CustomOrderFragment : androidx.fragment.app.Fragment() {
     private lateinit var mAdapter: DiningCourtOrderAdapter
