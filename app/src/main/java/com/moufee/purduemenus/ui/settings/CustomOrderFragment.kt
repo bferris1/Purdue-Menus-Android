@@ -32,7 +32,6 @@ import javax.inject.Inject
 
 class CustomOrderFragment : androidx.fragment.app.Fragment() {
     private lateinit var mAdapter: DiningCourtOrderAdapter
-    private val defaultOrder = DiningCourtComparator.diningCourts
 
     @Inject
     lateinit var mSharedPreferences: SharedPreferences
@@ -53,7 +52,7 @@ class CustomOrderFragment : androidx.fragment.app.Fragment() {
         mAdapter = DiningCourtOrderAdapter(listener = object : DiningCourtOrderAdapter.OnLocationChangedListener {
             override fun onLocationVisibilityChanged(location: Location) {
                 location.isHidden = !location.isHidden
-                mAdapter.notifyItemChanged(location.displayOrder)
+                mAdapter.notifyDataSetChanged()
                 mMenuRepository.updateLocations(location)
             }
         })

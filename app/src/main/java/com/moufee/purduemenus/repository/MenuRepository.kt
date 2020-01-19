@@ -91,7 +91,7 @@ constructor(private val mWebservice: Webservice, private val mAppExecutors: AppE
                 val body = response.body()
                 if (response.isSuccessful && body != null) {
                     for (location in body.Location) {
-                        location.displayOrder = locationsDefaultOrder[location.Name] ?: 10
+                        location.displayOrder = locationsDefaultOrder[location.Name] ?: 100
                     }
                     Timber.d("getLocations: ${response.body()?.Location}")
                     mLocationDao.insertAll(body.Location)
