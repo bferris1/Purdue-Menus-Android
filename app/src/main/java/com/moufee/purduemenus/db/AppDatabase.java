@@ -1,13 +1,13 @@
 package com.moufee.purduemenus.db;
 
-import com.moufee.purduemenus.menus.Favorite;
-import com.moufee.purduemenus.menus.Location;
-
 import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.RoomDatabase;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
+
+import com.moufee.purduemenus.menus.Favorite;
+import com.moufee.purduemenus.menus.Location;
 
 @Database(entities = {Favorite.class, Location.class}, version = 3)
 public abstract class AppDatabase extends RoomDatabase {
@@ -20,6 +20,7 @@ public abstract class AppDatabase extends RoomDatabase {
                     "`Name` TEXT NOT NULL, `LocationId` TEXT NOT NULL, " +
                     "`FormalName` TEXT NOT NULL, " +
                     "`displayOrder` INTEGER NOT NULL, " +
+                    "`isHidden` INTEGER NOT NULL," +
                     "PRIMARY KEY(`LocationId`))");
         }
     };
