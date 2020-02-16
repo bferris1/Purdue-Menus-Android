@@ -2,7 +2,6 @@ package com.moufee.purduemenus.ui.menu
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +20,7 @@ import com.moufee.purduemenus.repository.FavoritesRepository
 import com.moufee.purduemenus.repository.data.menus.MenuItem
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_menuitem_list.*
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -55,7 +55,7 @@ class MenuItemListFragment
 
     override fun toggleFavorite(item: MenuItem): Boolean {
         if (mViewModel.favoriteSet.value == null) return true
-        Log.d(TAG, "toggleFavorite: Adding Favorite " + item.name + " " + item.id)
+        Timber.d("toggleFavorite: Adding Favorite: ${item.name} ${item.id}")
         if (!mViewModel.favoriteSet.value!!.contains(item.id)) mFavoritesRepository!!.addFavorite(item) else mFavoritesRepository!!.removeFavorite(item)
         return true
     }

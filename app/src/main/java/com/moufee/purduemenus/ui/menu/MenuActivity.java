@@ -76,6 +76,7 @@ public class MenuActivity extends AppCompatActivity implements HasAndroidInjecto
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             switch (key) {
                 case SettingsActivity.KEY_PREF_SHOW_SERVING_TIMES:
+                    mBinding.setShowServingTimes(sharedPreferences.getBoolean(key, true));
                     updateServingTime();
                     break;
                 case SettingsActivity.KEY_PREF_USE_NIGHT_MODE:

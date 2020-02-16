@@ -112,17 +112,20 @@ constructor(private val mWebservice: Webservice, private val mAppExecutors: AppE
 }
 
 fun List<ApiDiningCourtMenu>.toDayMenu(dateTime: LocalDate): DayMenu {
-    val nameToMealList: MutableMap<String, MutableList<DiningCourtMeal>> = HashMap()
+    val mealNames = listOf("Breakfast", "Lunch", "Late Lunch", "Dinner")
+    val mealNameToMealListMap: MutableMap<String, MutableList<DiningCourtMeal>> = HashMap()
     for (apiDiningCourtMenu in this) {
         for (apiMeal in apiDiningCourtMenu.Meals) {
             if (apiMeal.Status == "Open" && apiMeal.Stations.isNotEmpty()) {
-                if (nameToMealList.containsKey(apiMeal.Name).not())
-                    nameToMealList[apiMeal.Name] = mutableListOf()
-                nameToMealList[apiMeal.Name]?.add(DiningCourtMeal(apiDiningCourtMenu.Location, apiMeal.Hours?.StartTime, apiMeal.Hours?.EndTime, apiMeal.Stations.toEntity()))
+                if (mealNameToMealListMap.containsKey(apiMeal.Name).not())
+                    mealNameToMealListMap[apiMeal.Name] = mutableListOf()
+                mealNameToMealListMap[apiMeal.Name]?.add(DiningCourtMeal(apiDiningCourtMenu.Location, apiMeal.Hours?.StartTime, apiMeal.Hours?.EndTime, apiMeal.Stations.toEntity()))
             }
         }
     }
-    return DayMenu(dateTime, nameToMealList.map { entry -> Meal(entry.key, entry.value.map { Pair(it.diningCourtName, it) }.toMap()) })
+    return DayMenu(dateTime, mealNames.mapNotNull { mealName ->
+        mealNameToMealListMap[mealName]?.let { meals -> Meal(mealName, meals.map { Pair(it.diningCourtName, it) }.toMap()) }
+    })
 }
 
 fun List<ApiStation>.toEntity() = map { Station(it.Name, it.Items.map { item -> item.toEntity() }) }
