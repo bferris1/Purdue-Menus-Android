@@ -1,11 +1,11 @@
-package com.moufee.purduemenus.menus;
-
-import com.squareup.moshi.Json;
+package com.moufee.purduemenus.repository.data.menus;
 
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+
+import com.squareup.moshi.Json;
 
 /**
  * Created by Ben on 13/08/2017.

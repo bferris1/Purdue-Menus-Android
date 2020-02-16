@@ -1,7 +1,7 @@
 package com.moufee.purduemenus.api
 
-import com.moufee.purduemenus.menus.Location
-import com.moufee.purduemenus.repository.data.ApiDiningCourtMenu
+import com.moufee.purduemenus.api.models.ApiDiningCourtMenu
+import com.moufee.purduemenus.repository.data.menus.Location
 import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
 import org.joda.time.LocalDate

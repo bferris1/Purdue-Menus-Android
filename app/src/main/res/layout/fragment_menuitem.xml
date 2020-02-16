@@ -9,7 +9,7 @@
 
         <variable
             name="menuItem"
-            type="com.moufee.purduemenus.menus.MenuItem" />
+            type="com.moufee.purduemenus.repository.data.menus.MenuItem" />
 
         <variable
             name="listener"

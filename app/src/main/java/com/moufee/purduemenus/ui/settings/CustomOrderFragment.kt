@@ -16,8 +16,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.moufee.purduemenus.R
-import com.moufee.purduemenus.menus.Location
 import com.moufee.purduemenus.repository.MenuRepository
+import com.moufee.purduemenus.repository.data.menus.Location
 import dagger.android.support.AndroidSupportInjection
 import timber.log.Timber
 import javax.inject.Inject

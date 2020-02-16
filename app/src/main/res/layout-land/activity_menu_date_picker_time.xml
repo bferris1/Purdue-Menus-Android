@@ -14,9 +14,6 @@
             name="menusResource"
             type="com.moufee.purduemenus.util.Resource"/>
         <variable
-            name="menu"
-            type="com.moufee.purduemenus.menus.FullDayMenu" />
-        <variable
             name="showServingTimes"
             type="boolean"/>
 

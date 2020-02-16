@@ -1,11 +1,10 @@
-package com.moufee.purduemenus.menus;
+package com.moufee.purduemenus.repository.data.menus;
+
+import androidx.annotation.Keep;
 
 import com.squareup.moshi.Json;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import androidx.annotation.Keep;
 
 /**
  * A container for a list of favorites

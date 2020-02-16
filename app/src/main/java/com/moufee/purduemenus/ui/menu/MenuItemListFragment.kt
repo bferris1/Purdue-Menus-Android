@@ -17,9 +17,8 @@ import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.moufee.purduemenus.R
-import com.moufee.purduemenus.menus.DiningCourtMeal
-import com.moufee.purduemenus.menus.MenuItem
 import com.moufee.purduemenus.repository.FavoritesRepository
+import com.moufee.purduemenus.repository.data.menus.MenuItem
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_menuitem_list.*
 import javax.inject.Inject

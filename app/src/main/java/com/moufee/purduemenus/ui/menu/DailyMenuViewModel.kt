@@ -1,11 +1,11 @@
 package com.moufee.purduemenus.ui.menu
 
 import androidx.lifecycle.*
-import com.moufee.purduemenus.menus.DayMenu
-import com.moufee.purduemenus.menus.DiningCourtMeal
-import com.moufee.purduemenus.menus.Location
 import com.moufee.purduemenus.repository.FavoritesRepository
 import com.moufee.purduemenus.repository.MenuRepository
+import com.moufee.purduemenus.repository.data.menus.DayMenu
+import com.moufee.purduemenus.repository.data.menus.DiningCourtMeal
+import com.moufee.purduemenus.repository.data.menus.Location
 import com.moufee.purduemenus.util.DateTimeHelper
 import com.moufee.purduemenus.util.Resource
 import org.joda.time.LocalDate

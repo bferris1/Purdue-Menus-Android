@@ -1,4 +1,4 @@
-package com.moufee.purduemenus.menus
+package com.moufee.purduemenus.repository.data.menus
 
 import org.joda.time.DateTime
 

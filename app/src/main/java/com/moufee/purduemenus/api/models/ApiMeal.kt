@@ -1,4 +1,4 @@
-package com.moufee.purduemenus.repository.data
+package com.moufee.purduemenus.api.models
 
 data class ApiMeal(
         val ID: String,

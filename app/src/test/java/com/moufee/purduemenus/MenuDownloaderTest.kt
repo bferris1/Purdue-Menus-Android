@@ -3,8 +3,8 @@ package com.moufee.purduemenus
 import com.google.common.truth.Truth.assertThat
 import com.moufee.purduemenus.api.MenuDownloader
 import com.moufee.purduemenus.api.Webservice
-import com.moufee.purduemenus.menus.Location
-import com.moufee.purduemenus.repository.data.*
+import com.moufee.purduemenus.api.models.*
+import com.moufee.purduemenus.repository.data.menus.Location
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.joda.time.LocalDate

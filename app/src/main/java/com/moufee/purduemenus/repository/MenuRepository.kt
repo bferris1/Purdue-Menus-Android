@@ -6,11 +6,11 @@ import androidx.lifecycle.liveData
 import com.moufee.purduemenus.api.MenuCache
 import com.moufee.purduemenus.api.MenuDownloader
 import com.moufee.purduemenus.api.Webservice
+import com.moufee.purduemenus.api.models.ApiDiningCourtMenu
+import com.moufee.purduemenus.api.models.ApiStation
+import com.moufee.purduemenus.api.models.MenuItem
 import com.moufee.purduemenus.db.LocationDao
-import com.moufee.purduemenus.menus.*
-import com.moufee.purduemenus.repository.data.ApiDiningCourtMenu
-import com.moufee.purduemenus.repository.data.ApiStation
-import com.moufee.purduemenus.repository.data.MenuItem
+import com.moufee.purduemenus.repository.data.menus.*
 import com.moufee.purduemenus.util.AppExecutors
 import com.moufee.purduemenus.util.Resource
 import kotlinx.coroutines.CoroutineScope

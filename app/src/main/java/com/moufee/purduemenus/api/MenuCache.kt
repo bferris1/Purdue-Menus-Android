@@ -1,7 +1,7 @@
 package com.moufee.purduemenus.api
 
 import android.content.Context
-import com.moufee.purduemenus.menus.DayMenu
+import com.moufee.purduemenus.repository.data.menus.DayMenu
 import com.squareup.moshi.Moshi
 import org.joda.time.LocalDate
 import org.joda.time.format.DateTimeFormat

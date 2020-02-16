@@ -1,4 +1,4 @@
-package com.moufee.purduemenus.repository.data
+package com.moufee.purduemenus.api.models
 
 data class ApiLocation(
         val LocationId: String,

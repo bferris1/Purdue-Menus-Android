@@ -7,8 +7,8 @@ import androidx.test.runner.AndroidJUnit4
 import com.moufee.purduemenus.db.AppDatabase
 import com.moufee.purduemenus.db.FavoriteDao
 import com.moufee.purduemenus.db.LocationDao
-import com.moufee.purduemenus.menus.Favorite
-import com.moufee.purduemenus.menus.Location
+import com.moufee.purduemenus.repository.data.menus.Favorite
+import com.moufee.purduemenus.repository.data.menus.Location
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After

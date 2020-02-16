@@ -4,7 +4,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.PagerAdapter
-import com.moufee.purduemenus.menus.DiningCourtMeal
+import com.moufee.purduemenus.repository.data.menus.DiningCourtMeal
 
 /**
  * Created by Ben on 26/09/2017.

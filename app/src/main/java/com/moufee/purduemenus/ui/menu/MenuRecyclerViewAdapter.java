@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.moufee.purduemenus.databinding.FragmentMenuitemBinding;
 import com.moufee.purduemenus.databinding.StationHeaderBinding;
-import com.moufee.purduemenus.menus.MenuItem;
-import com.moufee.purduemenus.menus.Station;
+import com.moufee.purduemenus.repository.data.menus.MenuItem;
+import com.moufee.purduemenus.repository.data.menus.Station;
 
 import java.util.ArrayList;
 import java.util.HashSet;

@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.moufee.purduemenus.databinding.FragmentDiningCourtListItemBinding
-import com.moufee.purduemenus.menus.Location
+import com.moufee.purduemenus.repository.data.menus.Location
 
 
 class DiningCourtOrderAdapter(val listener: OnLocationChangedListener) : ListAdapter<Location, DiningCourtOrderAdapter.DiningCourtViewHolder>(

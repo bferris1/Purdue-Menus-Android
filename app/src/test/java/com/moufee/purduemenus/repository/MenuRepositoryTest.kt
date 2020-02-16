@@ -1,7 +1,7 @@
 package com.moufee.purduemenus.repository
 
 import com.google.common.truth.Truth.assertThat
-import com.moufee.purduemenus.repository.data.*
+import com.moufee.purduemenus.api.models.*
 import org.joda.time.LocalDate
 import org.joda.time.LocalTime
 import org.junit.Test

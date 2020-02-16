@@ -1,9 +1,9 @@
 package com.moufee.purduemenus.api
 
-import com.moufee.purduemenus.menus.Favorite
-import com.moufee.purduemenus.menus.Favorites
-import com.moufee.purduemenus.menus.LocationsResponse
-import com.moufee.purduemenus.repository.data.ApiDiningCourtMenu
+import com.moufee.purduemenus.api.models.ApiDiningCourtMenu
+import com.moufee.purduemenus.repository.data.menus.Favorite
+import com.moufee.purduemenus.repository.data.menus.Favorites
+import com.moufee.purduemenus.repository.data.menus.LocationsResponse
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
