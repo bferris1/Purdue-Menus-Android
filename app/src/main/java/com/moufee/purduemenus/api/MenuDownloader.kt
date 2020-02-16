@@ -1,10 +1,10 @@
 package com.moufee.purduemenus.api
 
-import com.moufee.purduemenus.menus.FullDayMenu
 import com.moufee.purduemenus.menus.Location
+import com.moufee.purduemenus.repository.data.ApiDiningCourtMenu
 import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
-import org.joda.time.DateTime
+import org.joda.time.LocalDate
 import org.joda.time.format.DateTimeFormat
 import timber.log.Timber
 import javax.inject.Inject
@@ -15,14 +15,14 @@ class MenuDownloader @Inject constructor(val webservice: Webservice) {
 
     private val formatter = DateTimeFormat.forPattern("yyyy-MM-dd")
 
-    suspend fun getMenus(date: DateTime, locations: List<Location>): FullDayMenu = supervisorScope {
+    suspend fun getMenus(date: LocalDate, locations: List<Location>): List<ApiDiningCourtMenu> = supervisorScope {
         val locationNames = locations.map { it.Name }
-        val deferred = locationNames.map {
+        val deferredResponses = locationNames.map {
             async {
                 webservice.getMenu(it, formatter.print(date))
             }
         }
-        val mapped = deferred.mapNotNull {
+        deferredResponses.mapNotNull {
             try {
                 it.await()
             } catch (t: Throwable) {
@@ -30,6 +30,5 @@ class MenuDownloader @Inject constructor(val webservice: Webservice) {
                 null
             }
         }
-        FullDayMenu(mapped, date)
     }
 }

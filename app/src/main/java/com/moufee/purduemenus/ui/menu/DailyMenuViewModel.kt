@@ -1,13 +1,14 @@
 package com.moufee.purduemenus.ui.menu
 
 import androidx.lifecycle.*
-import com.moufee.purduemenus.menus.FullDayMenu
+import com.moufee.purduemenus.menus.DayMenu
+import com.moufee.purduemenus.menus.DiningCourtMeal
 import com.moufee.purduemenus.menus.Location
 import com.moufee.purduemenus.repository.FavoritesRepository
 import com.moufee.purduemenus.repository.MenuRepository
 import com.moufee.purduemenus.util.DateTimeHelper
 import com.moufee.purduemenus.util.Resource
-import org.joda.time.DateTime
+import org.joda.time.LocalDate
 import javax.inject.Inject
 
 // todo: move this somewhere else?
@@ -40,31 +41,35 @@ fun <A, B> combineLatest(a: LiveData<A>, b: LiveData<B>): LiveData<Pair<A, B>> {
  */
 class DailyMenuViewModel @Inject
 constructor(private val mMenuRepository: MenuRepository, mFavoritesRepository: FavoritesRepository) : ViewModel() {
-    private val mCurrentDate = MutableLiveData<DateTime>()
+    private val mCurrentDate = MutableLiveData<LocalDate>()
     private val mSelectedMealIndex = MutableLiveData<Int>()
 
     val favoriteSet: LiveData<Set<String>> = mFavoritesRepository.favoriteIDSet
     val locations: LiveData<List<Location>>
-    private val mFullMenu: LiveData<Resource<FullDayMenu>>
+    val dayMenu: LiveData<Resource<DayMenu>>
+    val selectedMenus: LiveData<Map<String, DiningCourtMeal>>
+    val sortedLocations: LiveData<List<DiningCourtMeal>>
 
     val selectedMealIndex: LiveData<Int>
         get() = mSelectedMealIndex
 
 
-    val fullMenu: LiveData<Resource<FullDayMenu>>
-        get() = mFullMenu
-
-    val currentDate: LiveData<DateTime>
+    val currentDate: LiveData<LocalDate>
         get() = mCurrentDate
 
     init {
         mSelectedMealIndex.value = DateTimeHelper.getCurrentMealIndex()
         locations = mMenuRepository.visibleLocations
-        setDate(DateTime())
-        mFullMenu = Transformations.switchMap(combineLatest(mCurrentDate, locations)) {
-            if (it.second.size > 0)
-                return@switchMap mMenuRepository.getMenus(it.first, it.second)
-            return@switchMap null
+        setDate(LocalDate.now())
+        dayMenu = Transformations.switchMap(combineLatest(mCurrentDate, locations)) { (date, locations) ->
+            if (locations.isEmpty()) return@switchMap null
+            mMenuRepository.getMenus(date, locations)
+        }
+        selectedMenus = Transformations.map(combineLatest(dayMenu, selectedMealIndex)) { (menu, mealIndex) ->
+            menu.data?.meals?.getOrNull(mealIndex)?.locations ?: emptyMap()
+        }
+        sortedLocations = Transformations.map(combineLatest(selectedMenus, locations)) { (menus, locations) ->
+            locations.mapNotNull { menus[it.Name] }
         }
     }
 
@@ -73,21 +78,19 @@ constructor(private val mMenuRepository: MenuRepository, mFavoritesRepository: F
         mSelectedMealIndex.value = index
     }
 
-    fun setDate(date: DateTime) {
+    fun setDate(date: LocalDate) {
         mCurrentDate.value = date
     }
 
     fun nextDay() {
-        if (mCurrentDate.value != null)
-            mCurrentDate.value = mCurrentDate.value!!.plusDays(1)
+        mCurrentDate.value = mCurrentDate.value?.plusDays(1)
     }
 
     fun previousDay() {
-        if (mCurrentDate.value != null)
-            mCurrentDate.value = mCurrentDate.value!!.plusDays(-1)
+        mCurrentDate.value = mCurrentDate.value?.plusDays(-1)
     }
 
     fun currentDay() {
-        mCurrentDate.value = DateTime()
+        mCurrentDate.value = LocalDate.now()
     }
 }

@@ -42,7 +42,7 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     public void setStations(List<Station> stations) {
         mListItems.clear();
         for (Station station : stations) {
-            if (station.getNumItems() > 0) {
+            if (station.getItems().size() > 0) {
                 mListItems.add(station.getName());
                 mListItems.addAll(station.getItems());
             }

@@ -1,22 +1,21 @@
 package com.moufee.purduemenus.menus;
 
+import androidx.annotation.Keep;
+import androidx.annotation.Nullable;
+
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import androidx.annotation.Keep;
-import androidx.annotation.Nullable;
-
 @Keep
-public class Meal implements Serializable {
+public class OldMeal implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private String Id;
     private String Name;
     private int Order;
     private String Status;
-    private Hours Hours;
     private List<Station> Stations;
 
     public String getId() {
@@ -35,9 +34,6 @@ public class Meal implements Serializable {
         return Status;
     }
 
-    public Hours getHours() {
-        return Hours;
-    }
 
     public int getNumFavorites(@Nullable Set<String> favoriteIDs) {
 

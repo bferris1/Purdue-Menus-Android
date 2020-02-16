@@ -3,9 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/menu_item_recyclerview"
+    <androidx.recyclerview.widget.RecyclerView xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/menuItemRecyclerView"
         android:name="com.moufee.purduetoolkit.MenuItemFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

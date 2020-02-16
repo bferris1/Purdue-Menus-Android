@@ -10,11 +10,11 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
@@ -29,20 +29,17 @@ import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.moufee.purduemenus.BuildConfig;
 import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.api.DownloadWorker;
 import com.moufee.purduemenus.databinding.ActivityMenuDatePickerTimeBinding;
-import com.moufee.purduemenus.menus.Hours;
 import com.moufee.purduemenus.ui.settings.SettingsActivity;
 import com.moufee.purduemenus.ui.settings.SettingsFragmentKt;
 import com.moufee.purduemenus.util.ConstantsKt;
 import com.moufee.purduemenus.util.DateTimeHelper;
 
-import org.joda.time.DateTime;
-import org.joda.time.LocalTime;
+import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -55,6 +52,7 @@ import dagger.android.AndroidInjection;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasAndroidInjector;
+import timber.log.Timber;
 
 public class MenuActivity extends AppCompatActivity implements HasAndroidInjector {
 
@@ -109,11 +107,16 @@ public class MenuActivity extends AppCompatActivity implements HasAndroidInjecto
             }
         });
 
-        mViewModel.getLocations().observe(this, locations -> mMenuPagerAdapter.setLocationList(locations));
-
         mViewModel.getFavoriteSet().observe(this, strings -> mMenuPagerAdapter.setFavoritesSet(strings));
 
-        mViewModel.getFullMenu().observe(this, fullDayMenuResource -> {
+        mViewModel.getSortedLocations().observe(this, sorted -> {
+            mMenuPagerAdapter.setMenus(sorted);
+            Timber.d(sorted.toString());
+        });
+
+        mViewModel.getDayMenu().observe(this, resource -> mBinding.setMenusResource(resource));
+
+        /*mViewModel.getFullMenu().observe(this, fullDayMenuResource -> {
             mBinding.setMenusResource(fullDayMenuResource);
             //done: loading state
             if (fullDayMenuResource != null) {
@@ -137,18 +140,18 @@ public class MenuActivity extends AppCompatActivity implements HasAndroidInjecto
                         break;
                 }
             }
-        });
+        });*/
     }
 
-    private void updateLateLunch(boolean isLateLunchServed) {
+    /*private void updateLateLunch(boolean isLateLunchServed) {
         if (mViewModel.getSelectedMealIndex().getValue() == 2 && !isLateLunchServed) {
             mViewModel.setSelectedMealIndex(1);
         }
-    }
+    }*/
 
     //todo: remove this method from activity, use Kotlin and data binding
     private void updateServingTime() {
-        boolean showServingTimes = mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_SHOW_SERVING_TIMES, true);
+        /*boolean showServingTimes = mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_SHOW_SERVING_TIMES, true);
         mBinding.setShowServingTimes(showServingTimes);
 
         LocalTime startTime;
@@ -166,14 +169,14 @@ public class MenuActivity extends AppCompatActivity implements HasAndroidInjecto
             mBinding.mealTimeTextView.setText("");
             return;
         }
-        mBinding.mealTimeTextView.setText(timeString);
+        mBinding.mealTimeTextView.setText(timeString);*/
     }
 
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        Log.d(TAG, "onConfigurationChanged: ");
+        Timber.d("onConfigurationChanged ");
     }
 
     @Override
@@ -294,7 +297,7 @@ public class MenuActivity extends AppCompatActivity implements HasAndroidInjecto
                     networkInfo.isConnected();
             if (isConnected && mViewModel.getCurrentDate().getValue() != null) {
                 //todo: better way to force update?
-                mViewModel.setDate(new DateTime(mViewModel.getCurrentDate().getValue()));
+                mViewModel.setDate(new LocalDate(mViewModel.getCurrentDate().getValue()));
             }
         }
     }

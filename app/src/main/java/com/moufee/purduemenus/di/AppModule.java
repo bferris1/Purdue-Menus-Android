@@ -12,6 +12,7 @@ import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
 import com.moufee.purduemenus.api.DateTimeTypeAdapter;
 import com.moufee.purduemenus.api.FileCookiePersistor;
+import com.moufee.purduemenus.api.LocalDateAdapter;
 import com.moufee.purduemenus.api.LocalTimeTypeAdapter;
 import com.moufee.purduemenus.api.Webservice;
 import com.moufee.purduemenus.db.AppDatabase;
@@ -55,6 +56,7 @@ class AppModule {
         return new Moshi.Builder()
                 .add(new LocalTimeTypeAdapter())
                 .add(new DateTimeTypeAdapter())
+                .add(new LocalDateAdapter())
                 .add(new KotlinJsonAdapterFactory())
                 .build();
     }

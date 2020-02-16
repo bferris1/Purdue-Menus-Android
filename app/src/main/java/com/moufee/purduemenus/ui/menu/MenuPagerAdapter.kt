@@ -4,10 +4,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.PagerAdapter
-import com.moufee.purduemenus.menus.DiningCourtMenu
-import com.moufee.purduemenus.menus.Location
-import java.util.*
-import kotlin.collections.HashSet
+import com.moufee.purduemenus.menus.DiningCourtMeal
 
 /**
  * Created by Ben on 26/09/2017.
@@ -15,8 +12,7 @@ import kotlin.collections.HashSet
 
 class MenuPagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
-    private var diningCourtMap: Map<String, DiningCourtMenu> = HashMap()
-    private var locationList: List<Location> = ArrayList()
+    private var diningCourtMeals: List<DiningCourtMeal> = emptyList()
     private var mealIndex: Int = 0
     private var favoritesSet: Set<String> = HashSet()
     private var showFavoriteCount = true
@@ -26,13 +22,8 @@ class MenuPagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm, BEHA
         notifyDataSetChanged()
     }
 
-    fun setMenus(diningCourtMenus: Map<String, DiningCourtMenu>) {
-        this.diningCourtMap = diningCourtMenus
-        notifyDataSetChanged()
-    }
-
-    fun setLocationList(locationList: List<Location>) {
-        this.locationList = locationList
+    fun setMenus(diningCourtMenus: List<DiningCourtMeal>) {
+        this.diningCourtMeals = diningCourtMenus
         notifyDataSetChanged()
     }
 
@@ -47,19 +38,15 @@ class MenuPagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm, BEHA
     }
 
     private fun getLocationForIndex(index: Int): String {
-        return locationList[index].Name
+        return diningCourtMeals[index].diningCourtName
     }
 
     override fun getItem(position: Int): Fragment {
         val name = getLocationForIndex(position)
-        return MenuItemListFragment.newInstance(name, mealIndex)
+        return MenuItemListFragment.newInstance(name, position)
     }
 
-    override fun getCount(): Int {
-        return if (diningCourtMap.isEmpty()) {
-            0
-        } else locationList.size
-    }
+    override fun getCount(): Int = diningCourtMeals.size
 
     override fun getItemPosition(`object`: Any): Int {
         /*  if (object instanceof MenuItemListFragment) {
@@ -76,16 +63,18 @@ class MenuPagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm, BEHA
     }
 
     override fun getPageTitle(position: Int): CharSequence? {
-        var title = locationList[position].Name
-        if (!showFavoriteCount || favoritesSet.isEmpty())
-            return title
-
-        var numFavorites = 0
-        if (diningCourtMap[title]?.isServing(mealIndex) == true)
-            numFavorites = diningCourtMap[title]?.getMeal(mealIndex)?.getNumFavorites(favoritesSet)
-                    ?: 0
-
-        title += " ($numFavorites)"
-        return title
+        return diningCourtMeals[position].diningCourtName
     }
+    /*var title = locationList[position].Name
+    if (!showFavoriteCount || favoritesSet.isEmpty())
+        return title
+
+    var numFavorites = 0
+    if (diningCourtMap[title]?.isServing(mealIndex) == true)
+        numFavorites = diningCourtMap[title]?.getMeal(mealIndex)?.getNumFavorites(favoritesSet)
+                ?: 0
+
+    title += " ($numFavorites)"
+    return title
+}*/
 }

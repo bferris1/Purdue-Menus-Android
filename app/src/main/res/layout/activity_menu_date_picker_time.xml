@@ -17,9 +17,6 @@
             name="menusResource"
             type="com.moufee.purduemenus.util.Resource"/>
         <variable
-            name="menu"
-            type="com.moufee.purduemenus.menus.FullDayMenu" />
-        <variable
             name="showServingTimes"
             type="boolean"/>
 
@@ -77,7 +74,6 @@
                     android:layout_width="50dp"
                     android:layout_height="0dp"
                     android:layout_marginEnd="16dp"
-                    android:layout_marginRight="16dp"
                     android:background="@android:color/transparent"
                     android:contentDescription="@string/next_day_button_description"
                     android:src="@drawable/ic_keyboard_arrow_right_black_24dp"
@@ -107,7 +103,6 @@
                     android:id="@+id/button_previous_day"
                     android:layout_width="50dp"
                     android:layout_height="0dp"
-                    android:layout_marginLeft="16dp"
                     android:layout_marginStart="16dp"
                     android:background="@android:color/transparent"
                     android:contentDescription="@string/previous_day_button_description"
@@ -237,7 +232,7 @@
                     android:padding="0dp"
                     android:text="@string/late_lunch"
                     app:selected="@{safeUnbox(viewModel.selectedMealIndex) == 2}"
-                    app:visibleGone="@{menu.isLateLunchServed}"
+                    app:visibleGone="@{viewModel.dayMenu.data.meals.size == 4}"
                     tools:text="Late Lunch"
                     tools:visibility="visible" />
 
