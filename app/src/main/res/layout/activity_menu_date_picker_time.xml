@@ -157,7 +157,7 @@
                     tools:text="11:00 AM - 2:00 PM" />
             </LinearLayout>
 
-            <androidx.viewpager.widget.ViewPager
+            <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/menu_view_pager"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
@@ -168,10 +168,7 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/serving_time_layout"
                 app:visibleGone="@{menusResource.data != null}"
-                tools:context="com.moufee.purduemenus.ui.menu.MenuActivity">
-
-
-            </androidx.viewpager.widget.ViewPager>
+                tools:context="com.moufee.purduemenus.ui.menu.MenuActivity"></androidx.viewpager2.widget.ViewPager2>
 
             <LinearLayout
                 android:id="@+id/meal_button_layout"

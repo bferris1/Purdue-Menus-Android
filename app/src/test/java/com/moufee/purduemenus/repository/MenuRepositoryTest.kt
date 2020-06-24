@@ -16,7 +16,7 @@ class MenuRepositoryTest {
                 Location = "Ford",
                 Date = LocalDate.now(),
                 Notes = "",
-                Meals = listOf(ApiMeal("123abc", "Breakfast", 1, "DiningCourt", "Open", ApiHours(LocalTime.now(), LocalTime.now()), listOf(station)))
+                Meals = listOf(ApiMeal("123abc", "Breakfast", 1, "Open", "DiningCourt", ApiHours(LocalTime.now(), LocalTime.now()), listOf(station)))
         )
         val result = listOf(apiMenu).toDayMenu(LocalDate.now())
         assertThat(result.meals).hasSize(1)

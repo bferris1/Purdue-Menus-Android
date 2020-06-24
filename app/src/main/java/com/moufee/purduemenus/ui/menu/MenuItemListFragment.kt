@@ -49,7 +49,7 @@ class MenuItemListFragment
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (arguments != null) {
-            mDiningCourtName = arguments!!.getString(ARG_DINING_COURT_INDEX)
+            mDiningCourtName = arguments!!.getString(ARG_DINING_COURT_NAME)
         }
     }
 
@@ -144,14 +144,11 @@ class MenuItemListFragment
     }
 
     companion object {
-        private const val ARG_DINING_COURT_INDEX = "dining-court-index"
-        private const val ARG_MEAL_INDEX = "meal-index"
-        private const val TAG = "MENU_ITEM_LIST_FRAGMENT"
-        fun newInstance(diningCourtName: String?, mealIndex: Int): MenuItemListFragment {
+        private const val ARG_DINING_COURT_NAME = "dining-court-name"
+        fun newInstance(diningCourtName: String): MenuItemListFragment {
             val fragment = MenuItemListFragment()
             val args = Bundle()
-            args.putString(ARG_DINING_COURT_INDEX, diningCourtName)
-            args.putInt(ARG_MEAL_INDEX, mealIndex)
+            args.putString(ARG_DINING_COURT_NAME, diningCourtName)
             fragment.arguments = args
             return fragment
         }

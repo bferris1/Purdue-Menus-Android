@@ -19,7 +19,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
@@ -30,6 +29,7 @@ import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.moufee.purduemenus.BuildConfig;
 import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.api.DownloadWorker;
@@ -55,8 +55,6 @@ import dagger.android.HasAndroidInjector;
 import timber.log.Timber;
 
 public class MenuActivity extends AppCompatActivity implements HasAndroidInjector {
-
-    private static String TAG = "MENU_ACTIVITY";
 
     private ActivityMenuDatePickerTimeBinding mBinding;
     private MenuPagerAdapter mMenuPagerAdapter;
@@ -103,7 +101,6 @@ public class MenuActivity extends AppCompatActivity implements HasAndroidInjecto
         });
         mViewModel.getSelectedMealIndex().observe(this, newMealIndex -> {
             if (newMealIndex != null) {
-                mMenuPagerAdapter.setMealIndex(newMealIndex);
                 updateServingTime();
             }
         });
@@ -200,12 +197,12 @@ public class MenuActivity extends AppCompatActivity implements HasAndroidInjecto
         Toolbar toolbar = mBinding.mainToolbar;
         setSupportActionBar(toolbar);
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        mMenuPagerAdapter = new MenuPagerAdapter(fragmentManager);
+        mMenuPagerAdapter = new MenuPagerAdapter(this);
         mMenuPagerAdapter.setShowFavoriteCount(mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_SHOW_FAVORITE_COUNT, true));
         mBinding.menuViewPager.setAdapter(mMenuPagerAdapter);
+        new TabLayoutMediator(tabLayout, mBinding.menuViewPager, (tab, position) -> tab.setText(mMenuPagerAdapter.getPageTitle(position))).attach();
 
-        tabLayout.setupWithViewPager(mBinding.menuViewPager);
+//        tabLayout.setupWithViewPager(mBinding.menuViewPager);
 
         setListeners();
 //        displayChangelog();
@@ -231,7 +228,7 @@ public class MenuActivity extends AppCompatActivity implements HasAndroidInjecto
 
             }
         };
-        mBinding.menuViewPager.addOnPageChangeListener(mOnPageChangeListener);
+//        mBinding.menuViewPager.addOnPageChangeListener(mOnPageChangeListener);
 
         WorkManager workManager = WorkManager.getInstance(this);
         Constraints constraints = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).setRequiresBatteryNotLow(true).build();
@@ -282,7 +279,7 @@ public class MenuActivity extends AppCompatActivity implements HasAndroidInjecto
     @Override
     protected void onDestroy() {
         unregisterReceiver(mNetworkReceiver);
-        mBinding.menuViewPager.removeOnPageChangeListener(mOnPageChangeListener);
+//        mBinding.menuViewPager.removeOnPageChangeListener(mOnPageChangeListener);
         mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
         super.onDestroy();
     }

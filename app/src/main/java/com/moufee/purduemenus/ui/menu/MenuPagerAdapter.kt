@@ -1,19 +1,17 @@
 package com.moufee.purduemenus.ui.menu
 
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentStatePagerAdapter
-import androidx.viewpager.widget.PagerAdapter
+import androidx.fragment.app.FragmentActivity
+import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.moufee.purduemenus.repository.data.menus.DiningCourtMeal
 
 /**
  * Created by Ben on 26/09/2017.
  */
 
-class MenuPagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+class MenuPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(activity) {
 
     private var diningCourtMeals: List<DiningCourtMeal> = emptyList()
-    private var mealIndex: Int = 0
     private var favoritesSet: Set<String> = HashSet()
     private var showFavoriteCount = true
 
@@ -27,42 +25,27 @@ class MenuPagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm, BEHA
         notifyDataSetChanged()
     }
 
-    fun setMealIndex(mealIndex: Int) {
-        this.mealIndex = mealIndex
-        notifyDataSetChanged()
-    }
-
     fun setShowFavoriteCount(showFavoriteCount: Boolean) {
         this.showFavoriteCount = showFavoriteCount
         notifyDataSetChanged()
     }
 
-    private fun getLocationForIndex(index: Int): String {
-        return diningCourtMeals[index].diningCourtName
+    override fun getItemId(position: Int): Long {
+        return diningCourtMeals[position].diningCourtName.hashCode().toLong()
     }
 
-    override fun getItem(position: Int): Fragment {
-        val name = getLocationForIndex(position)
-        return MenuItemListFragment.newInstance(name, position)
+    override fun containsItem(itemId: Long): Boolean {
+        return diningCourtMeals.find { it.diningCourtName.hashCode().toLong() == itemId } != null
     }
 
-    override fun getCount(): Int = diningCourtMeals.size
-
-    override fun getItemPosition(`object`: Any): Int {
-        /*  if (object instanceof MenuItemListFragment) {
-            String locationName = ((MenuItemListFragment) object).mDiningCourtName;
-            for (int i = 0; i < locationList.size(); i++) {
-                Location location = locationList.get(i);
-                if (location.getName().equals(locationName)) {
-                    return i;
-                }
-            }
-        }*/
-        //todo: better way to determine reordering of dining courts
-        return PagerAdapter.POSITION_NONE
+    override fun createFragment(position: Int): Fragment {
+        val name = diningCourtMeals[position].diningCourtName
+        return MenuItemListFragment.newInstance(name)
     }
 
-    override fun getPageTitle(position: Int): CharSequence? {
+    override fun getItemCount(): Int = diningCourtMeals.size
+
+    fun getPageTitle(position: Int): CharSequence? {
         return diningCourtMeals[position].diningCourtName
     }
     /*var title = locationList[position].Name
