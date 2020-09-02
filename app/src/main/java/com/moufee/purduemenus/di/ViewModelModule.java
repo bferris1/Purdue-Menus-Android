@@ -1,9 +1,10 @@
 package com.moufee.purduemenus.di;
 
-import android.arch.lifecycle.ViewModel;
-import android.arch.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
-import com.moufee.purduemenus.menus.DailyMenuViewModel;
+import com.moufee.purduemenus.ui.menu.DailyMenuViewModel;
+import com.moufee.purduemenus.ui.settings.LocationSettingsViewModel;
 
 import dagger.Binds;
 import dagger.Module;
@@ -19,6 +20,11 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(DailyMenuViewModel.class)
     abstract ViewModel bindListViewModel(DailyMenuViewModel dailyMenuViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(LocationSettingsViewModel.class)
+    abstract ViewModel bindLocationsViewModel(LocationSettingsViewModel locationSettingsViewModel);
 
     @Binds
     abstract ViewModelProvider.Factory bindViewModelFactory(MenusAppViewModelFactory factory);

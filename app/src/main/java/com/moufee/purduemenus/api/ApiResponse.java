@@ -16,11 +16,11 @@
 
 package com.moufee.purduemenus.api;
 
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.IOException;
 
+import androidx.annotation.Nullable;
 import retrofit2.Response;
 
 /**

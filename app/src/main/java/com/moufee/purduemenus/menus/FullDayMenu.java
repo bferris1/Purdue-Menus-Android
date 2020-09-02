@@ -2,41 +2,55 @@ package com.moufee.purduemenus.menus;
 
 import org.joda.time.DateTime;
 
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Contains all the menus for all campus dining courts for one day
  */
 
-public class FullDayMenu {
-    private List<DiningCourtMenu> mMenus;
+public class FullDayMenu implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private Map<String, DiningCourtMenu> mMenuMap = new HashMap<>();
     private DateTime mDate;
     private boolean mLateLunchServed;
 
-    public FullDayMenu(List<DiningCourtMenu> diningCourtMenus, DateTime date, boolean lateLunchServed) {
-        mMenus = diningCourtMenus;
+    public FullDayMenu(List<DiningCourtMenu> diningCourtMenus, DateTime date) {
         mDate = date;
-        mLateLunchServed = lateLunchServed;
+        if (diningCourtMenus != null)
+            for (DiningCourtMenu menu :
+                    diningCourtMenus) {
+                mMenuMap.put(menu.getLocation(), menu);
+            }
+        mLateLunchServed = hasLateLunch();
+    }
+
+    public Map<String, DiningCourtMenu> getMenuMap() {
+        return mMenuMap;
+    }
+
+    public DiningCourtMenu getMenu(String location) {
+        return mMenuMap.get(location);
+    }
+
+    private boolean hasLateLunch() {
+        for (DiningCourtMenu menu :
+                mMenuMap.values()) {
+            if (menu.servesLateLunch()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public int getNumMenus() {
-        return mMenus.size();
+        return mMenuMap.size();
     }
 
-    public List<DiningCourtMenu> getMenus() {
-        return mMenus;
-    }
-
-    /**
-     * Gets a  menu from a designated index
-     *
-     * @param index, the index of the {@link DiningCourtMenu} to get
-     * @return a {@link DiningCourtMenu}, or null if none exists
-     */
-    public DiningCourtMenu getMenu(int index) {
-        if (mMenus != null && index < mMenus.size())
-            return mMenus.get(index);
-        return null;
+    public DateTime getDate() {
+        return mDate;
     }
 
     public boolean isLateLunchServed() {

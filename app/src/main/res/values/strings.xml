@@ -37,7 +37,7 @@
     <string name="pref_night_mode_auto" translatable="false">mode_auto</string>
 
     <string name="off">Off</string>
-    <string name="auto">Auto</string>
+    <string name="auto">Use System Setting</string>
     <string name="on">On</string>
 
 
@@ -85,6 +85,9 @@
     <string name="description_signed_in">You are signed in as %1$s</string>
     <string name="prompt_clear_local_favorites">Would you also like to clear your local favorites, or just stop synchronizing them?</string>
     <string name="title_prompt_clear_favorites">Clear Favorites?</string>
+    <string name="title_privacy_policy">Privacy Policy</string>
+    <string name="desc_toggle_visibility">toggle visibility</string>
+    <string name="pref_title_dark_mode">Dark Mode</string>
 
 
 </resources>

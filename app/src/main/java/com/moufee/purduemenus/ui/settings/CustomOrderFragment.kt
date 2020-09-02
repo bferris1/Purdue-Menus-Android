@@ -5,20 +5,23 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Canvas
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.view.ViewCompat
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.helper.ItemTouchHelper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.ItemTouchHelper
 import com.moufee.purduemenus.R
 import com.moufee.purduemenus.menus.DiningCourtComparator
+import com.moufee.purduemenus.menus.Location
+import com.moufee.purduemenus.repository.MenuRepository
 import dagger.android.support.AndroidSupportInjection
+import timber.log.Timber
 import javax.inject.Inject
-
 
 /**
  * A simple [Fragment] subclass.
@@ -26,65 +29,80 @@ import javax.inject.Inject
  * create an instance of this fragment.
  *
  */
-const val KEY_PREF_DINING_COURT_ORDER = "dining_court_order"
 
-
-class CustomOrderFragment : Fragment() {
+class CustomOrderFragment : androidx.fragment.app.Fragment() {
     private lateinit var mAdapter: DiningCourtOrderAdapter
-    private val defaultOrder = DiningCourtComparator.diningCourts
-    private var currentOrder: MutableList<String> = ArrayList(defaultOrder)
 
     @Inject
     lateinit var mSharedPreferences: SharedPreferences
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    @Inject
+    lateinit var mViewModelFactory: ViewModelProvider.Factory
 
-    }
+    lateinit var mViewModel: LocationSettingsViewModel
+
+    @Inject
+    lateinit var mMenuRepository: MenuRepository
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         val view: View = inflater.inflate(R.layout.fragment_custom_order, container, false)
-        mAdapter = DiningCourtOrderAdapter()
-        val recyclerView: RecyclerView = view.findViewById(R.id.dining_court_order_recyclerview)
-        recyclerView.layoutManager = LinearLayoutManager(activity)
+        mAdapter = DiningCourtOrderAdapter(listener = object : DiningCourtOrderAdapter.OnLocationChangedListener {
+            override fun onLocationVisibilityChanged(location: Location) {
+                location.isHidden = !location.isHidden
+                mAdapter.notifyDataSetChanged()
+                mMenuRepository.updateLocations(location)
+            }
+        })
+        val recyclerView: androidx.recyclerview.widget.RecyclerView = view.findViewById(R.id.dining_court_order_recyclerview)
+        recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(activity)
         recyclerView.adapter = mAdapter
-        currentOrder = mSharedPreferences.getString(KEY_PREF_DINING_COURT_ORDER, "").split(",").toMutableList()
-        if (currentOrder.size != 5)
-            currentOrder = defaultOrder
-        mAdapter.submitList(currentOrder)
+        if (mViewModel.orderedLocations.size > 0) {
+            mAdapter.submitList(mViewModel.orderedLocations)
+        }
+        mViewModel.locations.observe(this, Observer {
+            Timber.d(it.toString())
+            // initialize once: after this, orderedLocations is the single source of truth for the location info
+            // if we update it every time the liveData changes, updates may happen out of order with respect to UI changes, resulting in bad data being saved to DB
+            // maybe there is a better way to handle this?
+            if (mViewModel.orderedLocations.size == 0) {
+                mAdapter.submitList(it)
+                mViewModel.orderedLocations = it as MutableList<Location>
+            }
+        })
         val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.DOWN or ItemTouchHelper.UP, 0) {
-            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+            override fun onMove(recyclerView: androidx.recyclerview.widget.RecyclerView, viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, target: androidx.recyclerview.widget.RecyclerView.ViewHolder): Boolean {
                 val fromPos = viewHolder.adapterPosition
                 val toPos = target.adapterPosition
-                val item = currentOrder.removeAt(fromPos)
-                currentOrder.add(toPos, item)
-//                    mAdapter.submitList(currentOrder)
+                mViewModel.orderedLocations.add(toPos, mViewModel.orderedLocations.removeAt(fromPos))
                 mAdapter.notifyItemMoved(fromPos, toPos)
-                Log.d("SADF", "list $currentOrder")
-                mSharedPreferences.edit().putString(KEY_PREF_DINING_COURT_ORDER, currentOrder.joinToString(",")).apply()
+                Timber.d("from $fromPos to $toPos")
                 return true
             }
 
-            override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+            override fun onSelectedChanged(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder?, actionState: Int) {
                 if (viewHolder?.itemView != null && actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
                     ItemTouchHelper.Callback.getDefaultUIUtil().onSelected(viewHolder.itemView)
                     ViewCompat.setElevation(viewHolder.itemView, 10f)
                 }
             }
 
-            override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+            override fun clearView(recyclerView: androidx.recyclerview.widget.RecyclerView, viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder) {
                 super.clearView(recyclerView, viewHolder)
+                for ((i, location) in mViewModel.orderedLocations.withIndex()) {
+                    location.displayOrder = i
+                }
+                mMenuRepository.updateLocations(mViewModel.orderedLocations)
                 ViewCompat.setElevation(viewHolder.itemView, 0f)
             }
 
-            override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
+            override fun onChildDraw(c: Canvas, recyclerView: androidx.recyclerview.widget.RecyclerView, viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
                 ItemTouchHelper.Callback.getDefaultUIUtil().onDraw(c, recyclerView, viewHolder.itemView, dX, dY, actionState, false)
             }
 
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            override fun onSwiped(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, direction: Int) {
 
             }
         })
@@ -92,8 +110,11 @@ class CustomOrderFragment : Fragment() {
         return view
     }
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
+        if (context is FragmentActivity) {
+            mViewModel = ViewModelProviders.of(context, mViewModelFactory).get((LocationSettingsViewModel::class.java))
+        }
         super.onAttach(context)
 
     }

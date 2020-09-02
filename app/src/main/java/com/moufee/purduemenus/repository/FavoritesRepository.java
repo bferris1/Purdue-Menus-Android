@@ -1,12 +1,13 @@
 package com.moufee.purduemenus.repository;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Transformations;
 import android.content.SharedPreferences;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.moufee.purduemenus.api.FavoriteTransactionTask;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Transformations;
+
+import com.moufee.purduemenus.api.AuthenticatedAPITask;
 import com.moufee.purduemenus.api.UpdateFavoritesTask;
 import com.moufee.purduemenus.api.Webservice;
 import com.moufee.purduemenus.db.FavoriteDao;
@@ -68,7 +69,7 @@ public class FavoritesRepository {
         Favorite favorite = new Favorite(item.getName(), UUID.randomUUID().toString(), item.getId(), item.isVegetarian());
         mAppExecutors.diskIO().execute(() -> mFavoriteDao.insertFavorites(favorite));
         if (mSharedPreferences.getBoolean("logged_in", false))
-            mAppExecutors.networkIO().execute(new FavoriteTransactionTask<ResponseBody>(mSharedPreferences) {
+            mAppExecutors.networkIO().execute(new AuthenticatedAPITask<ResponseBody>(mSharedPreferences) {
                 @Override
                 public Call<ResponseBody> getCall() {
                     return mWebservice.addFavorite(favorite);
@@ -87,7 +88,7 @@ public class FavoritesRepository {
             mAppExecutors.diskIO().execute(() -> {
                 Favorite favorite = mFavoriteDao.getFavoriteByItemId(item.getId());
                 Log.d(TAG, "removeFavorite: deleting favorite" + favorite + " " + favorite.favoriteId);
-                mAppExecutors.networkIO().execute(new FavoriteTransactionTask<ResponseBody>(mSharedPreferences) {
+                mAppExecutors.networkIO().execute(new AuthenticatedAPITask<ResponseBody>(mSharedPreferences) {
                     @Override
                     public Call<ResponseBody> getCall() {
                         return mWebservice.deleteFavorite(favorite.favoriteId);

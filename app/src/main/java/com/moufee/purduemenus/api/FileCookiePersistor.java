@@ -23,7 +23,7 @@ import javax.inject.Inject;
 import okhttp3.Cookie;
 
 /**
- * Not currently used
+ * Not currently used, doesn't seem to work properly
  */
 public class FileCookiePersistor implements CookiePersistor {
 

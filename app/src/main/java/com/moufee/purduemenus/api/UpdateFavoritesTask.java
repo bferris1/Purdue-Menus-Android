@@ -3,6 +3,8 @@ package com.moufee.purduemenus.api;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.moufee.purduemenus.db.FavoriteDao;
 import com.moufee.purduemenus.menus.Favorite;
 import com.moufee.purduemenus.menus.Favorites;
@@ -16,7 +18,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class UpdateFavoritesTask extends FavoriteTransactionTask<Favorites> {
+public class UpdateFavoritesTask extends AuthenticatedAPITask<Favorites> {
 
 
     private static final String TAG = "DOWNLOAD_FAV_TASK";
@@ -59,12 +61,12 @@ public class UpdateFavoritesTask extends FavoriteTransactionTask<Favorites> {
                 Log.d(TAG, "uploadFavorites: " + favorite);
                 mWebservice.addFavorite(favorite).enqueue(new Callback<ResponseBody>() {
                     @Override
-                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                         Log.d(TAG, "onResponse: " + response);
                     }
 
                     @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
                         Log.e(TAG, "onFailure: ", t);
                     }
                 });

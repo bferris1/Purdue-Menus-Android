@@ -7,13 +7,14 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.repository.FavoritesRepository;
@@ -28,6 +29,7 @@ import okhttp3.Response;
 
 /**
  * A login screen that offers login via username/password.
+ * todo: I think this could be cleaned up a bit, this is mostly the Android Studio template
  */
 public class LoginActivity extends AppCompatActivity {
 

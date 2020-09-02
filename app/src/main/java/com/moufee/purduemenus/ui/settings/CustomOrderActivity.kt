@@ -1,23 +1,21 @@
 package com.moufee.purduemenus.ui.settings
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.moufee.purduemenus.R
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
-import dagger.android.support.HasSupportFragmentInjector
+import dagger.android.HasAndroidInjector
 import javax.inject.Inject
 
-class CustomOrderActivity : AppCompatActivity(), HasSupportFragmentInjector {
+class CustomOrderActivity : AppCompatActivity(), HasAndroidInjector {
 
     @Inject
-    internal lateinit var mDispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
+    internal lateinit var mDispatchingAndroidInjector: DispatchingAndroidInjector<Any>
 
 
-
-    override fun supportFragmentInjector(): AndroidInjector<Fragment> {
+    override fun androidInjector(): AndroidInjector<Any> {
         return mDispatchingAndroidInjector
     }
 

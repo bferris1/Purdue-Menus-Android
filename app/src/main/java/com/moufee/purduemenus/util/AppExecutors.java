@@ -18,7 +18,8 @@ package com.moufee.purduemenus.util;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -49,7 +50,7 @@ public class AppExecutors {
 
     @Inject
     public AppExecutors() {
-        this(Executors.newSingleThreadExecutor(), Executors.newFixedThreadPool(3),
+        this(Executors.newSingleThreadExecutor(), Executors.newCachedThreadPool(),
                 new MainThreadExecutor());
     }
 

@@ -1,39 +1,43 @@
 package com.moufee.purduemenus.ui.menu;
 
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.databinding.DataBindingUtil;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.viewpager.widget.ViewPager;
+import androidx.work.Constraints;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
+
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.tabs.TabLayout;
 import com.moufee.purduemenus.BuildConfig;
-import com.moufee.purduemenus.MenusApp;
 import com.moufee.purduemenus.R;
+import com.moufee.purduemenus.api.DownloadWorker;
 import com.moufee.purduemenus.databinding.ActivityMenuDatePickerTimeBinding;
-import com.moufee.purduemenus.menus.DailyMenuViewModel;
-import com.moufee.purduemenus.menus.DiningCourtMenu;
-import com.moufee.purduemenus.ui.settings.CustomOrderFragmentKt;
+import com.moufee.purduemenus.menus.Hours;
 import com.moufee.purduemenus.ui.settings.SettingsActivity;
+import com.moufee.purduemenus.ui.settings.SettingsFragmentKt;
 import com.moufee.purduemenus.util.ConstantsKt;
 import com.moufee.purduemenus.util.DateTimeHelper;
 
@@ -43,15 +47,16 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
-import dagger.android.support.HasSupportFragmentInjector;
+import dagger.android.HasAndroidInjector;
 
-public class MenuActivity extends AppCompatActivity implements HasSupportFragmentInjector, MenuItemListFragment.OnListFragmentInteractionListener {
+public class MenuActivity extends AppCompatActivity implements HasAndroidInjector {
 
     private static String TAG = "MENU_ACTIVITY";
 
@@ -64,7 +69,7 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
     @Inject
     SharedPreferences mSharedPreferences;
     @Inject
-    DispatchingAndroidInjector<Fragment> mDispatchingAndroidInjector;
+    DispatchingAndroidInjector<Object> mDispatchingAndroidInjector;
     @Inject
     ViewModelProvider.Factory mViewModelFactory;
 
@@ -81,20 +86,14 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
                 case SettingsActivity.KEY_PREF_SHOW_FAVORITE_COUNT:
                     mMenuPagerAdapter.setShowFavoriteCount(mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_SHOW_FAVORITE_COUNT, true));
                     break;
-                case CustomOrderFragmentKt.KEY_PREF_DINING_COURT_ORDER:
+                case SettingsFragmentKt.KEY_PREF_DINING_COURT_ORDER:
                     mViewModel.setDate(mViewModel.getCurrentDate().getValue());
             }
         }
     };
 
-
     @Override
-    public void onListFragmentInteraction(com.moufee.purduemenus.menus.MenuItem item) {
-
-    }
-
-    @Override
-    public AndroidInjector<Fragment> supportFragmentInjector() {
+    public AndroidInjector<Object> androidInjector() {
         return mDispatchingAndroidInjector;
     }
 
@@ -105,23 +104,24 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
         });
         mViewModel.getSelectedMealIndex().observe(this, newMealIndex -> {
             if (newMealIndex != null) {
-                mBinding.setSelectedMealIndex(newMealIndex);
                 mMenuPagerAdapter.setMealIndex(newMealIndex);
                 updateServingTime();
             }
         });
 
+        mViewModel.getLocations().observe(this, locations -> mMenuPagerAdapter.setLocationList(locations));
+
         mViewModel.getFavoriteSet().observe(this, strings -> mMenuPagerAdapter.setFavoritesSet(strings));
 
         mViewModel.getFullMenu().observe(this, fullDayMenuResource -> {
-            mBinding.setMenusResource(fullDayMenuResource == null ? null : fullDayMenuResource);
+            mBinding.setMenusResource(fullDayMenuResource);
             //done: loading state
             if (fullDayMenuResource != null) {
                 switch (fullDayMenuResource.status) {
                     case SUCCESS:
                         mBinding.setMenu(fullDayMenuResource.data);
                         if (fullDayMenuResource.data != null)
-                            mMenuPagerAdapter.setMenus(fullDayMenuResource.data.getMenus());
+                            mMenuPagerAdapter.setMenus(fullDayMenuResource.data.getMenuMap());
                         updateLateLunch(fullDayMenuResource.data.isLateLunchServed());
                         updateServingTime();
                         break;
@@ -129,8 +129,9 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
                         break;
                     case ERROR:
                         if (fullDayMenuResource.data != null) {
-                            mMenuPagerAdapter.setMenus(fullDayMenuResource.data.getMenus());
+                            mMenuPagerAdapter.setMenus(fullDayMenuResource.data.getMenuMap());
                         } else {
+                            Log.e(TAG, "setListeners: " + fullDayMenuResource.message);
                             Snackbar.make(mBinding.activityMenuCoordinatorLayout, getString(R.string.network_error_message), Snackbar.LENGTH_SHORT).show();
                         }
                         break;
@@ -145,6 +146,7 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
         }
     }
 
+    //todo: remove this method from activity, use Kotlin and data binding
     private void updateServingTime() {
         boolean showServingTimes = mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_SHOW_SERVING_TIMES, true);
         mBinding.setShowServingTimes(showServingTimes);
@@ -154,7 +156,9 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
         String timeString;
         try {
             int diningCourtIndex = mBinding.menuViewPager.getCurrentItem();
-            DiningCourtMenu.Hours hours = mViewModel.getFullMenu().getValue().data.getMenu(diningCourtIndex).getMeal(mViewModel.getSelectedMealIndex().getValue()).getHours();
+            // todo: figure out all these null pointer warnings (convert to Kotlin and/or restructure data)
+            String selectedLocation = mViewModel.getLocations().getValue().get(diningCourtIndex).getName();
+            Hours hours = mViewModel.getFullMenu().getValue().data.getMenu(selectedLocation).getMeal(mViewModel.getSelectedMealIndex().getValue()).getHours();
             startTime = hours.getStartTime();
             endTime = hours.getEndTime();
             timeString = mTimeFormatter.print(startTime) + " - " + mTimeFormatter.print(endTime);
@@ -174,14 +178,12 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate: oncreate called");
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
-        MenusApp app = (MenusApp) getApplication();
         setTitle(getString(R.string.app_name));
 
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_menu_date_picker_time);
-        mBinding.setSelectedMealIndex(0);
+        mBinding.setLifecycleOwner(this);
 
         mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(DailyMenuViewModel.class);
         mBinding.setViewModel(mViewModel);
@@ -205,7 +207,7 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
 //        displayChangelog();
 
         //receive network status updates, to trigger data update when connectivity is reestablished
-        //todo: integrate with Lifecycle
+        //todo: integrate with Lifecycle?
         registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
 
@@ -227,7 +229,12 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
         };
         mBinding.menuViewPager.addOnPageChangeListener(mOnPageChangeListener);
 
-
+        WorkManager workManager = WorkManager.getInstance(this);
+        Constraints constraints = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).setRequiresBatteryNotLow(true).build();
+        PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(DownloadWorker.class, 1, TimeUnit.DAYS)
+                .setConstraints(constraints)
+                .build();
+        workManager.enqueueUniquePeriodicWork("downloader", ExistingPeriodicWorkPolicy.KEEP, request);
     }
 
     void displayChangelog() {
@@ -257,7 +264,7 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
             case R.id.action_feedback:
                 Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
                 emailIntent.setData(Uri.parse("mailto:")); // only email apps should handle this
-                emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"feedback@purdue.tools"}); // recipients
+                emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"support@benferris.tech"}); // recipients
                 emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Purdue Menus Feedback");
                 if (emailIntent.resolveActivity(getPackageManager()) != null) {
                     startActivity(emailIntent);
@@ -270,7 +277,6 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG, "onDestroy: ");
         unregisterReceiver(mNetworkReceiver);
         mBinding.menuViewPager.removeOnPageChangeListener(mOnPageChangeListener);
         mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);

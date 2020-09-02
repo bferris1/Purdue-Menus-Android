@@ -1,16 +1,18 @@
-package com.moufee.purduemenus.menus;
+package com.moufee.purduemenus.ui.menu;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.moufee.purduemenus.databinding.FragmentMenuitemBinding;
 import com.moufee.purduemenus.databinding.StationHeaderBinding;
-import com.moufee.purduemenus.ui.menu.MenuItemHolder;
+import com.moufee.purduemenus.menus.MenuItem;
+import com.moufee.purduemenus.menus.Station;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -21,9 +23,8 @@ import java.util.Set;
 
 public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private List<DiningCourtMenu.Station> stations = new ArrayList<>();
+    private List<Object> mListItems = new ArrayList<>();
     private Set<String> mFavoriteSet = new HashSet<>();
-    private int mTotalItems = 0;
     private OnToggleFavoriteListener mFavoriteListener;
 
     private final static int VIEW_TYPE_HEADER = 0;
@@ -38,19 +39,20 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
         notifyDataSetChanged();
     }
 
-    public void setStations(List<DiningCourtMenu.Station> stations) {
-        this.stations = stations;
-        int total = 0;
-        for (DiningCourtMenu.Station station : stations) {
-            total += station.getNumItems();
+    public void setStations(List<Station> stations) {
+        mListItems.clear();
+        for (Station station : stations) {
+            if (station.getNumItems() > 0) {
+                mListItems.add(station.getName());
+                mListItems.addAll(station.getItems());
+            }
         }
-        total += stations.size();
-        mTotalItems = total;
         notifyDataSetChanged();
     }
 
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater =
                 LayoutInflater.from(parent.getContext());
         if (viewType == VIEW_TYPE_HEADER) {
@@ -63,25 +65,25 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder.getItemViewType() == VIEW_TYPE_HEADER && holder instanceof StationHeaderViewHolder) {
             StationHeaderViewHolder stationHolder = (StationHeaderViewHolder) holder;
-            stationHolder.bind(stations.get(getSectionIndex(position)));
+            stationHolder.bind((String) mListItems.get(position));
         } else {
             MenuItemHolder itemHolder = (MenuItemHolder) holder;
-            MenuItem item = getMenuItemForPosition(position);
+            MenuItem item = (MenuItem) mListItems.get(position);
             itemHolder.bind(item, mFavoriteListener, mFavoriteSet.contains(item.getId()));
         }
     }
 
     @Override
     public int getItemCount() {
-        return mTotalItems;
+        return mListItems.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (getPositionInSection(position) == 0)
+        if (mListItems.get(position) instanceof String)
             return VIEW_TYPE_HEADER;
         return VIEW_TYPE_ITEM;
     }
@@ -89,34 +91,6 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     public boolean isHeader(int position) {
         return getItemViewType(position) == VIEW_TYPE_HEADER;
     }
-
-    private MenuItem getMenuItemForPosition(int position) {
-        return stations.get(getSectionIndex(position)).getItem(getPositionInSection(position) - 1);
-    }
-
-    private int getPositionInSection(int position) {
-        int currentStationStartIndex = 0;
-        for (DiningCourtMenu.Station station : stations) {
-            if (position >= currentStationStartIndex && position <= currentStationStartIndex + station.getNumItems()) {
-                return position - currentStationStartIndex;
-            }
-            currentStationStartIndex += station.getNumItems() + 1;
-        }
-        throw new IndexOutOfBoundsException("Position is outside the allowed range.");
-    }
-
-    private int getSectionIndex(int position) {
-        int currentStationStartIndex = 0;
-        for (int i = 0; i < stations.size(); i++) {
-            DiningCourtMenu.Station station = stations.get(i);
-            if (position >= currentStationStartIndex && position <= currentStationStartIndex + station.getNumItems()) {
-                return i;
-            }
-            currentStationStartIndex += station.getNumItems() + 1;
-        }
-        throw new IndexOutOfBoundsException("Position is outside the allowed range.");
-    }
-
 
     private class StationHeaderViewHolder extends RecyclerView.ViewHolder {
 
@@ -127,8 +101,8 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
             this.binding = binding;
         }
 
-        private void bind(DiningCourtMenu.Station station) {
-            binding.setStation(station);
+        private void bind(String stationName) {
+            binding.setStationName(stationName);
             binding.executePendingBindings();
         }
     }

@@ -1,9 +1,11 @@
 package com.moufee.purduemenus.menus;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.Keep;
-import android.support.annotation.NonNull;
+import com.squareup.moshi.Json;
+
+import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 /**
  * Created by Ben on 13/08/2017.
@@ -13,13 +15,19 @@ import android.support.annotation.NonNull;
 @Entity
 public class Favorite {
     @NonNull
+    @Json(name = "ItemName")
     public final String itemName;
 
     @NonNull
+    @Json(name = "FavoriteId")
     public final String favoriteId;
+
     @PrimaryKey
     @NonNull
+    @Json(name = "ItemId")
     public final String itemId;
+
+    @Json(name = "IsVegetarian")
     @NonNull
     public final Boolean isVegetarian;
 
@@ -32,7 +40,7 @@ public class Favorite {
 
     @Override
     public boolean equals(Object obj) {
-        return obj != null && obj instanceof Favorite && ((Favorite) obj).itemId.equals(itemId);
+        return obj instanceof Favorite && ((Favorite) obj).itemId.equals(itemId);
     }
 
     @Override

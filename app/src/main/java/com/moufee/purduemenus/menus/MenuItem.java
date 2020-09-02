@@ -1,8 +1,6 @@
 package com.moufee.purduemenus.menus;
 
-import android.support.annotation.Keep;
-
-import com.google.gson.annotations.SerializedName;
+import androidx.annotation.Keep;
 
 import java.io.Serializable;
 
@@ -12,38 +10,28 @@ import java.io.Serializable;
  */
 @Keep
 public class MenuItem implements Serializable {
-    @SerializedName("ID")
-    private String id;
-    private String name;
-    private boolean isVegetarian;
-    private boolean isFavorite = false;
+    private String ID;
+    private String Name;
+    private boolean IsVegetarian;
 
     public MenuItem(String name) {
-        this.name = name;
-    }
-
-    public boolean isFavorite() {
-        return isFavorite;
-    }
-
-    public void setFavorite(boolean favorite) {
-        isFavorite = favorite;
+        this.Name = name;
     }
 
     public String getName() {
-        return name;
+        return Name;
     }
 
     public boolean isVegetarian() {
-        return isVegetarian;
+        return IsVegetarian;
     }
 
     public String getId() {
-        return id;
+        return ID;
     }
 
     @Override
     public String toString() {
-        return id + " :" + name;
+        return ID + " :" + Name;
     }
 }

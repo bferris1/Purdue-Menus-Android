@@ -48,4 +48,7 @@
     <string name="prompt_clear_local_favorites">Souhaitez-vous également supprimer vos favoris locaux ou simplement arrêter de les synchroniser?</string>
     <string name="action_sign_out">Se déconnecter</string>
     <string name="action_only_logout">Se déconnecter seulement</string>
+    <string name="title_privacy_policy">Politique de confidentialité</string>
+    <string name="desc_toggle_visibility">basculer la visibilité</string>
+    <string name="pref_title_dark_mode">Mode Sombre</string>
 </resources>
