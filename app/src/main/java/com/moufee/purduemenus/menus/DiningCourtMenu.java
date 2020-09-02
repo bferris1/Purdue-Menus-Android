@@ -47,7 +47,7 @@ public class DiningCourtMenu implements Serializable {
         if (Meals != null && Meals.size() > 0) {
             for (Meal meal :
                     Meals) {
-                if (meal.getOrder() == mealIndex + 1)
+                if (meal.getOrder() == mealIndex)
                     return meal;
             }
         }
