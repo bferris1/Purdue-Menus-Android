@@ -66,3 +66,4 @@ freeline/
 freeline_project_description.json
 
 app/release/output\.json
+/keystore.properties
