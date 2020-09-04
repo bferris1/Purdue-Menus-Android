@@ -13,7 +13,7 @@ jobs:
       - checkout
       - run:
           name: Assemble
-          command: ./gradlew clean assembleDebug
+          command: ./gradlew clean check assembleDebug
 
       - store_artifacts:
           path: app/build/outputs/apk
