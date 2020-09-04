@@ -59,6 +59,7 @@ constructor(private val mWebservice: Webservice, private val mAppExecutors: AppE
                     emit(Resource.success(fullMenu))
                     Timber.d("getFullMenu: Read from file!")
                 } else {
+                    Timber.d("Could not read from file")
                     emit(Resource.loading<DayMenu>(null))
                 }
             } catch (t: Throwable) {
@@ -112,7 +113,6 @@ constructor(private val mWebservice: Webservice, private val mAppExecutors: AppE
 }
 
 fun List<ApiDiningCourtMenu>.toDayMenu(dateTime: LocalDate): DayMenu {
-    val mealNames = listOf("Breakfast", "Lunch", "Late Lunch", "Dinner")
     val mealNameToMealListMap: MutableMap<String, MutableList<DiningCourtMeal>> = HashMap()
     for (apiDiningCourtMenu in this) {
         for (apiMeal in apiDiningCourtMenu.Meals) {
@@ -123,9 +123,7 @@ fun List<ApiDiningCourtMenu>.toDayMenu(dateTime: LocalDate): DayMenu {
             }
         }
     }
-    return DayMenu(dateTime, mealNames.mapNotNull { mealName ->
-        mealNameToMealListMap[mealName]?.let { meals -> Meal(mealName, meals.map { Pair(it.diningCourtName, it) }.toMap()) }
-    })
+    return DayMenu(dateTime, mealNameToMealListMap.mapValues { (name, mealList) -> Meal(name, mealList.map { Pair(it.diningCourtName, it) }.toMap()) })
 }
 
 fun List<ApiStation>.toEntity() = map { Station(it.Name, it.Items.map { item -> item.toEntity() }) }

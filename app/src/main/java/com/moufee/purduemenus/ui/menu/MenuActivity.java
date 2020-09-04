@@ -99,7 +99,7 @@ public class MenuActivity extends AppCompatActivity implements HasAndroidInjecto
             if (dateTime != null)
                 mBinding.dateTextView.setText(DateTimeHelper.getFriendlyDateFormat(dateTime, Locale.getDefault(), getApplicationContext()));
         });
-        mViewModel.getSelectedMealIndex().observe(this, newMealIndex -> {
+        mViewModel.getSelectedMeal().observe(this, newMealIndex -> {
             if (newMealIndex != null) {
                 updateServingTime();
             }
@@ -201,8 +201,6 @@ public class MenuActivity extends AppCompatActivity implements HasAndroidInjecto
         mMenuPagerAdapter.setShowFavoriteCount(mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_SHOW_FAVORITE_COUNT, true));
         mBinding.menuViewPager.setAdapter(mMenuPagerAdapter);
         new TabLayoutMediator(tabLayout, mBinding.menuViewPager, (tab, position) -> tab.setText(mMenuPagerAdapter.getPageTitle(position))).attach();
-
-//        tabLayout.setupWithViewPager(mBinding.menuViewPager);
 
         setListeners();
 //        displayChangelog();

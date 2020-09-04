@@ -42,7 +42,7 @@ fun <A, B> combineLatest(a: LiveData<A>, b: LiveData<B>): LiveData<Pair<A, B>> {
 class DailyMenuViewModel @Inject
 constructor(private val mMenuRepository: MenuRepository, mFavoritesRepository: FavoritesRepository) : ViewModel() {
     private val mCurrentDate = MutableLiveData<LocalDate>()
-    private val mSelectedMealIndex = MutableLiveData<Int>()
+    private val mSelectedMeal = MutableLiveData<String>()
 
     val favoriteSet: LiveData<Set<String>> = mFavoritesRepository.favoriteIDSet
     val locations: LiveData<List<Location>>
@@ -50,23 +50,23 @@ constructor(private val mMenuRepository: MenuRepository, mFavoritesRepository: F
     val selectedMenus: LiveData<Map<String, DiningCourtMeal>>
     val sortedLocations: LiveData<List<DiningCourtMeal>>
 
-    val selectedMealIndex: LiveData<Int>
-        get() = mSelectedMealIndex
+    val selectedMeal: LiveData<String>
+        get() = mSelectedMeal
 
 
     val currentDate: LiveData<LocalDate>
         get() = mCurrentDate
 
     init {
-        mSelectedMealIndex.value = DateTimeHelper.getCurrentMealIndex()
+        mSelectedMeal.value = DateTimeHelper.getCurrentMeal()
         locations = mMenuRepository.visibleLocations
         setDate(LocalDate.now())
         dayMenu = Transformations.switchMap(combineLatest(mCurrentDate, locations)) { (date, locations) ->
             if (locations.isEmpty()) return@switchMap null
             mMenuRepository.getMenus(date, locations)
         }
-        selectedMenus = Transformations.map(combineLatest(dayMenu, selectedMealIndex)) { (menu, mealIndex) ->
-            menu.data?.meals?.getOrNull(mealIndex)?.locations ?: emptyMap()
+        selectedMenus = Transformations.map(combineLatest(dayMenu, selectedMeal)) { (menu, mealName) ->
+            menu.data?.meals?.get(mealName)?.locations ?: emptyMap()
         }
         sortedLocations = Transformations.map(combineLatest(selectedMenus, locations)) { (menus, locations) ->
             locations.mapNotNull { menus[it.Name] }
@@ -74,8 +74,8 @@ constructor(private val mMenuRepository: MenuRepository, mFavoritesRepository: F
     }
 
 
-    fun setSelectedMealIndex(index: Int) {
-        mSelectedMealIndex.value = index
+    fun setSelectedMeal(meal: String) {
+        mSelectedMeal.value = meal
     }
 
     fun setDate(date: LocalDate) {

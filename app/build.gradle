@@ -43,8 +43,8 @@ android {
     }
     productFlavors {
     }
-    dataBinding {
-        enabled = true
+    buildFeatures {
+        dataBinding true
     }
     compileOptions {
         targetCompatibility 1.8

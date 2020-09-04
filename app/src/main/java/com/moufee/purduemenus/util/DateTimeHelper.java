@@ -17,18 +17,18 @@ import java.util.Locale;
  */
 
 public class DateTimeHelper {
-    public static int getCurrentMealIndex(){
+    public static String getCurrentMeal(){
         DateTime now = new DateTime();
         if (now.getHourOfDay() <= 9)
-            return 0;
+            return "Breakfast";
         else if (now.getHourOfDay() <= 13)
-            return 1;
+            return "Lunch";
         else if (now.getHourOfDay() <= 16)
-            return 2;
+            return "Late Lunch";
         else if (now.getHourOfDay() <= 21 )
-            return 3;
+            return "Dinner";
         else
-            return 0;
+            return "Breakfast";
     }
 
     public static String getFriendlyDateFormat(LocalDate dateTime, Locale locale, Context context) {
