@@ -25,7 +25,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * A Fragment that contains a list of menu items for one OldMeal at one Dining Court
+ * A Fragment that contains a list of menu items for one meal at one Dining Court
  *
  *
  */
