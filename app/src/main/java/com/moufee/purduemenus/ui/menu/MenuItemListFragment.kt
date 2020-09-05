@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -15,11 +14,13 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.moufee.purduemenus.R
+import com.moufee.purduemenus.databinding.FragmentMenuitemListBinding
 import com.moufee.purduemenus.repository.FavoritesRepository
 import com.moufee.purduemenus.repository.data.menus.MenuItem
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_menuitem_list.*
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.format.DateTimeFormatter
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -34,14 +35,17 @@ class MenuItemListFragment
  * fragment (e.g. upon screen orientation changes).
  */
     : Fragment(), OnToggleFavoriteListener {
+    private var mTimeFormatter: DateTimeFormatter = DateTimeFormat.shortTime()
+
     // TODO: restructure so that all data stays in ViewModel (data binding?)
     var mDiningCourtName: String? = null
-    private var mNotServingTextView: TextView? = null
     private var mDataBoundAdapter: MenuRecyclerViewAdapter = MenuRecyclerViewAdapter((this))
     private lateinit var mViewModel: DailyMenuViewModel
+
     @JvmField
     @Inject
     var mViewModelFactory: ViewModelProvider.Factory? = null
+
     @JvmField
     @Inject
     var mFavoritesRepository: FavoritesRepository? = null
@@ -62,9 +66,9 @@ class MenuItemListFragment
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_menuitem_list, container, false)
-        mNotServingTextView = view.findViewById(R.id.not_serving_textview)
-        return view
+        val binding = FragmentMenuitemListBinding.inflate(inflater)
+        binding.showServingTimes = true
+        return binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -84,8 +88,10 @@ class MenuItemListFragment
     }
 
     private fun setListener() {
-        mViewModel.selectedMenus.observe(this, Observer {
-            mDataBoundAdapter.setStations(it[mDiningCourtName]?.stations ?: emptyList())
+        mViewModel.selectedMenus.observe(this, { meal ->
+            mDataBoundAdapter.setStations(meal[mDiningCourtName]?.stations ?: emptyList())
+            meal[mDiningCourtName]?.let { "${mTimeFormatter.print(it.startTime)} - ${mTimeFormatter.print(it.endTime)}" }?.let { text -> mealTimeTextView.text = text }
+
         })
         /*mViewModel.getFullMenu().observe(this, fullDayMenuResource -> {
             try {
@@ -131,7 +137,8 @@ class MenuItemListFragment
                 mNotServingTextView.setText(R.string.not_serving);
                 mNotServingTextView.setVisibility(View.VISIBLE);
             }
-        });*/mViewModel.favoriteSet.observe(this, Observer<Set<String?>> { favoriteIDs: Set<String?>? -> mDataBoundAdapter.setFavoriteSet(favoriteIDs) })
+        });*/
+        mViewModel.favoriteSet.observe(this, Observer<Set<String?>> { favoriteIDs: Set<String?>? -> mDataBoundAdapter.setFavoriteSet(favoriteIDs) })
     }
 
     override fun onAttach(context: Context) {
