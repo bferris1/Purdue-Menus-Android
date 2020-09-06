@@ -1,6 +1,8 @@
 package com.moufee.purduemenus.ui.menu
 
 import androidx.lifecycle.*
+import com.moufee.purduemenus.preferences.AppPreferenceManager
+import com.moufee.purduemenus.preferences.AppPreferences
 import com.moufee.purduemenus.repository.FavoritesRepository
 import com.moufee.purduemenus.repository.MenuRepository
 import com.moufee.purduemenus.repository.data.menus.DayMenu
@@ -40,7 +42,7 @@ fun <A, B> combineLatest(a: LiveData<A>, b: LiveData<B>): LiveData<Pair<A, B>> {
  * A ViewModel representing all the dining menus for one day.
  */
 class DailyMenuViewModel @Inject
-constructor(private val mMenuRepository: MenuRepository, mFavoritesRepository: FavoritesRepository) : ViewModel() {
+constructor(private val mMenuRepository: MenuRepository, private val preferenceManager: AppPreferenceManager, mFavoritesRepository: FavoritesRepository) : ViewModel() {
     private val mCurrentDate = MutableLiveData<LocalDate>()
     private val mSelectedMeal = MutableLiveData<String>()
 
@@ -49,6 +51,7 @@ constructor(private val mMenuRepository: MenuRepository, mFavoritesRepository: F
     val dayMenu: LiveData<Resource<DayMenu>>
     val selectedMenus: LiveData<Map<String, DiningCourtMeal>>
     val sortedLocations: LiveData<List<DiningCourtMeal>>
+    val appPreferences: LiveData<AppPreferences> by lazy { preferenceManager.preferences }
 
     val selectedMeal: LiveData<String>
         get() = mSelectedMeal

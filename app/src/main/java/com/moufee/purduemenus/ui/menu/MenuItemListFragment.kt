@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
@@ -41,6 +40,7 @@ class MenuItemListFragment
     var mDiningCourtName: String? = null
     private var mDataBoundAdapter: MenuRecyclerViewAdapter = MenuRecyclerViewAdapter((this))
     private lateinit var mViewModel: DailyMenuViewModel
+    private lateinit var binding: FragmentMenuitemListBinding
 
     @JvmField
     @Inject
@@ -66,8 +66,9 @@ class MenuItemListFragment
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val binding = FragmentMenuitemListBinding.inflate(inflater)
-        binding.showServingTimes = true
+        binding = FragmentMenuitemListBinding.inflate(inflater)
+        binding.lifecycleOwner = this
+        binding.viewModel = mViewModel
         return binding.root
     }
 
@@ -90,7 +91,7 @@ class MenuItemListFragment
     private fun setListener() {
         mViewModel.selectedMenus.observe(this, { meal ->
             mDataBoundAdapter.setStations(meal[mDiningCourtName]?.stations ?: emptyList())
-            meal[mDiningCourtName]?.let { "${mTimeFormatter.print(it.startTime)} - ${mTimeFormatter.print(it.endTime)}" }?.let { text -> mealTimeTextView.text = text }
+            meal[mDiningCourtName]?.let { "${mTimeFormatter.print(it.startTime)} - ${mTimeFormatter.print(it.endTime)}" }?.let { text -> servingTimeTextView.text = text }
 
         })
         /*mViewModel.getFullMenu().observe(this, fullDayMenuResource -> {
@@ -138,7 +139,7 @@ class MenuItemListFragment
                 mNotServingTextView.setVisibility(View.VISIBLE);
             }
         });*/
-        mViewModel.favoriteSet.observe(this, Observer<Set<String?>> { favoriteIDs: Set<String?>? -> mDataBoundAdapter.setFavoriteSet(favoriteIDs) })
+        mViewModel.favoriteSet.observe(this, { favoriteIDs: Set<String>? -> mDataBoundAdapter.setFavoriteSet(favoriteIDs) })
     }
 
     override fun onAttach(context: Context) {

@@ -13,6 +13,7 @@ import androidx.core.content.edit
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.moufee.purduemenus.R
+import com.moufee.purduemenus.preferences.*
 import com.moufee.purduemenus.repository.FavoritesRepository
 import com.moufee.purduemenus.ui.login.LoginActivity
 import dagger.android.support.AndroidSupportInjection
@@ -21,14 +22,6 @@ import javax.inject.Inject
 /**
  * Displays preferences for the app
  */
-const val KEY_PREF_SHOW_SERVING_TIMES = "show_serving_times"
-const val KEY_PREF_USE_NIGHT_MODE = "night_mode"
-const val KEY_PREF_LOGGED_IN = "logged_in"
-const val KEY_PREF_USERNAME = "username"
-const val KEY_PREF_PASSWORD = "password"
-const val KEY_PREF_DINING_COURT_ORDER = "dining_court_order"
-const val PREF_LOG_IN = "log_in"
-const val KEY_PREF_PRIVACY_POLICY = "privacy_policy"
 
 class SettingsFragment : PreferenceFragmentCompat(), OnSharedPreferenceChangeListener {
     @Inject

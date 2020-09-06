@@ -144,7 +144,7 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/meal_button_layout"
-                app:visibleGone="@{menusResource.data != null}"
+                app:visibleIfTrue="@{menusResource.data != null}"
                 tools:context="com.moufee.purduemenus.ui.menu.MenuActivity" />
 
             <LinearLayout
@@ -206,7 +206,7 @@
                     android:padding="0dp"
                     android:text="@string/late_lunch"
                     app:selected='@{viewModel.selectedMeal == "Late Lunch"}'
-                    app:visibleGone="@{viewModel.dayMenu.data.hasLateLunch}"
+                    app:visibleIfTrue="@{viewModel.dayMenu.data.hasLateLunch}"
                     tools:text="Late Lunch"
                     tools:visibility="visible" />
 

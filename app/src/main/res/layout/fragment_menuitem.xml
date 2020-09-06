@@ -57,7 +57,7 @@
             android:contentDescription="@string/description_vegetarian_icon"
             android:scaleType="centerInside"
             android:src="@drawable/ic_vegetarian_mark"
-            app:visibleGone="@{menuItem.isVegetarian}"
+            app:visibleIfTrue="@{menuItem.isVegetarian}"
             tools:visibility="visible" />
 
         <ImageView
@@ -74,7 +74,7 @@
             android:maxHeight="14sp"
             android:maxWidth="14sp"
             android:src="@drawable/ic_favorite_24dp"
-            app:visibleGone="@{isFavorite}"
+            app:visibleIfTrue="@{isFavorite}"
             tools:visibility="visible" />
 
 

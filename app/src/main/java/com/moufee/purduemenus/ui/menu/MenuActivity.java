@@ -34,8 +34,8 @@ import com.moufee.purduemenus.BuildConfig;
 import com.moufee.purduemenus.R;
 import com.moufee.purduemenus.api.DownloadWorker;
 import com.moufee.purduemenus.databinding.ActivityMenuDatePickerTimeBinding;
+import com.moufee.purduemenus.preferences.AppPreferencesKt;
 import com.moufee.purduemenus.ui.settings.SettingsActivity;
-import com.moufee.purduemenus.ui.settings.SettingsFragmentKt;
 import com.moufee.purduemenus.util.ConstantsKt;
 import com.moufee.purduemenus.util.DateTimeHelper;
 
@@ -73,17 +73,17 @@ public class MenuActivity extends AppCompatActivity implements HasAndroidInjecto
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             switch (key) {
-                case SettingsActivity.KEY_PREF_SHOW_SERVING_TIMES:
+                case AppPreferencesKt.KEY_PREF_SHOW_SERVING_TIMES:
                     mBinding.setShowServingTimes(sharedPreferences.getBoolean(key, true));
                     updateServingTime();
                     break;
-                case SettingsActivity.KEY_PREF_USE_NIGHT_MODE:
+                case AppPreferencesKt.KEY_PREF_USE_NIGHT_MODE:
                     recreate();
                     break;
-                case SettingsActivity.KEY_PREF_SHOW_FAVORITE_COUNT:
-                    mMenuPagerAdapter.setShowFavoriteCount(mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_SHOW_FAVORITE_COUNT, true));
+                case AppPreferencesKt.KEY_PREF_SHOW_FAVORITE_COUNT:
+                    mMenuPagerAdapter.setShowFavoriteCount(mSharedPreferences.getBoolean(AppPreferencesKt.KEY_PREF_SHOW_FAVORITE_COUNT, true));
                     break;
-                case SettingsFragmentKt.KEY_PREF_DINING_COURT_ORDER:
+                case AppPreferencesKt.KEY_PREF_DINING_COURT_ORDER:
                     mViewModel.setDate(mViewModel.getCurrentDate().getValue());
             }
         }
@@ -198,7 +198,7 @@ public class MenuActivity extends AppCompatActivity implements HasAndroidInjecto
         setSupportActionBar(toolbar);
 
         mMenuPagerAdapter = new MenuPagerAdapter(this);
-        mMenuPagerAdapter.setShowFavoriteCount(mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_SHOW_FAVORITE_COUNT, true));
+        mMenuPagerAdapter.setShowFavoriteCount(mSharedPreferences.getBoolean(AppPreferencesKt.KEY_PREF_SHOW_FAVORITE_COUNT, true));
         mBinding.menuViewPager.setAdapter(mMenuPagerAdapter);
         new TabLayoutMediator(tabLayout, mBinding.menuViewPager, (tab, position) -> tab.setText(mMenuPagerAdapter.getPageTitle(position))).attach();
 
