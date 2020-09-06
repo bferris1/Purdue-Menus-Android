@@ -73,15 +73,8 @@ public class MenuActivity extends AppCompatActivity implements HasAndroidInjecto
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             switch (key) {
-                case AppPreferencesKt.KEY_PREF_SHOW_SERVING_TIMES:
-                    mBinding.setShowServingTimes(sharedPreferences.getBoolean(key, true));
-                    updateServingTime();
-                    break;
                 case AppPreferencesKt.KEY_PREF_USE_NIGHT_MODE:
                     recreate();
-                    break;
-                case AppPreferencesKt.KEY_PREF_SHOW_FAVORITE_COUNT:
-                    mMenuPagerAdapter.setShowFavoriteCount(mSharedPreferences.getBoolean(AppPreferencesKt.KEY_PREF_SHOW_FAVORITE_COUNT, true));
                     break;
                 case AppPreferencesKt.KEY_PREF_DINING_COURT_ORDER:
                     mViewModel.setDate(mViewModel.getCurrentDate().getValue());
@@ -99,13 +92,9 @@ public class MenuActivity extends AppCompatActivity implements HasAndroidInjecto
             if (dateTime != null)
                 mBinding.dateTextView.setText(DateTimeHelper.getFriendlyDateFormat(dateTime, Locale.getDefault(), getApplicationContext()));
         });
-        mViewModel.getSelectedMeal().observe(this, newMealIndex -> {
-            if (newMealIndex != null) {
-                updateServingTime();
-            }
-        });
 
         mViewModel.getFavoriteSet().observe(this, strings -> mMenuPagerAdapter.setFavoritesSet(strings));
+        mViewModel.getAppPreferences().observe(this, prefs -> mMenuPagerAdapter.setShowFavoriteCount(prefs.getShowFavoriteCounts()));
 
         mViewModel.getSortedLocations().observe(this, sorted -> {
             mMenuPagerAdapter.setMenus(sorted);
@@ -147,30 +136,6 @@ public class MenuActivity extends AppCompatActivity implements HasAndroidInjecto
         }
     }*/
 
-    //todo: remove this method from activity, use Kotlin and data binding
-    private void updateServingTime() {
-        /*boolean showServingTimes = mSharedPreferences.getBoolean(SettingsActivity.KEY_PREF_SHOW_SERVING_TIMES, true);
-        mBinding.setShowServingTimes(showServingTimes);
-
-        LocalTime startTime;
-        LocalTime endTime;
-        String timeString;
-        try {
-            int diningCourtIndex = mBinding.menuViewPager.getCurrentItem();
-            // todo: figure out all these null pointer warnings (convert to Kotlin and/or restructure data)
-            String selectedLocation = mViewModel.getLocations().getValue().get(diningCourtIndex).getName();
-            Hours hours = mViewModel.getFullMenu().getValue().data.getMenu(selectedLocation).getMeal(mViewModel.getSelectedMealIndex().getValue()).getHours();
-            startTime = hours.getStartTime();
-            endTime = hours.getEndTime();
-            timeString = mTimeFormatter.print(startTime) + " - " + mTimeFormatter.print(endTime);
-        } catch (Exception e) {
-            mBinding.mealTimeTextView.setText("");
-            return;
-        }
-        mBinding.mealTimeTextView.setText(timeString);*/
-    }
-
-
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -208,25 +173,6 @@ public class MenuActivity extends AppCompatActivity implements HasAndroidInjecto
         //receive network status updates, to trigger data update when connectivity is reestablished
         //todo: integrate with Lifecycle?
         registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-
-
-        mOnPageChangeListener = new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                updateServingTime();
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        };
-//        mBinding.menuViewPager.addOnPageChangeListener(mOnPageChangeListener);
 
         WorkManager workManager = WorkManager.getInstance(this);
         Constraints constraints = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).setRequiresBatteryNotLow(true).build();

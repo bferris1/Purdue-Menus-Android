@@ -12,10 +12,6 @@
         <import type="com.moufee.purduemenus.repository.data.menus.MealType" />
 
         <variable
-            name="selectedMealIndex"
-            type="int" />
-
-        <variable
             name="viewModel"
             type="com.moufee.purduemenus.ui.menu.DailyMenuViewModel" />
 
