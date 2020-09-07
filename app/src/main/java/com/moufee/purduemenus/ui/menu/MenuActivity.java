@@ -1,13 +1,8 @@
 package com.moufee.purduemenus.ui.menu;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
@@ -21,7 +16,6 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.viewpager.widget.ViewPager;
 import androidx.work.Constraints;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.NetworkType;
@@ -39,10 +33,6 @@ import com.moufee.purduemenus.ui.settings.SettingsActivity;
 import com.moufee.purduemenus.util.ConstantsKt;
 import com.moufee.purduemenus.util.DateTimeHelper;
 
-import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -59,9 +49,6 @@ public class MenuActivity extends AppCompatActivity implements HasAndroidInjecto
     private ActivityMenuDatePickerTimeBinding mBinding;
     private MenuPagerAdapter mMenuPagerAdapter;
     private DailyMenuViewModel mViewModel;
-    private NetworkReceiver mNetworkReceiver = new NetworkReceiver();
-    private DateTimeFormatter mTimeFormatter = DateTimeFormat.shortTime();
-    private ViewPager.OnPageChangeListener mOnPageChangeListener;
     @Inject
     SharedPreferences mSharedPreferences;
     @Inject
@@ -172,7 +159,6 @@ public class MenuActivity extends AppCompatActivity implements HasAndroidInjecto
 
         //receive network status updates, to trigger data update when connectivity is reestablished
         //todo: integrate with Lifecycle?
-        registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         WorkManager workManager = WorkManager.getInstance(this);
         Constraints constraints = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).setRequiresBatteryNotLow(true).build();
@@ -222,25 +208,8 @@ public class MenuActivity extends AppCompatActivity implements HasAndroidInjecto
 
     @Override
     protected void onDestroy() {
-        unregisterReceiver(mNetworkReceiver);
-//        mBinding.menuViewPager.removeOnPageChangeListener(mOnPageChangeListener);
         mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
         super.onDestroy();
     }
 
-    class NetworkReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            ConnectivityManager conn = (ConnectivityManager)
-                    context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            if (conn == null) return;
-            NetworkInfo networkInfo = conn.getActiveNetworkInfo();
-            boolean isConnected = networkInfo != null &&
-                    networkInfo.isConnected();
-            if (isConnected && mViewModel.getCurrentDate().getValue() != null) {
-                //todo: better way to force update?
-                mViewModel.setDate(new LocalDate(mViewModel.getCurrentDate().getValue()));
-            }
-        }
-    }
 }
