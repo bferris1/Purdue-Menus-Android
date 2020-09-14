@@ -44,14 +44,16 @@ public class DiningCourtMenu implements Serializable {
      * @return the Meal associated with the provided index
      */
     public Meal getMeal(int mealIndex) {
+        if (mealIndex > 3)
+            return null;
+        String[] mealNames = {"Breakfast", "Lunch", "Late Lunch", "Dinner"};
         if (Meals != null && Meals.size() > 0) {
             for (Meal meal :
                     Meals) {
-                if (meal.getOrder() == mealIndex)
+                if (meal.getName().equals(mealNames[mealIndex]))
                     return meal;
             }
         }
-
         return null;
     }
 
