@@ -14,7 +14,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.work.*
-import com.google.android.material.tabs.TabLayout
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import com.moufee.purduemenus.BuildConfig
 import com.moufee.purduemenus.R
@@ -26,9 +26,7 @@ import com.moufee.purduemenus.preferences.KEY_PREF_USE_NIGHT_MODE
 import com.moufee.purduemenus.repository.data.menus.DayMenu
 import com.moufee.purduemenus.repository.data.menus.DiningCourtMeal
 import com.moufee.purduemenus.ui.settings.SettingsActivity
-import com.moufee.purduemenus.util.DateTimeHelper
-import com.moufee.purduemenus.util.Resource
-import com.moufee.purduemenus.util.UPDATE_MESSAGE_KEY
+import com.moufee.purduemenus.util.*
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -43,11 +41,12 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
     private lateinit var mBinding: ActivityMenuDatePickerTimeBinding
     private val mMenuPagerAdapter: MenuPagerAdapter = MenuPagerAdapter(this)
     private lateinit var mViewModel: DailyMenuViewModel
+    private lateinit var networkListener: NetworkAvailabilityListener
 
     @Inject
     lateinit var mSharedPreferences: SharedPreferences
 
-     @Inject
+    @Inject
     lateinit var mDispatchingAndroidInjector: DispatchingAndroidInjector<Any>
 
     @Inject
@@ -59,6 +58,7 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
             KEY_PREF_DINING_COURT_ORDER -> mViewModel.setDate(mViewModel.currentDate.value!!)
         }
     }
+
 
     override fun androidInjector(): AndroidInjector<Any> {
         return mDispatchingAndroidInjector
@@ -72,7 +72,12 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
             mMenuPagerAdapter.setMenus(sorted)
             Timber.d(sorted.toString())
         })
-        mViewModel.dayMenu.observe(this, { resource: Resource<DayMenu> -> mBinding.menusResource = resource })
+        mViewModel.dayMenu.observe(this, { resource: Resource<DayMenu> ->
+            mBinding.menusResource = resource
+            if (resource.status == Status.ERROR && resource.data == null) {
+                Snackbar.make(mBinding.activityMenuCoordinatorLayout, getString(R.string.network_error_message), Snackbar.LENGTH_SHORT).show();
+            }
+        })
 
         /*mViewModel.getFullMenu().observe(this, fullDayMenuResource -> {
             mBinding.setMenusResource(fullDayMenuResource);
@@ -101,11 +106,6 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
         });*/
     }
 
-    /*private void updateLateLunch(boolean isLateLunchServed) {
-        if (mViewModel.getSelectedMealIndex().getValue() == 2 && !isLateLunchServed) {
-            mViewModel.setSelectedMealIndex(1);
-        }
-    }*/
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         Timber.d("onConfigurationChanged ")
@@ -125,8 +125,11 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
         setSupportActionBar(toolbar)
         mMenuPagerAdapter.setShowFavoriteCount(mSharedPreferences.getBoolean(KEY_PREF_SHOW_FAVORITE_COUNT, true))
         mBinding.menuViewPager.adapter = mMenuPagerAdapter
-        TabLayoutMediator(tabLayout, mBinding.menuViewPager) { tab: TabLayout.Tab, position: Int -> tab.text = mMenuPagerAdapter.getPageTitle(position) }.attach()
+        TabLayoutMediator(tabLayout, mBinding.menuViewPager) { tab, position -> tab.text = mMenuPagerAdapter.getPageTitle(position) }.attach()
         setListeners()
+        networkListener = NetworkAvailabilityListener(this, lifecycle) {
+            mViewModel.reloadData()
+        }
         //        displayChangelog();
 
         //receive network status updates, to trigger data update when connectivity is reestablished
@@ -176,7 +179,7 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
     }
 
     override fun onDestroy() {
-        mSharedPreferences!!.unregisterOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener)
+        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener)
         super.onDestroy()
     }
 }

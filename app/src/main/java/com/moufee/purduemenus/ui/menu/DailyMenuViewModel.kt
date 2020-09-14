@@ -69,7 +69,10 @@ constructor(private val mMenuRepository: MenuRepository, private val preferenceM
             mMenuRepository.getMenus(date, locations)
         }
         selectedMenus = Transformations.map(combineLatest(dayMenu, selectedMeal)) { (menu, mealName) ->
-            menu.data?.meals?.get(mealName)?.locations ?: emptyMap()
+            if (mealName == "Late Lunch" && menu.data?.hasLateLunch == false) {
+                setSelectedMeal("Dinner")
+            }
+            menu.data?.meals?.get(mealName)?.locations?.filterValues { it.stations.isNotEmpty() } ?: emptyMap()
         }
         sortedLocations = Transformations.map(combineLatest(selectedMenus, locations)) { (menus, locations) ->
             locations.mapNotNull { menus[it.Name] }
@@ -95,5 +98,9 @@ constructor(private val mMenuRepository: MenuRepository, private val preferenceM
 
     fun currentDay() {
         mCurrentDate.value = LocalDate.now()
+    }
+
+    fun reloadData() {
+        mCurrentDate.value?.let { mCurrentDate.postValue(it) }
     }
 }
