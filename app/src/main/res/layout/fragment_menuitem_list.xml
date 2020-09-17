@@ -24,6 +24,7 @@
             android:background="?android:attr/colorBackground"
             android:elevation="1dp"
             android:gravity="center"
+            app:visibleIfTrue="@{viewModel.appPreferences.showServingTimes}"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -37,7 +38,6 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 android:textAlignment="center"
-                app:visibleIfTrue="@{viewModel.appPreferences.showServingTimes}"
                 tools:layout_editor_absoluteX="72dp"
                 tools:layout_editor_absoluteY="239dp"
                 tools:text="11:00 AM - 2:00 PM" />
@@ -48,7 +48,7 @@
             android:name="com.moufee.purduetoolkit.MenuItemFragment"
             android:layout_width="0dp"
             android:layout_height="0dp"
-
+            visibleIfTrue="@{dataAvailable}"
             android:scrollbars="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -68,6 +68,7 @@
             android:layout_height="wrap_content"
             android:text="@string/not_serving"
             android:visibility="gone"
+            visibleIfTrue="@{!dataAvailable}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

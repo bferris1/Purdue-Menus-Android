@@ -13,8 +13,10 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.moufee.purduemenus.R
 import com.moufee.purduemenus.databinding.FragmentMenuitemListBinding
 import com.moufee.purduemenus.repository.FavoritesRepository
+import com.moufee.purduemenus.repository.data.menus.DiningCourtMeal
 import com.moufee.purduemenus.repository.data.menus.MenuItem
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_menuitem_list.*
@@ -89,56 +91,19 @@ class MenuItemListFragment
     }
 
     private fun setListener() {
-        mViewModel.selectedMenus.observe(this, { meal ->
-            mDataBoundAdapter.setStations(meal[mDiningCourtName]?.stations ?: emptyList())
-            meal[mDiningCourtName]?.let { "${mTimeFormatter.print(it.startTime)} - ${mTimeFormatter.print(it.endTime)}" }?.let { text -> servingTimeTextView.text = text }
+        mViewModel.selectedMenus.observe(this, { menus: Map<String, DiningCourtMeal> ->
+            val menu = menus[mDiningCourtName]
+            val stations = menu?.stations ?: emptyList()
+            mDataBoundAdapter.setStations(stations)
+            binding.dataAvailable = stations.isNotEmpty()
+            binding.notServingTextview.text = if (menu?.status != null && menu.status != "Open") menu.status else getString(R.string.no_data)
+            menu?.let {
+                if (it.startTime != null && it.endTime != null)
+                    "${mTimeFormatter.print(it.startTime)} - ${mTimeFormatter.print(it.endTime)}"
+                else ""
+            }?.let { text -> servingTimeTextView.text = text }
 
         })
-        /*mViewModel.getFullMenu().observe(this, fullDayMenuResource -> {
-            try {
-                if (fullDayMenuResource != null && fullDayMenuResource.data != null && fullDayMenuResource.data.getMenu(mDiningCourtName).isServing(mMealIndex)) {
-                    mDataBoundAdapter.setStations(fullDayMenuResource.data.getMenu(mDiningCourtName).getMeal(mMealIndex).getStations());
-                    mMenuItemRecyclerView.setVisibility(View.VISIBLE);
-                    mNotServingTextView.setVisibility(View.GONE);
-                } else {
-                    mMenuItemRecyclerView.setVisibility(View.GONE);
-                    mNotServingTextView.setText(fullDayMenuResource.data.getMenu(mDiningCourtName).getMeal(mMealIndex).getStatus());
-                    mNotServingTextView.setVisibility(View.VISIBLE);
-                }
-            } catch (Exception e) {
-                // this is called frequently due to getStatus() being called on null meals
-                // todo: better handling of null meals (Kotlin?)
-                mDataBoundAdapter.setStations(new ArrayList<>());
-                mMenuItemRecyclerView.setVisibility(View.GONE);
-                mNotServingTextView.setText(R.string.not_serving);
-                mNotServingTextView.setVisibility(View.VISIBLE);
-            }
-
-        });*/
-// todo: refactor this and above method to remove duplicated code
-/*mViewModel.getSelectedMealIndex().observe(this, integer -> {
-            if (integer == null)
-                return;
-            mMealIndex = integer;
-            Resource<FullDayMenu> fullDayMenuResource = mViewModel.getFullMenu().getValue();
-            try {
-                if (fullDayMenuResource != null && fullDayMenuResource.data != null && fullDayMenuResource.data.getMenu(mDiningCourtName).isServing(mMealIndex)) {
-//                        DiningCourtMenu.OldMeal meal = fullDayMenuResource.data.getMenu(mDiningCourtIndex).getMeal(mMealIndex);
-                    mDataBoundAdapter.setStations(mViewModel.getFullMenu().getValue().data.getMenu(mDiningCourtName).getMeal(mMealIndex).getStations());
-                    mMenuItemRecyclerView.setVisibility(View.VISIBLE);
-                    mNotServingTextView.setVisibility(View.GONE);
-                } else {
-                    mMenuItemRecyclerView.setVisibility(View.GONE);
-                    mNotServingTextView.setText(fullDayMenuResource.data.getMenu(mDiningCourtName).getMeal(mMealIndex).getStatus());
-                    mNotServingTextView.setVisibility(View.VISIBLE);
-                }
-            } catch (Exception e) {
-                mDataBoundAdapter.setStations(new ArrayList<>());
-                mMenuItemRecyclerView.setVisibility(View.GONE);
-                mNotServingTextView.setText(R.string.not_serving);
-                mNotServingTextView.setVisibility(View.VISIBLE);
-            }
-        });*/
         mViewModel.favoriteSet.observe(this, { favoriteIDs: Set<String>? -> mDataBoundAdapter.setFavoriteSet(favoriteIDs) })
     }
 

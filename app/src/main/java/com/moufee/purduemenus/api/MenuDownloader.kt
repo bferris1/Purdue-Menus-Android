@@ -17,6 +17,7 @@ class MenuDownloader @Inject constructor(val webservice: Webservice) {
 
     suspend fun getMenus(date: LocalDate, locations: List<Location>): List<ApiDiningCourtMenu> = supervisorScope {
         val locationNames = locations.map { it.Name }
+        var lastException: Throwable? = null
         val deferredResponses = locationNames.map {
             async {
                 webservice.getMenu(it, formatter.print(date))
@@ -27,7 +28,12 @@ class MenuDownloader @Inject constructor(val webservice: Webservice) {
                 it.await()
             } catch (t: Throwable) {
                 Timber.e(t, "Network error.")
+                lastException = t
                 null
+            }
+        }.also { menuList ->
+            if (menuList.isEmpty()) {
+                lastException?.let { throw it }
             }
         }
     }

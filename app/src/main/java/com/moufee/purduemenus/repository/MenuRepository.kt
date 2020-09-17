@@ -116,11 +116,15 @@ fun List<ApiDiningCourtMenu>.toDayMenu(dateTime: LocalDate): DayMenu {
     val mealNameToMealListMap: MutableMap<String, MutableList<DiningCourtMeal>> = HashMap()
     for (apiDiningCourtMenu in this) {
         for (apiMeal in apiDiningCourtMenu.Meals) {
-            if (apiMeal.Status == "Open" && apiMeal.Stations.isNotEmpty()) {
-                if (mealNameToMealListMap.containsKey(apiMeal.Name).not())
-                    mealNameToMealListMap[apiMeal.Name] = mutableListOf()
-                mealNameToMealListMap[apiMeal.Name]?.add(DiningCourtMeal(apiDiningCourtMenu.Location, apiMeal.Hours?.StartTime, apiMeal.Hours?.EndTime, apiMeal.Stations.toEntity()))
-            }
+            if (mealNameToMealListMap.containsKey(apiMeal.Name).not())
+                mealNameToMealListMap[apiMeal.Name] = mutableListOf()
+            mealNameToMealListMap[apiMeal.Name]?.add(DiningCourtMeal(
+                    diningCourtName = apiDiningCourtMenu.Location,
+                    status = apiMeal.Status,
+                    startTime = apiMeal.Hours?.StartTime,
+                    endTime = apiMeal.Hours?.EndTime,
+                    stations = apiMeal.Stations.toEntity()
+            ))
         }
     }
     return DayMenu(dateTime, mealNameToMealListMap.mapValues { (name, mealList) -> Meal(name, mealList.map { Pair(it.diningCourtName, it) }.toMap()) })

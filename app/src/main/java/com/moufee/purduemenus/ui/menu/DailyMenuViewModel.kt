@@ -72,7 +72,7 @@ constructor(private val mMenuRepository: MenuRepository, private val preferenceM
             if (mealName == "Late Lunch" && menu.data?.hasLateLunch == false) {
                 setSelectedMeal("Dinner")
             }
-            menu.data?.meals?.get(mealName)?.locations?.filterValues { it.stations.isNotEmpty() } ?: emptyMap()
+            menu.data?.meals?.get(mealName)?.locations ?: emptyMap()
         }
         sortedLocations = Transformations.map(combineLatest(selectedMenus, locations)) { (menus, locations) ->
             locations.mapNotNull { menus[it.Name] }
