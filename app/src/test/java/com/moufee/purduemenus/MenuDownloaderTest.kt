@@ -28,7 +28,6 @@ val apiMenu = ApiDiningCourtMenu(
 
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
-
 class MenuDownloaderTest {
 
     @Mock
@@ -81,9 +80,14 @@ class MenuDownloaderTest {
         locations.add(Location("Failure", "TEST", "Test Dining Court", 0))
         locations.add(Location("Failure", "TEST", "Test Dining Court", 0))
         locations.add(Location("Failure", "TEST", "Test Dining Court", 0))
-        val singleFailure = downloader.getMenus(testDate, locations)
-        verify(webservice, times(3)).getMenu("Failure", dateString)
-//        assertThat(singleFailure.getMenu("Failure")).isNull()
-        assertThat(singleFailure).hasSize(0)
+        var exceptionThrown = false
+        try {
+            downloader.getMenus(testDate, locations)
+        } catch (e: RuntimeException) {
+            exceptionThrown = true
+        } finally {
+            verify(webservice, times(3)).getMenu("Failure", dateString)
+            assertThat(exceptionThrown).isTrue()
+        }
     }
 }
