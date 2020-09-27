@@ -41,8 +41,10 @@ fun <A, B> combineLatest(a: LiveData<A>, b: LiveData<B>): LiveData<Pair<A, B>> {
 /**
  * A ViewModel representing all the dining menus for one day.
  */
-class DailyMenuViewModel @Inject
-constructor(private val mMenuRepository: MenuRepository, private val preferenceManager: AppPreferenceManager, mFavoritesRepository: FavoritesRepository) : ViewModel() {
+class DailyMenuViewModel @Inject constructor(private val mMenuRepository: MenuRepository,
+                                             private val preferenceManager: AppPreferenceManager,
+                                             mFavoritesRepository: FavoritesRepository) : ViewModel() {
+
     private val mCurrentDate = MutableLiveData<LocalDate>()
     private val mSelectedMeal = MutableLiveData<String>()
 
@@ -72,7 +74,11 @@ constructor(private val mMenuRepository: MenuRepository, private val preferenceM
             if (mealName == "Late Lunch" && menu.data?.hasLateLunch == false) {
                 setSelectedMeal("Dinner")
             }
-            menu.data?.meals?.get(mealName)?.locations ?: emptyMap()
+            menu.data?.meals?.get(mealName)
+        }.let {
+            Transformations.map(combineLatest(it, appPreferences)) { (meal, prefs) ->
+                if (prefs.hideClosedDiningCourts) meal?.openLocations ?: emptyMap() else meal?.locations ?: emptyMap()
+            }
         }
         sortedLocations = Transformations.map(combineLatest(selectedMenus, locations)) { (menus, locations) ->
             locations.mapNotNull { menus[it.Name] }

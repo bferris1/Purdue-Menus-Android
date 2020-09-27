@@ -20,6 +20,12 @@
         android:key="show_favorite_count"
         android:title="@string/pref_title_show_favorite_count" />
 
+    <SwitchPreference
+        app:iconSpaceReserved="false"
+        android:defaultValue="true"
+        android:key="@string/key_pref_hide_closed_locations"
+        android:title="@string/pref_title_hide_closed_locations" />
+
     <Preference
         app:iconSpaceReserved="false"
         android:key="dining_court_order"

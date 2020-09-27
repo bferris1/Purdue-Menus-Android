@@ -89,6 +89,8 @@
     <string name="desc_toggle_visibility">toggle visibility</string>
     <string name="pref_title_dark_mode">Dark Mode</string>
     <string name="no_data">No Data</string>
+    <string name="pref_title_hide_closed_locations">Hide Closed Locations</string>
+    <string name="key_pref_hide_closed_locations" translatable="false">hide_closed_locations</string>
 
 
 </resources>

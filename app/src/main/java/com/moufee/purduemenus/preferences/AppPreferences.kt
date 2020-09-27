@@ -7,6 +7,7 @@ import javax.inject.Singleton
 
 const val KEY_PREF_SHOW_SERVING_TIMES = "show_serving_times"
 const val KEY_PREF_SHOW_FAVORITE_COUNT = "show_favorite_count"
+const val KEY_PREF_HIDE_CLOSED_LOCATIONS = "hide_closed_locations"
 const val KEY_PREF_USE_NIGHT_MODE = "night_mode"
 const val KEY_PREF_LOGGED_IN = "logged_in"
 const val KEY_PREF_USERNAME = "username"
@@ -19,7 +20,7 @@ data class AppPreferences(
         val showServingTimes: Boolean,
         val showFavoriteCounts: Boolean,
         val showVegetarianIcons: Boolean,
-        val showClosedDiningCourts: Boolean
+        val hideClosedDiningCourts: Boolean
 )
 
 
@@ -49,5 +50,5 @@ private fun SharedPreferences.toAppPreferences() = AppPreferences(
         showServingTimes = getBoolean(KEY_PREF_SHOW_SERVING_TIMES, true),
         showFavoriteCounts = getBoolean(KEY_PREF_SHOW_FAVORITE_COUNT, true),
         showVegetarianIcons = true,
-        showClosedDiningCourts = false
+        hideClosedDiningCourts = getBoolean(KEY_PREF_HIDE_CLOSED_LOCATIONS, true)
 )
