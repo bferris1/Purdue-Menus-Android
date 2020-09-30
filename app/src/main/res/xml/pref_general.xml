@@ -29,8 +29,8 @@
     <Preference
         app:iconSpaceReserved="false"
         android:key="dining_court_order"
-        android:title="Manage Dining Court Display Order"
-        android:summary="Drag and drop to customize." />
+        android:title="@string/title_pref_dining_court_order"
+        android:summary="@string/pref_summary_dining_court_order" />
 
     <ListPreference
         app:iconSpaceReserved="false"

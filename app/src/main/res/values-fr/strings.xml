@@ -36,7 +36,7 @@
     <string name="late_lunch">Déjeuner tard</string>
     <string name="on">Activé</string>
     <string name="off">Desactivé</string>
-    <string name="auto">Automatique</string>
+    <string name="auto">Utiliser les paramètres système</string>
     <string name="pref_log_in">Se connecter</string>
     <string name="pref_summary_not_logged_in">Vous n\'êtes pas connecté</string>
     <string name="pref_title_show_favorite_count">Afficher les comptes des favoris</string>
@@ -52,5 +52,7 @@
     <string name="desc_toggle_visibility">basculer la visibilité</string>
     <string name="pref_title_dark_mode">Mode Sombre</string>
     <string name="no_data">Pas de données</string>
-    <string name="pref_title_hide_closed_locations">Cacher Lieux Fermés</string>
+    <string name="pref_title_hide_closed_locations">Cacher lieux fermés</string>
+    <string name="title_pref_dining_court_order">Gérer l\'ordre d\'affichage des emplacements</string>
+    <string name="pref_summary_dining_court_order">Faites glisser et déposez pour personnaliser.</string>
 </resources>

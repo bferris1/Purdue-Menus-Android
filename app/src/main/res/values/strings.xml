@@ -91,6 +91,8 @@
     <string name="no_data">No Data</string>
     <string name="pref_title_hide_closed_locations">Hide Closed Locations</string>
     <string name="key_pref_hide_closed_locations" translatable="false">hide_closed_locations</string>
+    <string name="title_pref_dining_court_order">Manage Location Display Order</string>
+    <string name="pref_summary_dining_court_order">Drag and drop to customize.</string>
 
 
 </resources>
