@@ -51,7 +51,6 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
 
     @Inject
     lateinit var mViewModelFactory: ViewModelProvider.Factory
-
     private val mSharedPreferenceChangeListener = OnSharedPreferenceChangeListener { _, key ->
         when (key) {
             KEY_PREF_USE_NIGHT_MODE -> recreate()
@@ -59,13 +58,15 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
         }
     }
 
-
     override fun androidInjector(): AndroidInjector<Any> {
         return mDispatchingAndroidInjector
     }
 
     private fun setListeners() {
-        mViewModel.currentDate.observe(this, { dateTime: LocalDate -> mBinding.dateTextView.text = DateTimeHelper.getFriendlyDateFormat(dateTime, Locale.getDefault(), applicationContext) })
+        mViewModel.currentDate.observe(this,
+                                       { dateTime: LocalDate ->
+                                           mBinding.dateTextView.text = DateTimeHelper.getFriendlyDateFormat(dateTime, Locale.getDefault(), applicationContext)
+                                       })
         mViewModel.favoriteSet.observe(this, { strings: Set<String> -> mMenuPagerAdapter.setFavoritesSet(strings) })
         mViewModel.appPreferences.observe(this, { (_, showFavoriteCounts) -> mMenuPagerAdapter.setShowFavoriteCount(showFavoriteCounts) })
         mViewModel.sortedLocations.observe(this, { sorted: List<DiningCourtMeal> ->
@@ -78,32 +79,6 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
                 Snackbar.make(mBinding.activityMenuCoordinatorLayout, getString(R.string.network_error_message), Snackbar.LENGTH_SHORT).show()
             }
         })
-
-        /*mViewModel.getFullMenu().observe(this, fullDayMenuResource -> {
-            mBinding.setMenusResource(fullDayMenuResource);
-            //done: loading state
-            if (fullDayMenuResource != null) {
-                switch (fullDayMenuResource.status) {
-                    case SUCCESS:
-                        mBinding.setMenu(fullDayMenuResource.data);
-                        if (fullDayMenuResource.data != null)
-                            mMenuPagerAdapter.setMenus(fullDayMenuResource.data.getMenuMap());
-                        updateLateLunch(fullDayMenuResource.data.isLateLunchServed());
-                        updateServingTime();
-                        break;
-                    case LOADING:
-                        break;
-                    case ERROR:
-                        if (fullDayMenuResource.data != null) {
-                            mMenuPagerAdapter.setMenus(fullDayMenuResource.data.getMenuMap());
-                        } else {
-                            Log.e(TAG, "setListeners: " + fullDayMenuResource.message);
-                            Snackbar.make(mBinding.activityMenuCoordinatorLayout, getString(R.string.network_error_message), Snackbar.LENGTH_SHORT).show();
-                        }
-                        break;
-                }
-            }
-        });*/
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -131,7 +106,6 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
             mViewModel.reloadData()
         }
         //        displayChangelog();
-
         val workManager = WorkManager.getInstance(this)
         val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).setRequiresBatteryNotLow(true).build()
         val request = PeriodicWorkRequest.Builder(DownloadWorker::class.java, 1, TimeUnit.DAYS)
@@ -166,7 +140,7 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
                 val emailIntent = Intent(Intent.ACTION_SENDTO)
                 emailIntent.data = Uri.parse("mailto:") // only email apps should handle this
                 emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf("support@benferris.tech")) // recipients
-                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Purdue Menus Feedback")
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Purdue Menus Feedback (version ${BuildConfig.VERSION_NAME})")
                 if (emailIntent.resolveActivity(packageManager) != null) {
                     startActivity(emailIntent)
                 }
