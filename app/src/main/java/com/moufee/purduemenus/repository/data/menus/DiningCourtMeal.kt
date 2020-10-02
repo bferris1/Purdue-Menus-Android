@@ -8,7 +8,7 @@ import org.joda.time.LocalTime
  * @property meals a map of meal name to the meal
  */
 data class DayMenu(val date: LocalDate, val meals: Map<String, Meal>) {
-    val hasLateLunch = meals["Late Lunch"] != null
+    val hasLateLunch = meals["Late Lunch"]?.openLocations?.isNotEmpty() ?: false
 }
 
 /**
@@ -21,7 +21,6 @@ data class Meal(val name: String, val locations: Map<String, DiningCourtMeal>) {
 
 /**
  * The menu for a single meal at a single dining court
- * @property diningCourtName the name of the dining court
  */
 data class DiningCourtMeal(
         val diningCourtName: String,

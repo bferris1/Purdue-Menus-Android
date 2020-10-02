@@ -52,7 +52,7 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
     @Inject
     lateinit var mViewModelFactory: ViewModelProvider.Factory
 
-    private val mSharedPreferenceChangeListener = OnSharedPreferenceChangeListener { sharedPreferences, key ->
+    private val mSharedPreferenceChangeListener = OnSharedPreferenceChangeListener { _, key ->
         when (key) {
             KEY_PREF_USE_NIGHT_MODE -> recreate()
             KEY_PREF_DINING_COURT_ORDER -> mViewModel.setDate(mViewModel.currentDate.value!!)
@@ -75,7 +75,7 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
         mViewModel.dayMenu.observe(this, { resource: Resource<DayMenu> ->
             mBinding.menusResource = resource
             if (resource.status == Status.ERROR && resource.data == null) {
-                Snackbar.make(mBinding.activityMenuCoordinatorLayout, getString(R.string.network_error_message), Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(mBinding.activityMenuCoordinatorLayout, getString(R.string.network_error_message), Snackbar.LENGTH_SHORT).show()
             }
         })
 
@@ -132,8 +132,6 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
         }
         //        displayChangelog();
 
-        //receive network status updates, to trigger data update when connectivity is reestablished
-        //todo: integrate with Lifecycle?
         val workManager = WorkManager.getInstance(this)
         val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).setRequiresBatteryNotLow(true).build()
         val request = PeriodicWorkRequest.Builder(DownloadWorker::class.java, 1, TimeUnit.DAYS)
