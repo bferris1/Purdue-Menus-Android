@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.work.*
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
@@ -64,9 +63,9 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
 
     private fun setListeners() {
         mViewModel.currentDate.observe(this,
-                                       { dateTime: LocalDate ->
-                                           mBinding.dateTextView.text = DateTimeHelper.getFriendlyDateFormat(dateTime, Locale.getDefault(), applicationContext)
-                                       })
+                { dateTime: LocalDate ->
+                    mBinding.dateTextView.text = DateTimeHelper.getFriendlyDateFormat(dateTime, Locale.getDefault(), applicationContext)
+                })
         mViewModel.favoriteSet.observe(this, { strings: Set<String> -> mMenuPagerAdapter.setFavoritesSet(strings) })
         mViewModel.appPreferences.observe(this, { (_, showFavoriteCounts) -> mMenuPagerAdapter.setShowFavoriteCount(showFavoriteCounts) })
         mViewModel.sortedLocations.observe(this, { sorted: List<DiningCourtMeal> ->
@@ -92,7 +91,7 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
         title = getString(R.string.app_name)
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_menu_date_picker_time)
         mBinding.lifecycleOwner = this
-        mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(DailyMenuViewModel::class.java)
+        mViewModel = ViewModelProvider(this, mViewModelFactory).get(DailyMenuViewModel::class.java)
         mBinding.viewModel = mViewModel
         mSharedPreferences.registerOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener)
         val tabLayout = mBinding.menuTabLayout
@@ -105,7 +104,7 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
         networkListener = NetworkAvailabilityListener(this, lifecycle) {
             mViewModel.reloadData()
         }
-        //        displayChangelog();
+        displayChangelog()
         val workManager = WorkManager.getInstance(this)
         val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).setRequiresBatteryNotLow(true).build()
         val request = PeriodicWorkRequest.Builder(DownloadWorker::class.java, 1, TimeUnit.DAYS)
@@ -114,7 +113,7 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
         workManager.enqueueUniquePeriodicWork("downloader", ExistingPeriodicWorkPolicy.KEEP, request)
     }
 
-    fun displayChangelog() {
+    private fun displayChangelog() {
         val versionCode = BuildConfig.VERSION_CODE
         val hasShownMessage = mSharedPreferences.getBoolean(UPDATE_MESSAGE_KEY + versionCode, false)
         if (!hasShownMessage) {

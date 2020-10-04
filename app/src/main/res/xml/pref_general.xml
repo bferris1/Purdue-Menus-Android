@@ -9,49 +9,49 @@
         android:title="@string/preference_title_show_vegetarian_icons"/>-->
 
     <SwitchPreference
-        app:iconSpaceReserved="false"
         android:defaultValue="true"
         android:key="show_serving_times"
-        android:title="@string/pref_show_serving_times" />
+        android:title="@string/pref_show_serving_times"
+        app:iconSpaceReserved="false" />
 
     <SwitchPreference
-        app:iconSpaceReserved="false"
         android:defaultValue="true"
         android:key="show_favorite_count"
-        android:title="@string/pref_title_show_favorite_count" />
+        android:title="@string/pref_title_show_favorite_count"
+        app:iconSpaceReserved="false" />
 
     <SwitchPreference
-        app:iconSpaceReserved="false"
         android:defaultValue="true"
         android:key="@string/key_pref_hide_closed_locations"
-        android:title="@string/pref_title_hide_closed_locations" />
+        android:title="@string/pref_title_hide_closed_locations"
+        app:iconSpaceReserved="false" />
 
     <Preference
-        app:iconSpaceReserved="false"
         android:key="dining_court_order"
+        android:summary="@string/pref_summary_dining_court_order"
         android:title="@string/title_pref_dining_court_order"
-        android:summary="@string/pref_summary_dining_court_order" />
+        app:iconSpaceReserved="false" />
 
     <ListPreference
-        app:iconSpaceReserved="false"
         android:defaultValue="@string/pref_night_mode_auto"
         android:entries="@array/pref_nightMode_entries"
         android:entryValues="@array/pref_nightMode_values"
         android:key="night_mode"
         android:summary="%s"
-        android:title="@string/pref_title_dark_mode" />
+        android:title="@string/pref_title_dark_mode"
+        app:iconSpaceReserved="false" />
 
 
     <Preference
-        app:iconSpaceReserved="false"
         android:key="log_in"
         android:summary="@string/pref_summary_not_logged_in"
-        android:title="@string/pref_log_in" />
+        android:title="@string/pref_log_in"
+        app:iconSpaceReserved="false" />
 
     <Preference
-        app:iconSpaceReserved="false"
         android:key="privacy_policy"
-        android:title="@string/title_privacy_policy" />
+        android:title="@string/title_privacy_policy"
+        app:iconSpaceReserved="false" />
 
 
 </PreferenceScreen>
