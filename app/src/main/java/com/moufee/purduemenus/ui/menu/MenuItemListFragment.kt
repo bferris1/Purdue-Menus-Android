@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -44,25 +43,23 @@ class MenuItemListFragment
     private lateinit var mViewModel: DailyMenuViewModel
     private lateinit var binding: FragmentMenuitemListBinding
 
-    @JvmField
     @Inject
-    var mViewModelFactory: ViewModelProvider.Factory? = null
+    lateinit var mViewModelFactory: ViewModelProvider.Factory
 
-    @JvmField
     @Inject
-    var mFavoritesRepository: FavoritesRepository? = null
+    lateinit var mFavoritesRepository: FavoritesRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (arguments != null) {
-            mDiningCourtName = arguments!!.getString(ARG_DINING_COURT_NAME)
+            mDiningCourtName = requireArguments().getString(ARG_DINING_COURT_NAME)
         }
     }
 
     override fun toggleFavorite(item: MenuItem): Boolean {
         if (mViewModel.favoriteSet.value == null) return true
         Timber.d("toggleFavorite: Adding Favorite: ${item.name} ${item.id}")
-        if (!mViewModel.favoriteSet.value!!.contains(item.id)) mFavoritesRepository!!.addFavorite(item) else mFavoritesRepository!!.removeFavorite(item)
+        if (!mViewModel.favoriteSet.value!!.contains(item.id)) mFavoritesRepository.addFavorite(item) else mFavoritesRepository.removeFavorite(item)
         return true
     }
 
@@ -104,14 +101,14 @@ class MenuItemListFragment
             }?.let { text -> servingTimeTextView.text = text }
 
         })
-        mViewModel.favoriteSet.observe(this, { favoriteIDs: Set<String>? -> mDataBoundAdapter.setFavoriteSet(favoriteIDs) })
+        mViewModel.favoriteSet.observe(this, { favoriteIDs: Set<String> -> mDataBoundAdapter.setFavoriteSet(favoriteIDs) })
     }
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
         if (context is AppCompatActivity) {
-            mViewModel = ViewModelProviders.of(context, mViewModelFactory).get(DailyMenuViewModel::class.java)
+            mViewModel = ViewModelProvider(context, mViewModelFactory).get(DailyMenuViewModel::class.java)
             setListener()
         }
     }
