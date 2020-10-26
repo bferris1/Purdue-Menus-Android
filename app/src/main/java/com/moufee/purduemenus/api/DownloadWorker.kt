@@ -1,13 +1,14 @@
 package com.moufee.purduemenus.api
 
 import android.content.Context
-import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import com.moufee.purduemenus.db.LocationDao
 import com.moufee.purduemenus.di.ChildWorkerFactory
-import org.joda.time.DateTime
+import com.moufee.purduemenus.repository.toDayMenu
+import org.joda.time.LocalDate
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -21,18 +22,18 @@ class DownloadWorker(
     override suspend fun doWork(): Result {
         //download menus day by day and save to disk
         val locations = locationDao.getAllList()
-        val today = DateTime.now()
+        val today = LocalDate.now()
         val oneWeek = today.plusDays(7)
         var current = today
 
-        while (current.isBefore(oneWeek.toInstant())) {
+        while (current.isBefore(oneWeek)) {
             // todo: don't block here?
-            val menu = downloader.getMenus(current, locations)
+            val menu = downloader.getMenus(current, locations).toDayMenu(current)
             try {
-                Log.d(TAG, "Caching menu" + menu.date.toString())
+                Timber.d("Caching menu %s", menu.date.toString())
                 menuCache.put(menu)
             } catch (e: Exception) {
-                Log.e("DownloadWorker", "error:", e)
+                Timber.e(e, "error:")
             }
             current = current.plusDays(1)
         }

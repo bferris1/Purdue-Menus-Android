@@ -69,16 +69,11 @@
     <string name="pref_title_show_favorite_count">Show Favorite Counts</string>
     <string name="login_details">When you are logged in, the app will attempt to keep your favorites synchronized with the Purdue favorites system.</string>
     <string name="hint_purdue_username" translatable="false">Purdue Username</string>
-    <string name="changelog_title">Changelog for v%1$s</string>
+    <string name="changelog_title">Changelog for %1$s</string>
     <string name="changelog" translatable="false">
-        \n<b>Custom Dining Court Order</b>
-        \n\nYou can now customize the order in which the dining courts are displayed. Open settings to try it out!
-        \n\n<b>Favorites Support</b>
-        \n\nYou can now long-press on an item to add it as a favorite.
-        \n\nFavorite counts are displayed next to dining court names for quick comparison.
-        \n\nYou can log in to import and synchronize your favorites with the Purdue favorites system.
-        The app will attempt to keep your favorites synchronized with the Purdue
-        favorites system while you are logged in.</string>
+        \n<b>Hide Closed Locations</b>
+        \n\nTo make it even easier to compare menus, closed locations are now hidden by default. You can adjust this option in settings.
+        </string>
     <string name="action_clear_favorites">Clear Favorites</string>
     <string name="action_only_logout">Just Log Out</string>
     <string name="action_sign_out">Sign Out</string>
@@ -88,6 +83,11 @@
     <string name="title_privacy_policy">Privacy Policy</string>
     <string name="desc_toggle_visibility">toggle visibility</string>
     <string name="pref_title_dark_mode">Dark Mode</string>
+    <string name="no_data">No Data</string>
+    <string name="pref_title_hide_closed_locations">Hide Closed Locations</string>
+    <string name="key_pref_hide_closed_locations" translatable="false">hide_closed_locations</string>
+    <string name="title_pref_dining_court_order">Manage Location Display Order</string>
+    <string name="pref_summary_dining_court_order">Drag and drop to customize.</string>
 
 
 </resources>

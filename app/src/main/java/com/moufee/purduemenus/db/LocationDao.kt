@@ -2,7 +2,7 @@ package com.moufee.purduemenus.db
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.moufee.purduemenus.menus.Location
+import com.moufee.purduemenus.repository.data.menus.Location
 
 @Dao
 interface LocationDao {

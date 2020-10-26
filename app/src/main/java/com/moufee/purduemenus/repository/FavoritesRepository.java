@@ -11,8 +11,8 @@ import com.moufee.purduemenus.api.AuthenticatedAPITask;
 import com.moufee.purduemenus.api.UpdateFavoritesTask;
 import com.moufee.purduemenus.api.Webservice;
 import com.moufee.purduemenus.db.FavoriteDao;
-import com.moufee.purduemenus.menus.Favorite;
-import com.moufee.purduemenus.menus.MenuItem;
+import com.moufee.purduemenus.repository.data.menus.Favorite;
+import com.moufee.purduemenus.repository.data.menus.MenuItem;
 import com.moufee.purduemenus.util.AppExecutors;
 
 import java.util.HashSet;

@@ -10,8 +10,11 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 
+import com.moufee.purduemenus.preferences.AppPreferencesKt;
 import com.moufee.purduemenus.repository.FavoritesRepository;
 import com.moufee.purduemenus.util.SingleFragmentActivity;
+
+import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Inject;
 
@@ -25,9 +28,6 @@ import dagger.android.HasAndroidInjector;
  */
 
 public class SettingsActivity extends SingleFragmentActivity implements SharedPreferences.OnSharedPreferenceChangeListener, HasAndroidInjector {
-    public static final String KEY_PREF_SHOW_SERVING_TIMES = "show_serving_times";
-    public static final String KEY_PREF_USE_NIGHT_MODE = "night_mode";
-    public static final String KEY_PREF_SHOW_FAVORITE_COUNT = "show_favorite_count";
 
     @Inject
     SharedPreferences sharedPreferences;
@@ -78,7 +78,7 @@ public class SettingsActivity extends SingleFragmentActivity implements SharedPr
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(KEY_PREF_USE_NIGHT_MODE)) {
+        if (key.equals(AppPreferencesKt.KEY_PREF_USE_NIGHT_MODE)) {
             String value = sharedPreferences.getString(key, "");
             switch (value) {
                 case "mode_off":
@@ -97,7 +97,7 @@ public class SettingsActivity extends SingleFragmentActivity implements SharedPr
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NotNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
     }
 
