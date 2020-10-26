@@ -78,7 +78,7 @@ class SettingsFragment : PreferenceFragmentCompat(), OnSharedPreferenceChangeLis
     }
 
     private fun showLogoutPrompt() {
-        val logoutDialog = AlertDialog.Builder(activity!!)
+        val logoutDialog = AlertDialog.Builder(requireActivity())
                 .setTitle(R.string.title_prompt_clear_favorites)
                 .setMessage(R.string.prompt_clear_local_favorites)
                 .setPositiveButton(R.string.action_clear_favorites) { dialog: DialogInterface?, which: Int ->

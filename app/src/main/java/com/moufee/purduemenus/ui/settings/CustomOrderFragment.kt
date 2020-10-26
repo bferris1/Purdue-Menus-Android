@@ -11,9 +11,7 @@ import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.moufee.purduemenus.R
 import com.moufee.purduemenus.repository.MenuRepository
@@ -61,7 +59,7 @@ class CustomOrderFragment : androidx.fragment.app.Fragment() {
         if (mViewModel.orderedLocations.size > 0) {
             mAdapter.submitList(mViewModel.orderedLocations)
         }
-        mViewModel.locations.observe(this, Observer {
+        mViewModel.locations.observe(viewLifecycleOwner, {
             Timber.d(it.toString())
             // initialize once: after this, orderedLocations is the single source of truth for the location info
             // if we update it every time the liveData changes, updates may happen out of order with respect to UI changes, resulting in bad data being saved to DB
@@ -112,7 +110,7 @@ class CustomOrderFragment : androidx.fragment.app.Fragment() {
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         if (context is FragmentActivity) {
-            mViewModel = ViewModelProviders.of(context, mViewModelFactory).get((LocationSettingsViewModel::class.java))
+            mViewModel = ViewModelProvider(context, mViewModelFactory).get((LocationSettingsViewModel::class.java))
         }
         super.onAttach(context)
 
