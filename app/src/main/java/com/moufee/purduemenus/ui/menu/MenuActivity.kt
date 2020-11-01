@@ -21,7 +21,6 @@ import com.moufee.purduemenus.api.DownloadWorker
 import com.moufee.purduemenus.databinding.ActivityMenuDatePickerTimeBinding
 import com.moufee.purduemenus.preferences.KEY_PREF_DINING_COURT_ORDER
 import com.moufee.purduemenus.preferences.KEY_PREF_SHOW_FAVORITE_COUNT
-import com.moufee.purduemenus.preferences.KEY_PREF_USE_NIGHT_MODE
 import com.moufee.purduemenus.repository.data.menus.DayMenu
 import com.moufee.purduemenus.repository.data.menus.DiningCourtMeal
 import com.moufee.purduemenus.ui.settings.SettingsActivity
@@ -52,7 +51,6 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
     lateinit var mViewModelFactory: ViewModelProvider.Factory
     private val mSharedPreferenceChangeListener = OnSharedPreferenceChangeListener { _, key ->
         when (key) {
-            KEY_PREF_USE_NIGHT_MODE -> recreate()
             KEY_PREF_DINING_COURT_ORDER -> mViewModel.setDate(mViewModel.currentDate.value!!)
         }
     }
