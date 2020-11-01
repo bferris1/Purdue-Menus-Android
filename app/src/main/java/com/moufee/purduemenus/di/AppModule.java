@@ -4,14 +4,12 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-
 import androidx.room.Room;
-
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
 import com.moufee.purduemenus.api.DateTimeTypeAdapter;
-import com.moufee.purduemenus.api.FileCookiePersistor;
+import com.moufee.purduemenus.api.LocalDateAdapter;
 import com.moufee.purduemenus.api.LocalTimeTypeAdapter;
 import com.moufee.purduemenus.api.Webservice;
 import com.moufee.purduemenus.db.AppDatabase;
@@ -20,11 +18,9 @@ import com.moufee.purduemenus.db.LocationDao;
 import com.moufee.purduemenus.util.AppExecutors;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory;
-
-import javax.inject.Singleton;
-
 import dagger.Module;
 import dagger.Provides;
+import javax.inject.Singleton;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
@@ -55,13 +51,14 @@ class AppModule {
         return new Moshi.Builder()
                 .add(new LocalTimeTypeAdapter())
                 .add(new DateTimeTypeAdapter())
+                .add(new LocalDateAdapter())
                 .add(new KotlinJsonAdapterFactory())
                 .build();
     }
 
     @Singleton
     @Provides
-    OkHttpClient provideHttpClient(FileCookiePersistor fileCookiePersistor, Context context) {
+    OkHttpClient provideHttpClient(Context context) {
         //todo: maybe don't use shared prefs, possibly use custom implementation
         return new OkHttpClient.Builder()
                 .cookieJar(new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(context)))

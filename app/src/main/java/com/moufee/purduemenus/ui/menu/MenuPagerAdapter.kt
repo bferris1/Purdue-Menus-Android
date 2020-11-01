@@ -1,23 +1,19 @@
 package com.moufee.purduemenus.ui.menu
 
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentStatePagerAdapter
-import androidx.viewpager.widget.PagerAdapter
-import com.moufee.purduemenus.menus.DiningCourtMenu
-import com.moufee.purduemenus.menus.Location
-import java.util.*
-import kotlin.collections.HashSet
+import androidx.fragment.app.FragmentActivity
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.moufee.purduemenus.repository.data.menus.DiningCourtMeal
+import com.moufee.purduemenus.repository.data.menus.MenuItem
+import com.moufee.purduemenus.repository.data.menus.Station
 
 /**
  * Created by Ben on 26/09/2017.
  */
 
-class MenuPagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+class MenuPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(activity) {
 
-    private var diningCourtMap: Map<String, DiningCourtMenu> = HashMap()
-    private var locationList: List<Location> = ArrayList()
-    private var mealIndex: Int = 0
+    private var diningCourtMeals: List<DiningCourtMeal> = emptyList()
     private var favoritesSet: Set<String> = HashSet()
     private var showFavoriteCount = true
 
@@ -26,18 +22,8 @@ class MenuPagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm, BEHA
         notifyDataSetChanged()
     }
 
-    fun setMenus(diningCourtMenus: Map<String, DiningCourtMenu>) {
-        this.diningCourtMap = diningCourtMenus
-        notifyDataSetChanged()
-    }
-
-    fun setLocationList(locationList: List<Location>) {
-        this.locationList = locationList
-        notifyDataSetChanged()
-    }
-
-    fun setMealIndex(mealIndex: Int) {
-        this.mealIndex = mealIndex
+    fun setMenus(diningCourtMenus: List<DiningCourtMeal>) {
+        this.diningCourtMeals = diningCourtMenus
         notifyDataSetChanged()
     }
 
@@ -46,46 +32,39 @@ class MenuPagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm, BEHA
         notifyDataSetChanged()
     }
 
-    private fun getLocationForIndex(index: Int): String {
-        return locationList[index].Name
+    override fun getItemId(position: Int): Long {
+        return diningCourtMeals[position].diningCourtName.hashCode().toLong()
     }
 
-    override fun getItem(position: Int): Fragment {
-        val name = getLocationForIndex(position)
-        return MenuItemListFragment.newInstance(name, mealIndex)
+    override fun containsItem(itemId: Long): Boolean {
+        return diningCourtMeals.find { it.diningCourtName.hashCode().toLong() == itemId } != null
     }
 
-    override fun getCount(): Int {
-        return if (diningCourtMap.isEmpty()) {
-            0
-        } else locationList.size
+    override fun createFragment(position: Int): Fragment {
+        val name = diningCourtMeals[position].diningCourtName
+        return MenuItemListFragment.newInstance(name)
     }
 
-    override fun getItemPosition(`object`: Any): Int {
-        /*  if (object instanceof MenuItemListFragment) {
-            String locationName = ((MenuItemListFragment) object).mDiningCourtName;
-            for (int i = 0; i < locationList.size(); i++) {
-                Location location = locationList.get(i);
-                if (location.getName().equals(locationName)) {
-                    return i;
-                }
-            }
-        }*/
-        //todo: better way to determine reordering of dining courts
-        return PagerAdapter.POSITION_NONE
-    }
+    override fun getItemCount(): Int = diningCourtMeals.size
 
-    override fun getPageTitle(position: Int): CharSequence? {
-        var title = locationList[position].Name
+    fun getPageTitle(position: Int): CharSequence? {
+
+        val diningCourtName = diningCourtMeals[position].diningCourtName
         if (!showFavoriteCount || favoritesSet.isEmpty())
-            return title
+            return diningCourtName
 
-        var numFavorites = 0
-        if (diningCourtMap[title]?.isServing(mealIndex) == true)
-            numFavorites = diningCourtMap[title]?.getMeal(mealIndex)?.getNumFavorites(favoritesSet)
-                    ?: 0
+        val favoriteCount = diningCourtMeals.getOrNull(position)?.stations?.countFavorites(favoritesSet) ?: 0
 
-        title += " ($numFavorites)"
-        return title
+        return "$diningCourtName ($favoriteCount)"
+    }
+
+    private fun List<Station>.countFavorites(favoriteItemIds: Set<String>): Int {
+        val favorites: MutableSet<MenuItem> = HashSet()
+        forEach { station ->
+            station.items.forEach {
+                if (it.id in favoriteItemIds) favorites.add(it)
+            }
+        }
+        return favorites.size
     }
 }

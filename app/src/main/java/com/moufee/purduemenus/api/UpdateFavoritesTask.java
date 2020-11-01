@@ -6,8 +6,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.moufee.purduemenus.db.FavoriteDao;
-import com.moufee.purduemenus.menus.Favorite;
-import com.moufee.purduemenus.menus.Favorites;
+import com.moufee.purduemenus.repository.data.menus.Favorite;
+import com.moufee.purduemenus.repository.data.menus.Favorites;
 
 import java.util.HashSet;
 import java.util.List;

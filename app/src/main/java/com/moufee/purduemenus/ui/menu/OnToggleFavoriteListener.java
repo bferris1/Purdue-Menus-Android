@@ -1,6 +1,6 @@
 package com.moufee.purduemenus.ui.menu;
 
-import com.moufee.purduemenus.menus.MenuItem;
+import com.moufee.purduemenus.repository.data.menus.MenuItem;
 
 /**
  * Created by Ben on 3/5/18.

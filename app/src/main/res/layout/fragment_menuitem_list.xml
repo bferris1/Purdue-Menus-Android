@@ -1,28 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/menu_item_recyclerview"
-        android:name="com.moufee.purduetoolkit.MenuItemFragment"
+    <data>
+        <variable
+            name="viewModel"
+            type="com.moufee.purduemenus.ui.menu.DailyMenuViewModel" />
+        <variable
+            name="dataAvailable"
+            type="boolean" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/menuListLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="match_parent">
 
-        android:scrollbars="vertical"
-        tools:layoutManager="LinearLayoutManager"
-        tools:context="com.moufee.purduemenus.ui.menu.MenuItemListFragment"
-        tools:listitem="@layout/fragment_menuitem">
+        <LinearLayout
+            android:id="@+id/serving_time_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/colorBackground"
+            android:elevation="1dp"
+            android:gravity="center"
+            app:visibleIfTrue="@{viewModel.appPreferences.showServingTimes}"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/servingTimeTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:textAlignment="center"
+                tools:layout_editor_absoluteX="72dp"
+                tools:layout_editor_absoluteY="239dp"
+                tools:text="11:00 AM - 2:00 PM" />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/menuItemRecyclerView"
+            android:name="com.moufee.purduetoolkit.MenuItemFragment"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            visibleIfTrue="@{dataAvailable}"
+            android:scrollbars="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/serving_time_layout"
+            tools:context="com.moufee.purduemenus.ui.menu.MenuItemListFragment"
+            tools:layoutManager="LinearLayoutManager"
+            tools:listitem="@layout/fragment_menuitem"
+            tools:visibility="visible">
 
 
-    </androidx.recyclerview.widget.RecyclerView>
+        </androidx.recyclerview.widget.RecyclerView>
 
-    <TextView
-        android:id="@+id/not_serving_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|center_horizontal"
-        android:text="@string/not_serving"
-        android:visibility="gone" />
-</FrameLayout>
+        <TextView
+            android:id="@+id/not_serving_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/not_serving"
+            android:visibility="gone"
+            visibleIfTrue="@{!dataAvailable}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
