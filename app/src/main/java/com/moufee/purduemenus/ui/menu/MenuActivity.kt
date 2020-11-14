@@ -1,5 +1,6 @@
 package com.moufee.purduemenus.ui.menu
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
@@ -138,8 +139,10 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
                 emailIntent.data = Uri.parse("mailto:") // only email apps should handle this
                 emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf("support@benferris.tech")) // recipients
                 emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Purdue Menus Feedback (version ${BuildConfig.VERSION_NAME})")
-                if (emailIntent.resolveActivity(packageManager) != null) {
+                try {
                     startActivity(emailIntent)
+                } catch (e: ActivityNotFoundException) {
+
                 }
                 true
             }
