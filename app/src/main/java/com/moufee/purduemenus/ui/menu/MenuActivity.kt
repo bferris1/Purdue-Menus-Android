@@ -102,7 +102,7 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
         networkListener = NetworkAvailabilityListener(this, lifecycle) {
             mViewModel.reloadData()
         }
-        displayChangelog()
+//        displayChangelog()
         val workManager = WorkManager.getInstance(this)
         val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).setRequiresBatteryNotLow(true).build()
         val request = PeriodicWorkRequest.Builder(DownloadWorker::class.java, 1, TimeUnit.DAYS)
