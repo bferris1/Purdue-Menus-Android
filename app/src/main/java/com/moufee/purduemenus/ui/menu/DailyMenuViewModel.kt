@@ -1,6 +1,9 @@
 package com.moufee.purduemenus.ui.menu
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
+import androidx.lifecycle.ViewModel
 import com.moufee.purduemenus.preferences.AppPreferenceManager
 import com.moufee.purduemenus.preferences.AppPreferences
 import com.moufee.purduemenus.repository.FavoritesRepository
@@ -10,33 +13,9 @@ import com.moufee.purduemenus.repository.data.menus.DiningCourtMeal
 import com.moufee.purduemenus.repository.data.menus.Location
 import com.moufee.purduemenus.util.DateTimeHelper
 import com.moufee.purduemenus.util.Resource
+import com.moufee.purduemenus.util.combineLatest
 import org.joda.time.LocalDate
 import javax.inject.Inject
-
-// todo: move this somewhere else?
-// this is built-in functionality with RxJava, but not architecture components
-fun <A, B> combineLatest(a: LiveData<A>, b: LiveData<B>): LiveData<Pair<A, B>> {
-    return MediatorLiveData<Pair<A, B>>().apply {
-        var lastA: A? = null
-        var lastB: B? = null
-
-        fun update() {
-            val localLastA = lastA
-            val localLastB = lastB
-            if (localLastA != null && localLastB != null)
-                this.value = Pair(localLastA, localLastB)
-        }
-
-        addSource(a) {
-            lastA = it
-            update()
-        }
-        addSource(b) {
-            lastB = it
-            update()
-        }
-    }
-}
 
 /**
  * A ViewModel representing all the dining menus for one day.
