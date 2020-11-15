@@ -32,7 +32,11 @@ import kotlin.coroutines.EmptyCoroutineContext
  */
 @Singleton
 class MenuRepository @Inject
-constructor(private val mWebservice: Webservice, private val mAppExecutors: AppExecutors, private val mLocationDao: LocationDao, private val menuDownloader: MenuDownloader, private val menuCache: MenuCache) {
+constructor(private val mWebservice: Webservice,
+            private val mAppExecutors: AppExecutors,
+            private val mLocationDao: LocationDao,
+            private val menuDownloader: MenuDownloader,
+            private val menuCache: MenuCache) {
 
     val locations: LiveData<List<Location>>
         get() {

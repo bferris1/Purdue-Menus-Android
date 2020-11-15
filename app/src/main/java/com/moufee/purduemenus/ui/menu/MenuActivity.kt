@@ -1,5 +1,6 @@
 package com.moufee.purduemenus.ui.menu
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
@@ -21,7 +22,6 @@ import com.moufee.purduemenus.api.DownloadWorker
 import com.moufee.purduemenus.databinding.ActivityMenuDatePickerTimeBinding
 import com.moufee.purduemenus.preferences.KEY_PREF_DINING_COURT_ORDER
 import com.moufee.purduemenus.preferences.KEY_PREF_SHOW_FAVORITE_COUNT
-import com.moufee.purduemenus.preferences.KEY_PREF_USE_NIGHT_MODE
 import com.moufee.purduemenus.repository.data.menus.DayMenu
 import com.moufee.purduemenus.repository.data.menus.DiningCourtMeal
 import com.moufee.purduemenus.ui.settings.SettingsActivity
@@ -52,7 +52,6 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
     lateinit var mViewModelFactory: ViewModelProvider.Factory
     private val mSharedPreferenceChangeListener = OnSharedPreferenceChangeListener { _, key ->
         when (key) {
-            KEY_PREF_USE_NIGHT_MODE -> recreate()
             KEY_PREF_DINING_COURT_ORDER -> mViewModel.setDate(mViewModel.currentDate.value!!)
         }
     }
@@ -104,7 +103,7 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
         networkListener = NetworkAvailabilityListener(this, lifecycle) {
             mViewModel.reloadData()
         }
-        displayChangelog()
+//        displayChangelog()
         val workManager = WorkManager.getInstance(this)
         val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).setRequiresBatteryNotLow(true).build()
         val request = PeriodicWorkRequest.Builder(DownloadWorker::class.java, 1, TimeUnit.DAYS)
@@ -140,8 +139,10 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
                 emailIntent.data = Uri.parse("mailto:") // only email apps should handle this
                 emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf("support@benferris.tech")) // recipients
                 emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Purdue Menus Feedback (version ${BuildConfig.VERSION_NAME})")
-                if (emailIntent.resolveActivity(packageManager) != null) {
+                try {
                     startActivity(emailIntent)
+                } catch (e: ActivityNotFoundException) {
+
                 }
                 true
             }

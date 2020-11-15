@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
- android: circleci/android@0.2.1
+  android: circleci/android@0.2.1
 
 jobs:
   build:
@@ -12,9 +12,23 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Assemble
+          name: Checkout Secrets
+          command: |
+            git clone git@github.com:bferris1/menus-app-secrets.git ~/secrets
+            cp ~/secrets/google-services.json ./app/google-services.json
+            cp ~/secrets/androidkey.jks ./app/androidkey.jks
+            echo keyAlias=$keyAlias > keystore.properties
+            echo keyPassword=$keyPassword >> keystore.properties
+            echo storePassword=$storePassword >> keystore.properties
+      - run:
+          name: Assemble Debug
           command: ./gradlew clean check assembleDebug
-
+      - run:
+          name: Assemble Release
+          command: ./gradlew assembleRelease bundleRelease
       - store_artifacts:
           path: app/build/outputs/apk
           destination: apks
+      - store_artifacts:
+          path: app/build/outputs/bundle
+          destination: bundle
