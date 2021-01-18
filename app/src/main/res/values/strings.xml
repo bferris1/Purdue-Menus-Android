@@ -88,6 +88,8 @@
     <string name="key_pref_hide_closed_locations" translatable="false">hide_closed_locations</string>
     <string name="title_pref_dining_court_order">Manage Location Display Order</string>
     <string name="pref_summary_dining_court_order">Drag and drop to customize.</string>
+    <string name="update_downloaded_alert">An update has just been downloaded.</string>
+    <string name="update_downloaded_install">INSTALL</string>
 
 
 </resources>

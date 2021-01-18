@@ -8,7 +8,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
@@ -16,7 +15,9 @@ import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.moufee.purduemenus.R;
+import com.moufee.purduemenus.analytics.EventNames;
 import com.moufee.purduemenus.repository.FavoritesRepository;
 import com.moufee.purduemenus.util.AuthHelper;
 
@@ -26,6 +27,8 @@ import dagger.android.AndroidInjection;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
+import timber.log.Timber;
 
 /**
  * A login screen that offers login via username/password.
@@ -51,6 +54,8 @@ public class LoginActivity extends AppCompatActivity {
     SharedPreferences mSharedPreferences;
     @Inject
     FavoritesRepository mFavoritesRepository;
+    @Inject
+    FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +87,7 @@ public class LoginActivity extends AppCompatActivity {
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
+        mFirebaseAnalytics.logEvent(EventNames.SIGN_IN_TAPPED, new Bundle());
         if (mAuthTask != null) {
             return;
         }
@@ -174,8 +180,7 @@ public class LoginActivity extends AppCompatActivity {
                 Request firstRequest = AuthHelper.getTGTRequest(mUsername, mPassword);
 
                 Response response = mHTTPClient.newCall(firstRequest).execute();
-                Log.d(TAG, "doInBackground: code" + response.code());
-                Log.d(TAG, "doInBackground: was successful: " + response.isSuccessful());
+                Timber.d("doInBackground: code %s", response.code());
                 if (!response.isSuccessful()) {
                     mSharedPreferences.edit()
                             .putBoolean("logged_in", false)
@@ -188,7 +193,8 @@ public class LoginActivity extends AppCompatActivity {
                         .putString("username", mUsername)
                         .apply();
                 String location = response.headers().get("Location");
-                Log.d(TAG, "doInBackground: location: " + location);
+                Timber.d("doInBackground: location: %s", location);
+                response.close();
 
                 if (location == null)
                     return false;
@@ -198,16 +204,16 @@ public class LoginActivity extends AppCompatActivity {
 
                 Response ticketResponse = mHTTPClient.newCall(ticketRequest).execute();
                 if (!ticketResponse.isSuccessful()) {
-                    Log.d(TAG, "doInBackground: Ticket response not successful");
+                    Timber.d("doInBackground: Ticket response not successful");
                     return false;
                 }
-                String ticket = ticketResponse.body().string().trim();
-                Log.d(TAG, "doInBackground: ticket: " + ticket);
-
+                ResponseBody body = ticketResponse.body();
+                String ticket = body.string().trim();
+                body.close();
                 mFavoritesRepository.updateFavoritesFromWeb(ticket);
 
             } catch (Exception e) {
-                Log.e(TAG, "doInBackground: http error", e);
+                Timber.e(e, "doInBackground: http error");
                 return false;
             }
 
@@ -220,8 +226,10 @@ public class LoginActivity extends AppCompatActivity {
             showProgress(false);
 
             if (success) {
+                mFirebaseAnalytics.logEvent(EventNames.LOGIN_SUCCEEDED, new Bundle());
                 finish();
             } else {
+                mFirebaseAnalytics.logEvent(EventNames.LOGIN_FAILED, new Bundle());
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
             }
