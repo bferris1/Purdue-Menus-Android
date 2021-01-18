@@ -10,6 +10,8 @@ import androidx.room.Room;
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
+import com.google.android.play.core.appupdate.AppUpdateManager;
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.moufee.purduemenus.api.DateTimeTypeAdapter;
 import com.moufee.purduemenus.api.LocalDateAdapter;
@@ -104,6 +106,12 @@ class AppModule {
     @Provides
     LocationDao provideLocationDao(AppDatabase appDatabase) {
         return appDatabase.locationDao();
+    }
+
+    @Singleton
+    @Provides
+    AppUpdateManager provideUpdateManager(Context context) {
+        return AppUpdateManagerFactory.create(context);
     }
 
 }

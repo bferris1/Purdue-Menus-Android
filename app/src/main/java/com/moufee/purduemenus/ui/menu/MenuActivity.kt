@@ -16,6 +16,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.work.*
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.install.InstallState
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.InstallStatus
+import com.google.android.play.core.install.model.UpdateAvailability
 import com.moufee.purduemenus.BuildConfig
 import com.moufee.purduemenus.R
 import com.moufee.purduemenus.api.DownloadWorker
@@ -36,11 +41,16 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+private const val IN_APP_UPDATE_REQUEST_CODE = 1
+
 class MenuActivity : AppCompatActivity(), HasAndroidInjector {
     private lateinit var mBinding: ActivityMenuDatePickerTimeBinding
     private val mMenuPagerAdapter: MenuPagerAdapter = MenuPagerAdapter(this)
     private lateinit var mViewModel: DailyMenuViewModel
     private lateinit var networkListener: NetworkAvailabilityListener
+
+
+    @Inject lateinit var appUpdateManager: AppUpdateManager
 
     @Inject
     lateinit var mSharedPreferences: SharedPreferences
@@ -110,6 +120,7 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
                 .setConstraints(constraints)
                 .build()
         workManager.enqueueUniquePeriodicWork("downloader", ExistingPeriodicWorkPolicy.KEEP, request)
+        checkForUpdate()
     }
 
     private fun displayChangelog() {
@@ -119,6 +130,67 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
             val changelogFragment: DialogFragment = ChangelogDialogFragment()
             changelogFragment.show(supportFragmentManager, "changelog")
             mSharedPreferences.edit().putBoolean(UPDATE_MESSAGE_KEY + versionCode, true).apply()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        appUpdateManager
+                .appUpdateInfo
+                .addOnSuccessListener { appUpdateInfo ->
+                    // If the update is downloaded but not installed,
+                    // notify the user to complete the update.
+                    if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
+                        popupSnackbarForCompleteUpdate()
+                    }
+                }
+    }
+
+    private fun checkForUpdate() {
+        // Create a listener to track request state updates.
+        val listener = { state: InstallState ->
+            // (Optional) Provide a download progress bar.
+            if (state.installStatus() == InstallStatus.DOWNLOADING) {
+//                val bytesDownloaded = state.bytesDownloaded()
+//                val totalBytesToDownload = state.totalBytesToDownload()
+                // Show update progress bar.
+            } else if (state.installStatus() == InstallStatus.DOWNLOADED) {
+                popupSnackbarForCompleteUpdate()
+            }
+        }
+
+        val appUpdateInfoTask = appUpdateManager.appUpdateInfo
+
+        appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)
+            ) {
+                // Request the update.
+                appUpdateManager.registerListener(listener)
+                appUpdateManager.startUpdateFlowForResult(appUpdateInfo, AppUpdateType.FLEXIBLE, this, IN_APP_UPDATE_REQUEST_CODE)
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == IN_APP_UPDATE_REQUEST_CODE) {
+            if (resultCode != RESULT_OK) {
+                // Log something
+                Timber.d("Update failed")
+            }
+        }
+    }
+
+    private fun popupSnackbarForCompleteUpdate() {
+        Snackbar.make(
+                mBinding.activityMenuCoordinatorLayout,
+                getString(R.string.update_downloaded_alert),
+                Snackbar.LENGTH_INDEFINITE
+        ).apply {
+            setAction(getString(R.string.update_downloaded_install)) { appUpdateManager.completeUpdate() }
+            setActionTextColor(resources.getColor(R.color.snackbarButtonColor))
+            show()
         }
     }
 

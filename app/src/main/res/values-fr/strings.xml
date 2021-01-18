@@ -55,4 +55,6 @@
     <string name="pref_title_hide_closed_locations">Cacher les lieux fermés</string>
     <string name="title_pref_dining_court_order">Gérer l\'ordre d\'affichage des emplacements</string>
     <string name="pref_summary_dining_court_order">Faites glisser et déposez pour personnaliser.</string>
+    <string name="update_downloaded_alert">Une mise à jour vient d\'être téléchargée</string>
+    <string name="update_downloaded_install">INSTALLER</string>
 </resources>

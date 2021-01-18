@@ -27,4 +27,6 @@
     <color name="vegetarian_green">#c8e6c9</color>
     <color name="accent_grey">#e0e0e0</color>
     <color name="separator_grey">#87b7b7b7</color>
+
+    <color name="snackbarButtonColor">@color/colorPrimary</color>
 </resources>
