@@ -30,7 +30,10 @@ import com.moufee.purduemenus.preferences.KEY_PREF_SHOW_FAVORITE_COUNT
 import com.moufee.purduemenus.repository.data.menus.DayMenu
 import com.moufee.purduemenus.repository.data.menus.DiningCourtMeal
 import com.moufee.purduemenus.ui.settings.SettingsActivity
-import com.moufee.purduemenus.util.*
+import com.moufee.purduemenus.util.DateTimeHelper
+import com.moufee.purduemenus.util.NetworkAvailabilityListener
+import com.moufee.purduemenus.util.Resource
+import com.moufee.purduemenus.util.UPDATE_MESSAGE_KEY
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -81,9 +84,8 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
             mMenuPagerAdapter.setMenus(sorted)
             Timber.d(sorted.toString())
         })
-        mViewModel.dayMenu.observe(this, { resource: Resource<DayMenu> ->
-            mBinding.menusResource = resource
-            if (resource.status == Status.ERROR && resource.data == null) {
+        mViewModel.dayMenu.observe(this, { result: Resource<DayMenu> ->
+            if (result is Resource.Error) {
                 Snackbar.make(mBinding.activityMenuCoordinatorLayout, getString(R.string.network_error_message), Snackbar.LENGTH_SHORT).show()
             }
         })

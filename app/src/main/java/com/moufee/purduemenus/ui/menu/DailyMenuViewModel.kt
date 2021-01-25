@@ -50,10 +50,12 @@ class DailyMenuViewModel @Inject constructor(private val mMenuRepository: MenuRe
             mMenuRepository.getMenus(date, locations)
         }
         selectedMenus = Transformations.map(combineLatest(dayMenu, selectedMeal)) { (menu, mealName) ->
-            if (mealName == "Late Lunch" && menu.data?.hasLateLunch == false) {
-                setSelectedMeal("Dinner")
-            }
-            menu.data?.meals?.get(mealName)
+            if (menu is Resource.Success) {
+                if (mealName == "Late Lunch" && menu.data.hasLateLunch.not()) {
+                    setSelectedMeal("Dinner")
+                }
+                menu.data.meals[mealName]
+            } else null
         }.let {
             Transformations.map(combineLatest(it, appPreferences)) { (meal, prefs) ->
                 if (prefs.hideClosedDiningCourts) meal?.openLocations ?: emptyMap() else meal?.locations ?: emptyMap()

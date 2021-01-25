@@ -4,18 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <import type="com.moufee.purduemenus.util.Resource" />
-
-        <import type="com.moufee.purduemenus.util.Status" />
 
         <variable
             name="viewModel"
             type="com.moufee.purduemenus.ui.menu.DailyMenuViewModel" />
-
-        <variable
-            name="menusResource"
-            type="com.moufee.purduemenus.util.Resource" />
 
         <variable
             name="showServingTimes"
@@ -127,7 +120,7 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/menu_tab_layout"
-                app:resource="@{menusResource}" />
+                visibleIfLoading="@{viewModel.dayMenu}" />
 
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/menu_view_pager"
@@ -137,7 +130,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/meal_button_layout"
                 app:layout_constraintTop_toBottomOf="@+id/menu_tab_layout"
-                app:visibleIfTrue="@{menusResource.data != null}"
+                app:visibleIfLoaded="@{viewModel.dayMenu}"
                 tools:context="com.moufee.purduemenus.ui.menu.MenuActivity" />
 
             <LinearLayout
@@ -164,7 +157,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:drawableTop="@drawable/ic_coffee_state"
-                    android:enabled="@{menusResource.data != null}"
+                    android:enabled="@{viewModel.dayMenu.isSuccess}"
                     android:onClick='@{() -> viewModel.setSelectedMeal("Breakfast")}'
                     android:text="@string/breakfast"
                     app:selected='@{viewModel.selectedMeal == "Breakfast"}'
@@ -177,7 +170,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:drawableTop="@drawable/ic_pizza_state"
-                    android:enabled="@{menusResource.data != null}"
+                    android:enabled="@{viewModel.dayMenu.isSuccess}"
                     android:onClick='@{() -> viewModel.setSelectedMeal("Lunch")}'
                     android:padding="0dp"
                     android:text="@string/lunch"
@@ -192,13 +185,13 @@
                     android:layout_weight="1"
                     android:drawableTop="@drawable/ic_food_apple_state"
                     android:drawablePadding="0dp"
-                    android:enabled="@{menusResource.data != null}"
+                    android:enabled="@{viewModel.dayMenu.isSuccess}"
                     android:includeFontPadding="false"
                     android:onClick='@{() -> viewModel.setSelectedMeal("Late Lunch")}'
                     android:padding="0dp"
                     android:text="@string/late_lunch"
                     app:selected='@{viewModel.selectedMeal == "Late Lunch"}'
-                    app:visibleIfTrue="@{viewModel.dayMenu.data.hasLateLunch}"
+                    app:visibleIfTrue="@{viewModel.dayMenu.asSuccess().data.hasLateLunch}"
                     tools:text="Late Lunch"
                     tools:visibility="visible" />
 
@@ -209,7 +202,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:drawableTop="@drawable/ic_hamburger_state"
-                    android:enabled="@{menusResource.data != null}"
+                    android:enabled="@{viewModel.dayMenu.isSuccess}"
                     android:onClick='@{() -> viewModel.setSelectedMeal("Dinner")}'
                     android:text="@string/dinner"
                     app:selected='@{viewModel.selectedMeal == "Dinner"}'

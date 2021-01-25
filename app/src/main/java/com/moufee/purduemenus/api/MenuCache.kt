@@ -5,7 +5,6 @@ import com.moufee.purduemenus.repository.data.menus.DayMenu
 import com.squareup.moshi.Moshi
 import org.joda.time.LocalDate
 import org.joda.time.format.DateTimeFormat
-import timber.log.Timber
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter

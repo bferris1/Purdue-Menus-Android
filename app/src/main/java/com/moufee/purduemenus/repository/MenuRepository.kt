@@ -60,23 +60,24 @@ constructor(private val mWebservice: Webservice,
             try {
                 fullMenu = menuCache.get(dateTime)
                 if (fullMenu != null) {
-                    emit(Resource.success(fullMenu))
+                    emit(Resource.Success(fullMenu))
                     Timber.d("getFullMenu: Read from file!")
                 } else {
                     Timber.d("Could not read from file")
-                    emit(Resource.loading<DayMenu>(null))
+                    emit(Resource.Loading)
                 }
             } catch (t: Throwable) {
-                emit(Resource.loading<DayMenu>(null))
+                emit(Resource.Loading)
                 Timber.e(t)
             }
             try {
                 fullMenu = menuDownloader.getMenus(dateTime, locations).toDayMenu(dateTime)
-                emit(Resource.success(fullMenu))
+                emit(Resource.Success(fullMenu))
                 menuCache.put(fullMenu)
             } catch (t: Throwable) {
                 Timber.e(t)
-                emit(Resource.error("Network Error", fullMenu))
+                if (fullMenu == null)
+                    emit(Resource.Error(t as Exception))
             }
 
         }
