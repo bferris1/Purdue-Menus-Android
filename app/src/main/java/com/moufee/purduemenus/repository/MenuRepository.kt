@@ -7,8 +7,8 @@ import com.moufee.purduemenus.api.MenuCache
 import com.moufee.purduemenus.api.MenuDownloader
 import com.moufee.purduemenus.api.Webservice
 import com.moufee.purduemenus.api.models.ApiDiningCourtMenu
+import com.moufee.purduemenus.api.models.ApiMenuItem
 import com.moufee.purduemenus.api.models.ApiStation
-import com.moufee.purduemenus.api.models.MenuItem
 import com.moufee.purduemenus.db.LocationDao
 import com.moufee.purduemenus.repository.data.menus.*
 import com.moufee.purduemenus.util.AppExecutors
@@ -22,7 +22,6 @@ import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.EmptyCoroutineContext
-
 
 /**
  * Created by Ben on 22/07/2017.
@@ -137,4 +136,4 @@ fun List<ApiDiningCourtMenu>.toDayMenu(dateTime: LocalDate): DayMenu {
 
 fun List<ApiStation>.toEntity() = map { Station(it.Name, it.Items.map { item -> item.toEntity() }) }
 
-fun MenuItem.toEntity() = MenuItem(Name, IsVegetarian, ID)
+fun ApiMenuItem.toEntity() = MenuItem(Name, IsVegetarian, ID)

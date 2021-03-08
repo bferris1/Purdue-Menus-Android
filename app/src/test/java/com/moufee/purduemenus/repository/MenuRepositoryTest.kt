@@ -10,7 +10,7 @@ class MenuRepositoryTest {
 
 
     @Test fun testApiToMealMenu() {
-        val station = ApiStation("PB Road", listOf(MenuItem("132", "Some Food", true, emptyList())))
+        val station = ApiStation("PB Road", listOf(ApiMenuItem("132", "Some Food", true, emptyList())))
         val apiMenu = ApiDiningCourtMenu(
                 Location = "Ford",
                 Date = LocalDate.now(),

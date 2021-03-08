@@ -17,7 +17,7 @@ import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.junit.MockitoJUnitRunner
 
-val station = ApiStation("PB Road", listOf(MenuItem("132", "Some Food", true, emptyList())))
+val station = ApiStation("PB Road", listOf(ApiMenuItem("132", "Some Food", true, emptyList())))
 val apiMenu = ApiDiningCourtMenu(
         Location = "Ford",
         Date = LocalDate.now(),
