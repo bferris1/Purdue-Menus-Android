@@ -1,30 +1,24 @@
-package com.moufee.purduemenus.di;
+package com.moufee.purduemenus.di
 
-import android.app.Application;
-
-import com.moufee.purduemenus.MenusApp;
-
-import javax.inject.Singleton;
-
-import dagger.BindsInstance;
-import dagger.Component;
-import dagger.android.support.AndroidSupportInjectionModule;
+import android.app.Application
+import com.moufee.purduemenus.MenusApp
+import dagger.BindsInstance
+import dagger.Component
+import dagger.android.support.AndroidSupportInjectionModule
+import javax.inject.Singleton
 
 /**
  * Defines where dependency injection may be performed
  */
 @Singleton
-@Component(modules = {AndroidSupportInjectionModule.class, AppModule.class, ActivityModule.class, WorkerModule.class})
-public interface AppComponent {
-
+@Component(modules = [AndroidSupportInjectionModule::class, AppModule::class, ActivityModule::class, WorkerModule::class])
+interface AppComponent {
     @Component.Builder
     interface Builder {
         @BindsInstance
-        Builder application(Application application);
-
-        AppComponent build();
+        fun application(application: Application): Builder
+        fun build(): AppComponent
     }
 
-    void inject(MenusApp app);
-
+    fun inject(app: MenusApp)
 }

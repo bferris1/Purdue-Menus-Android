@@ -1,24 +1,22 @@
-package com.moufee.purduemenus.di;
+package com.moufee.purduemenus.di
 
-import com.moufee.purduemenus.ui.menu.MenuItemListFragment;
-import com.moufee.purduemenus.ui.settings.CustomOrderFragment;
-import com.moufee.purduemenus.ui.settings.SettingsFragment;
-
-import dagger.Module;
-import dagger.android.ContributesAndroidInjector;
+import com.moufee.purduemenus.ui.menu.MenuItemListFragment
+import com.moufee.purduemenus.ui.settings.CustomOrderFragment
+import com.moufee.purduemenus.ui.settings.SettingsFragment
+import dagger.Module
+import dagger.android.ContributesAndroidInjector
 
 /**
  * Defines the Fragments that may be injected
  */
-
 @Module
-public abstract class FragmentBuildersModule {
+abstract class FragmentBuildersModule {
     @ContributesAndroidInjector
-    abstract MenuItemListFragment contributeMenuItemListFragment();
+    abstract fun contributeMenuItemListFragment(): MenuItemListFragment?
 
     @ContributesAndroidInjector
-    abstract CustomOrderFragment contributeCustomOrderFragment();
+    abstract fun contributeCustomOrderFragment(): CustomOrderFragment?
 
     @ContributesAndroidInjector
-    abstract SettingsFragment contributeSettingsFragment();
+    abstract fun contributeSettingsFragment(): SettingsFragment?
 }
