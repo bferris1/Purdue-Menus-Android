@@ -18,11 +18,11 @@ class LoginViewModel @Inject constructor(private val authenticationRepository: A
 
     fun loginTapped(username: String?, password: String?) {
         if (username.isNullOrBlank()) {
-            _loginState.value = _loginState.value?.copy(emailError = R.string.error_field_required)
+            _loginState.value = LoginState(emailError = R.string.error_field_required)
             return
         }
         if (password.isNullOrBlank()) {
-            _loginState.value = _loginState.value?.copy(passwordError = R.string.error_field_required)
+            _loginState.value = LoginState(passwordError = R.string.error_field_required)
             return
         }
         _loginState.value = LoginState(isLoading = true)
