@@ -3,7 +3,7 @@ package com.moufee.purduemenus
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.runner.AndroidJUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.moufee.purduemenus.db.AppDatabase
 import com.moufee.purduemenus.db.FavoriteDao
 import com.moufee.purduemenus.db.LocationDao
@@ -21,7 +21,7 @@ import java.io.IOException
 class DatabaseTest {
     private lateinit var favoriteDao: FavoriteDao
     private lateinit var locationDao: LocationDao
-    private lateinit var db: com.moufee.purduemenus.db.AppDatabase
+    private lateinit var db: AppDatabase
 
     @Before
     fun createDb() {
@@ -43,7 +43,7 @@ class DatabaseTest {
     fun writeFavoriteAndQuery() {
         val favorite = Favorite("Salad", "12345", "54321", true)
         favoriteDao.insertFavorites(favorite)
-        val byId = favoriteDao.getFavoriteByItemId("54321")
+        val byId = favoriteDao.getFavoriteByItemId("54321")!!
         assertThat(byId.itemName, equalTo("Salad"))
         assertThat(byId.favoriteId, equalTo("12345"))
         assertThat(byId.itemName, equalTo("Salad"))

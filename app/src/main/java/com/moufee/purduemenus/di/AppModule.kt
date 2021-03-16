@@ -103,5 +103,5 @@ internal class AppModule {
 
     @Singleton
     @Provides
-    fun provideUpdateManager(context: Context?): AppUpdateManager = AppUpdateManagerFactory.create(context)
+    fun provideUpdateManager(context: Context): AppUpdateManager = AppUpdateManagerFactory.create(context)
 }
