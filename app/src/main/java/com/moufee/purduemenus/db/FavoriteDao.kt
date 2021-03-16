@@ -1,42 +1,25 @@
-package com.moufee.purduemenus.db;
+package com.moufee.purduemenus.db
 
-import androidx.lifecycle.LiveData;
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
-import androidx.room.Query;
+import androidx.lifecycle.LiveData
+import androidx.room.*
+import com.moufee.purduemenus.repository.data.menus.Favorite
 
-import com.moufee.purduemenus.repository.data.menus.Favorite;
+@Dao interface FavoriteDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insertFavorites(favorites: List<Favorite>)
 
-import java.util.List;
+    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insertFavorites(vararg favorites: Favorite)
 
-@Dao
-public interface FavoriteDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public void insertFavorites(List<Favorite> favorites);
+    @Query("SELECT * FROM favorite") fun loadAllFavorites(): LiveData<List<Favorite>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public void insertFavorites(Favorite... favorites);
+    @Query("SELECT * FROM favorite") fun getAllFavorites(): List<Favorite>
 
-    @Query("SELECT * FROM favorite")
-    public LiveData<List<Favorite>> loadAllFavorites();
+    @Query("SELECT itemId FROM favorite") fun getFavoriteIDs(): LiveData<List<String>>
 
-    @Query("SELECT * FROM favorite")
-    public List<Favorite> getAllFavorites();
+    @Query("SELECT * FROM favorite WHERE itemId = :itemID LIMIT 1") fun getFavoriteByItemId(itemID: String): Favorite?
 
-    @Query("SELECT itemId FROM favorite")
-    public LiveData<List<String>> getFavoriteIDs();
+    @Query("DELETE FROM favorite WHERE itemId = :itemID") fun deleteByItemID(itemID: String)
 
-    @Query("SELECT * FROM favorite WHERE itemId = :itemID LIMIT 1")
-    public Favorite getFavoriteByItemId(String itemID);
+    @Delete fun deleteFavorites(vararg favorites: Favorite)
 
-    @Query("DELETE FROM favorite WHERE itemId = :itemID")
-    public void deleteByItemID(String itemID);
-
-    @Delete
-    public void deleteFavorites(Favorite... favorites);
-
-    @Query("DELETE FROM favorite")
-    public void deleteAll();
+    @Query("DELETE FROM favorite") fun deleteAll()
 }
