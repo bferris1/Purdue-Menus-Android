@@ -1,6 +1,6 @@
 package com.moufee.purduemenus.di
 
-import com.moufee.purduemenus.api.DownloadWorker
+import com.moufee.purduemenus.workers.DownloadWorker
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap

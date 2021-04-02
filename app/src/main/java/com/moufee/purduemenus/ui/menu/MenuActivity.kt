@@ -23,7 +23,6 @@ import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.moufee.purduemenus.BuildConfig
 import com.moufee.purduemenus.R
-import com.moufee.purduemenus.api.DownloadWorker
 import com.moufee.purduemenus.databinding.ActivityMenuDatePickerTimeBinding
 import com.moufee.purduemenus.preferences.KEY_PREF_DINING_COURT_ORDER
 import com.moufee.purduemenus.preferences.KEY_PREF_SHOW_FAVORITE_COUNT
@@ -34,6 +33,7 @@ import com.moufee.purduemenus.util.DateTimeHelper
 import com.moufee.purduemenus.util.NetworkAvailabilityListener
 import com.moufee.purduemenus.util.Resource
 import com.moufee.purduemenus.util.UPDATE_MESSAGE_KEY
+import com.moufee.purduemenus.workers.DownloadWorker
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
