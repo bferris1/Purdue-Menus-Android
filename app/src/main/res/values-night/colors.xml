@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#424242</color>
-    <color name="colorPrimaryDark">#212121</color>
-    <color name="headerColor">@color/colorSecondaryDark</color>
-    <color name="colorPrimaryLight">#fff350</color>
-    <color name="colorSecondary">#ffc107</color>
-    <color name="colorSecondaryDark">#ffa000</color>
-    <color name="colorSecondaryLight">#fff350</color>
-    <color name="colorTextPrimary">#000000</color>
-    <color name="colorTextSecondary">#FFFFFF</color>
-    <color name="colorAccent">#ffc400</color>
-    <color name="separator_grey">#2d2b2b</color>
-
-    <color name="snackbarButtonColor">@color/colorSecondaryDark</color>
+<!--    <color name="primary_night">#424242</color>-->
+<!--    <color name="colorPrimaryDark">#212121</color>-->
+    <color name="headerColor">@color/primary_dark_amber</color>
+<!--    <color name="colorPrimaryLight">#fff350</color>-->
+<!--    <color name="colorSecondary">#ffc107</color>-->
+<!--    <color name="colorSecondaryDark">#ffa000</color>-->
+<!--    <color name="colorSecondaryLight">#fff350</color>-->
+<!--    <color name="colorTextPrimary">#000000</color>-->
+<!--    <color name="colorTextSecondary">#FFFFFF</color>-->
+<!--    <color name="colorAccent">#ffc400</color>-->
+    <color name="tab_indicator_color">@color/primary_dark_amber</color>
+<!--    <color name="separator_grey">#2d2b2b</color>-->
+    <color name="snackbarButtonColor">@color/primary_dark_amber</color>
 </resources>

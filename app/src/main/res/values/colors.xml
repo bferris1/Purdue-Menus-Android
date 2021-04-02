@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#ffc107</color>
-    <color name="colorPrimaryDark">#ffa000</color>
-    <color name="headerColor">@color/colorPrimaryDark</color>
-    <color name="colorPrimaryLight">#fff350</color>
-    <color name="colorSecondary">#455a64</color>
-    <color name="colorSecondaryDark">#1c313a</color>
-    <color name="colorSecondaryLight">#718792</color>
-    <color name="colorTextPrimary">#000000</color>
-    <color name="colorTextSecondary">#FFFFFF</color>
-    <color name="colorAccent">#ffc400</color>
+    <color name="primary_amber">#ffc107</color>
+    <color name="primary_dark_amber">#ffa000</color>
+    <color name="headerColor">@color/primary_dark_amber</color>
+    <color name="primary_amber_light">#fff350</color>
+    <color name="secondary_navy">#455a64</color>
+    <color name="secondary_navy_dark">#1c313a</color>
+    <color name="secondary_navy_light">#718792</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="amber_accent">#ffc400</color>
     <color name="red">#e53935</color>
 
     <color name="purdueGold">#b1810b</color>
@@ -24,9 +24,21 @@
     <color name="purdueGoldMaterial">#9e9d24</color>
     <color name="colorAccentMaterial">#ffab40</color>
     <color name="purdueDarkGoldMaterial">#827717</color>
-    <color name="vegetarian_green">#c8e6c9</color>
     <color name="accent_grey">#e0e0e0</color>
     <color name="separator_grey">#87b7b7b7</color>
 
-    <color name="snackbarButtonColor">@color/colorPrimary</color>
+
+    <color name="primary_night">#424242</color>
+    <color name="primary_night_dark">#212121</color>
+    <color name="secondary_night">#ffc107</color>
+    <color name="secondary_night_dark">#ffa000</color>
+    <color name="colorSecondaryLight">#fff350</color>
+    <color name="colorTextPrimary">#000000</color>
+    <color name="colorTextSecondary">#FFFFFF</color>
+    <color name="colorAccent">#ffc400</color>
+    <color name="night_navy_background">#303030</color>
+
+    <color name="tab_indicator_color">@color/secondary_navy_dark</color>
+
+    <color name="snackbarButtonColor">@color/primary_amber</color>
 </resources>
