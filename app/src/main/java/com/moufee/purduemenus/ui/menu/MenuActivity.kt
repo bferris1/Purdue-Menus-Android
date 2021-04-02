@@ -3,7 +3,6 @@ package com.moufee.purduemenus.ui.menu
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
@@ -24,7 +23,6 @@ import com.google.android.play.core.install.model.UpdateAvailability
 import com.moufee.purduemenus.BuildConfig
 import com.moufee.purduemenus.R
 import com.moufee.purduemenus.databinding.ActivityMenuDatePickerTimeBinding
-import com.moufee.purduemenus.preferences.KEY_PREF_DINING_COURT_ORDER
 import com.moufee.purduemenus.preferences.KEY_PREF_SHOW_FAVORITE_COUNT
 import com.moufee.purduemenus.repository.data.menus.DayMenu
 import com.moufee.purduemenus.repository.data.menus.DiningCourtMeal
@@ -63,11 +61,6 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
 
     @Inject
     lateinit var mViewModelFactory: ViewModelProvider.Factory
-    private val mSharedPreferenceChangeListener = OnSharedPreferenceChangeListener { _, key ->
-        when (key) {
-            KEY_PREF_DINING_COURT_ORDER -> mViewModel.setDate(mViewModel.currentDate.value!!)
-        }
-    }
 
     override fun androidInjector(): AndroidInjector<Any> {
         return mDispatchingAndroidInjector
@@ -104,7 +97,6 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
         mBinding.lifecycleOwner = this
         mViewModel = ViewModelProvider(this, mViewModelFactory).get(DailyMenuViewModel::class.java)
         mBinding.viewModel = mViewModel
-        mSharedPreferences.registerOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener)
         val tabLayout = mBinding.menuTabLayout
         val toolbar = mBinding.mainToolbar
         setSupportActionBar(toolbar)
@@ -224,8 +216,4 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
         }
     }
 
-    override fun onDestroy() {
-        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener)
-        super.onDestroy()
-    }
 }
