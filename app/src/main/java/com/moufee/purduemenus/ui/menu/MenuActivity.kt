@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
@@ -183,7 +184,7 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
                 Snackbar.LENGTH_INDEFINITE
         ).apply {
             setAction(getString(R.string.update_downloaded_install)) { appUpdateManager.completeUpdate() }
-            setActionTextColor(resources.getColor(R.color.snackbarButtonColor))
+            setActionTextColor(ResourcesCompat.getColor(resources, R.color.snackbarButtonColor, context.theme))
             show()
         }
     }
