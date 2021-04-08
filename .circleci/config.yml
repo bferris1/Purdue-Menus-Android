@@ -21,10 +21,13 @@ jobs:
             echo keyPassword=$keyPassword >> keystore.properties
             echo storePassword=$storePassword >> keystore.properties
       - run:
-          name: Assemble Debug
+          name: Run Tests
           command: ./gradlew clean check assembleDebug
       - run:
-          name: Assemble Release
+          name: Build Debug
+          command: ./gradlew assembleDebug
+      - run:
+          name: Build Release
           command: ./gradlew assembleRelease bundleRelease
       - android/start-emulator-and-run-tests:
           system-image: system-images;android-29;default;x86
@@ -34,3 +37,5 @@ jobs:
       - store_artifacts:
           path: app/build/outputs/bundle
           destination: bundle
+      - store_test_results:
+          path: app/build/test-results
