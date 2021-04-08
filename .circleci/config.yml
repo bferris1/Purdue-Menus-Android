@@ -7,7 +7,6 @@ jobs:
   build:
     executor:
       name: android/android-machine
-      sdk-version: "29"
 
     steps:
       - checkout
