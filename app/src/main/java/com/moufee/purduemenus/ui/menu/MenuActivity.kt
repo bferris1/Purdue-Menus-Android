@@ -33,10 +33,7 @@ import com.moufee.purduemenus.util.NetworkAvailabilityListener
 import com.moufee.purduemenus.util.Resource
 import com.moufee.purduemenus.util.UPDATE_MESSAGE_KEY
 import com.moufee.purduemenus.workers.DownloadWorker
-import dagger.android.AndroidInjection
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasAndroidInjector
+import dagger.hilt.android.AndroidEntryPoint
 import org.joda.time.LocalDate
 import timber.log.Timber
 import java.util.*
@@ -44,8 +41,8 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 private const val IN_APP_UPDATE_REQUEST_CODE = 1
-
-class MenuActivity : AppCompatActivity(), HasAndroidInjector {
+@AndroidEntryPoint
+class MenuActivity : AppCompatActivity() {
     private lateinit var mBinding: ActivityMenuDatePickerTimeBinding
     private val mMenuPagerAdapter: MenuPagerAdapter = MenuPagerAdapter(this)
     private lateinit var mViewModel: DailyMenuViewModel
@@ -56,16 +53,6 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
 
     @Inject
     lateinit var mSharedPreferences: SharedPreferences
-
-    @Inject
-    lateinit var mDispatchingAndroidInjector: DispatchingAndroidInjector<Any>
-
-    @Inject
-    lateinit var mViewModelFactory: ViewModelProvider.Factory
-
-    override fun androidInjector(): AndroidInjector<Any> {
-        return mDispatchingAndroidInjector
-    }
 
     private fun setListeners() {
         mViewModel.currentDate.observe(this,
@@ -91,12 +78,11 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         title = getString(R.string.app_name)
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_menu_date_picker_time)
         mBinding.lifecycleOwner = this
-        mViewModel = ViewModelProvider(this, mViewModelFactory).get(DailyMenuViewModel::class.java)
+        mViewModel = ViewModelProvider(this).get(DailyMenuViewModel::class.java)
         mBinding.viewModel = mViewModel
         val tabLayout = mBinding.menuTabLayout
         val toolbar = mBinding.mainToolbar

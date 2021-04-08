@@ -14,13 +14,14 @@ import com.moufee.purduemenus.R
 import com.moufee.purduemenus.analytics.EventNames
 import com.moufee.purduemenus.databinding.ActivityLoginBinding
 import com.moufee.purduemenus.repository.FavoritesRepository
-import dagger.android.AndroidInjection
+import dagger.hilt.android.AndroidEntryPoint
 import okhttp3.OkHttpClient
 import javax.inject.Inject
 
 /**
  * A login screen that offers login via username/password.
  */
+@AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
     private lateinit var viewModel: LoginViewModel
     private lateinit var binding: ActivityLoginBinding
@@ -37,13 +38,10 @@ class LoginActivity : AppCompatActivity() {
     @Inject
     lateinit var mFirebaseAnalytics: FirebaseAnalytics
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(LoginViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
         viewModel.loginState.observe(this) { loginState ->
             binding.username.error = loginState.emailError?.let { resources.getString(it) }
             binding.password.error = loginState.passwordError?.let { resources.getString(it) }

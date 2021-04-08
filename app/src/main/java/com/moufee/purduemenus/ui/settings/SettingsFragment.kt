@@ -1,6 +1,5 @@
 package com.moufee.purduemenus.ui.settings
 
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
@@ -16,13 +15,13 @@ import com.moufee.purduemenus.R
 import com.moufee.purduemenus.preferences.*
 import com.moufee.purduemenus.repository.FavoritesRepository
 import com.moufee.purduemenus.ui.login.LoginActivity
-import dagger.android.support.AndroidSupportInjection
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 /**
  * Displays preferences for the app
  */
-
+@AndroidEntryPoint
 class SettingsFragment : PreferenceFragmentCompat(), OnSharedPreferenceChangeListener {
     @Inject
     lateinit var mSharedPreferences: SharedPreferences
@@ -32,10 +31,6 @@ class SettingsFragment : PreferenceFragmentCompat(), OnSharedPreferenceChangeLis
     private var mLoginPref: Preference? = null
     private var mPrivacyPolicyPref: Preference? = null
 
-    override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
-    }
 
     override fun onDestroy() {
         super.onDestroy()
