@@ -22,10 +22,11 @@ class MenusApp : Application(), Configuration.Provider {
     @Inject
     lateinit var mSharedPreferences: SharedPreferences
 
-    @JvmField @Inject
-    var mWorkerFactory: MenusWorkerFactory? = null
+    @Inject
+    lateinit var mWorkerFactory: MenusWorkerFactory
+
     override fun getWorkManagerConfiguration(): Configuration {
-        return Configuration.Builder().setWorkerFactory(mWorkerFactory!!).build()
+        return Configuration.Builder().setWorkerFactory(mWorkerFactory).build()
     }
 
     override fun onCreate() {
