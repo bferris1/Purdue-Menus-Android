@@ -10,24 +10,20 @@ import androidx.fragment.app.Fragment
 import com.moufee.purduemenus.preferences.KEY_PREF_USE_NIGHT_MODE
 import com.moufee.purduemenus.repository.FavoritesRepository
 import com.moufee.purduemenus.util.SingleFragmentActivity
-import dagger.android.AndroidInjection
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasAndroidInjector
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 /**
  * Settings Activity
  */
-class SettingsActivity : SingleFragmentActivity(), OnSharedPreferenceChangeListener, HasAndroidInjector {
+@AndroidEntryPoint
+class SettingsActivity : SingleFragmentActivity(), OnSharedPreferenceChangeListener {
     @Inject
     lateinit var sharedPreferences: SharedPreferences
 
     @Inject
     lateinit var mFavoritesRepository: FavoritesRepository
 
-    @Inject
-    lateinit var mDispatchingAndroidInjector: DispatchingAndroidInjector<Any>
 
     override fun recreate() {
         finish()
@@ -37,7 +33,6 @@ class SettingsActivity : SingleFragmentActivity(), OnSharedPreferenceChangeListe
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
     }
 
@@ -63,10 +58,6 @@ class SettingsActivity : SingleFragmentActivity(), OnSharedPreferenceChangeListe
                 "mode_auto" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
             }
         }
-    }
-
-    override fun androidInjector(): AndroidInjector<Any> {
-        return mDispatchingAndroidInjector
     }
 
     companion object {

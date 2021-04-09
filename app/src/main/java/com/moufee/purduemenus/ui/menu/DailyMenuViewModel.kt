@@ -14,12 +14,14 @@ import com.moufee.purduemenus.repository.data.menus.Location
 import com.moufee.purduemenus.util.DateTimeHelper
 import com.moufee.purduemenus.util.Resource
 import com.moufee.purduemenus.util.combineLatest
+import dagger.hilt.android.lifecycle.HiltViewModel
 import org.joda.time.LocalDate
 import javax.inject.Inject
 
 /**
  * A ViewModel representing all the dining menus for one day.
  */
+@HiltViewModel
 class DailyMenuViewModel @Inject constructor(private val mMenuRepository: MenuRepository,
                                              private val preferenceManager: AppPreferenceManager,
                                              mFavoritesRepository: FavoritesRepository) : ViewModel() {

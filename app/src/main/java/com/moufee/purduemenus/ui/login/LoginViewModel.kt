@@ -8,9 +8,10 @@ import androidx.lifecycle.viewModelScope
 import com.moufee.purduemenus.R
 import com.moufee.purduemenus.repository.AuthenticationRepository
 import com.moufee.purduemenus.repository.FavoritesRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
+@HiltViewModel
 class LoginViewModel @Inject constructor(private val authenticationRepository: AuthenticationRepository, private val favoritesRepository: FavoritesRepository) :
         ViewModel() {
     private val _loginState = MutableLiveData(LoginState())

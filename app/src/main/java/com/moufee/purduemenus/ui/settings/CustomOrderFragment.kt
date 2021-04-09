@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import com.moufee.purduemenus.R
 import com.moufee.purduemenus.repository.MenuRepository
 import com.moufee.purduemenus.repository.data.menus.Location
-import dagger.android.support.AndroidSupportInjection
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -26,15 +26,12 @@ import javax.inject.Inject
  * create an instance of this fragment.
  *
  */
-
+@AndroidEntryPoint
 class CustomOrderFragment : androidx.fragment.app.Fragment() {
     private lateinit var mAdapter: DiningCourtOrderAdapter
 
     @Inject
     lateinit var mSharedPreferences: SharedPreferences
-
-    @Inject
-    lateinit var mViewModelFactory: ViewModelProvider.Factory
 
     lateinit var mViewModel: LocationSettingsViewModel
 
@@ -108,11 +105,10 @@ class CustomOrderFragment : androidx.fragment.app.Fragment() {
     }
 
     override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
-        if (context is FragmentActivity) {
-            mViewModel = ViewModelProvider(context, mViewModelFactory).get((LocationSettingsViewModel::class.java))
-        }
         super.onAttach(context)
+        if (context is FragmentActivity) {
+            mViewModel = ViewModelProvider(context).get((LocationSettingsViewModel::class.java))
+        }
 
     }
 

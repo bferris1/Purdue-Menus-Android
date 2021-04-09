@@ -17,7 +17,7 @@ import com.moufee.purduemenus.databinding.FragmentMenuitemListBinding
 import com.moufee.purduemenus.repository.FavoritesRepository
 import com.moufee.purduemenus.repository.data.menus.DiningCourtMeal
 import com.moufee.purduemenus.repository.data.menus.MenuItem
-import dagger.android.support.AndroidSupportInjection
+import dagger.hilt.android.AndroidEntryPoint
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import timber.log.Timber
@@ -28,6 +28,7 @@ import javax.inject.Inject
  *
  *
  */
+@AndroidEntryPoint
 class MenuItemListFragment
 /**
  * Mandatory empty constructor for the fragment manager to instantiate the
@@ -41,9 +42,6 @@ class MenuItemListFragment
     private var mDataBoundAdapter: MenuRecyclerViewAdapter = MenuRecyclerViewAdapter((this))
     private lateinit var mViewModel: DailyMenuViewModel
     private lateinit var binding: FragmentMenuitemListBinding
-
-    @Inject
-    lateinit var mViewModelFactory: ViewModelProvider.Factory
 
     @Inject
     lateinit var mFavoritesRepository: FavoritesRepository
@@ -104,10 +102,9 @@ class MenuItemListFragment
     }
 
     override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
         super.onAttach(context)
         if (context is AppCompatActivity) {
-            mViewModel = ViewModelProvider(context, mViewModelFactory).get(DailyMenuViewModel::class.java)
+            mViewModel = ViewModelProvider(context).get(DailyMenuViewModel::class.java)
             setListener()
         }
     }
