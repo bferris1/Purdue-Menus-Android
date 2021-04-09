@@ -38,7 +38,7 @@ jobs:
           command: ./gradlew assembleRelease bundleRelease
       - when:
           condition:
-            equal: [develop, << pipeline.git.branch >>]
+            equal: [circle_android_tests, << pipeline.git.branch >>]
           steps:
             - android/start-emulator-and-run-tests:
                 system-image: system-images;android-29;default;x86
