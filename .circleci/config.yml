@@ -2,15 +2,9 @@ version: 2.1
 
 orbs:
   android: circleci/android@1.0.3
-
-jobs:
-  build:
-    executor:
-      name: android/android-machine
-      resource-class: medium
-
+commands:
+  checkout_secrets:
     steps:
-      - checkout
       - run:
           name: Checkout Secrets
           command: |
@@ -20,15 +14,33 @@ jobs:
             echo keyAlias=$keyAlias > keystore.properties
             echo keyPassword=$keyPassword >> keystore.properties
             echo storePassword=$storePassword >> keystore.properties
+
+
+jobs:
+  build:
+    executor:
+      name: android/android-machine
+      resource-class: medium
+
+    steps:
+      - checkout
+      - checkout_secrets
+      - android/restore-gradle-cache:
+          cache-prefix: v1
+      - run:
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
       - run:
           name: Run Tests
-          command: ./gradlew clean check assembleDebug
+          command: ./gradlew test
       - run:
           name: Build Debug
           command: ./gradlew assembleDebug
       - run:
           name: Build Release
           command: ./gradlew assembleRelease bundleRelease
+      - android/save-gradle-cache:
+          cache-prefix: v1
       - android/start-emulator-and-run-tests:
           system-image: system-images;android-29;default;x86
       - store_artifacts:
