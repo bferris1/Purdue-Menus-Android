@@ -28,9 +28,6 @@ jobs:
       - android/restore-gradle-cache:
           cache-prefix: v1
       - run:
-          name: Download Dependencies
-          command: ./gradlew androidDependencies
-      - run:
           name: Run Tests
           command: ./gradlew test
       - run:
