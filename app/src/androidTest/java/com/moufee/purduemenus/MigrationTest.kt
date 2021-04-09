@@ -4,9 +4,8 @@ import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.common.truth.Truth.assertThat
 import com.moufee.purduemenus.db.AppDatabase
-import org.hamcrest.Matchers
-import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,21 +36,19 @@ class MigrationTest {
         // but you need to validate that the data was migrated properly.
         val result = db.query("SELECT * FROM favorite")
         result.moveToFirst()
-        Assert.assertThat(result.getString(0), Matchers.equalTo("My Great Food"))
-        Assert.assertThat(result.getString(1), Matchers.equalTo("123"))
-        Assert.assertThat(result.getString(2), Matchers.equalTo("321"))
-        Assert.assertThat(result.getInt(3), Matchers.equalTo(1))
+        assertThat(result.getString(0)).isEqualTo("My Great Food")
+        assertThat(result.getString(1)).isEqualTo("123")
+        assertThat(result.getString(2)).isEqualTo("321")
+        assertThat(result.getInt(3)).isEqualTo(1)
     }
 
     @Test
     @Throws(IOException::class)
     fun migrate2To3() {
-        var db = helper.createDatabase(TEST_DB, 2)
-        // Re-open the database with version 2 and provide
-        // MIGRATION_1_2 as the migration process.
-        db = helper.runMigrationsAndValidate(TEST_DB, 3, true, AppDatabase.MIGRATION_2_3)
+        helper.createDatabase(TEST_DB, 2)
+        helper.runMigrationsAndValidate(TEST_DB, 3, true, AppDatabase.MIGRATION_2_3)
         // MigrationTestHelper automatically verifies the schema changes,
-        // but you need to validate that the data was migrated properly.
+        // This migration just creates a new table, so no data validation needed
     }
 
     companion object {
