@@ -38,13 +38,12 @@ jobs:
           command: ./gradlew assembleRelease bundleRelease
       - when:
           condition:
-            equal: [develop, pipeline.git.branch]
+            equal: [develop, << pipeline.git.branch >>]
           steps:
             - android/start-emulator-and-run-tests:
                 system-image: system-images;android-29;default;x86
                 restore-gradle-cache-post-emulator-launch: false
                 save-gradle-cache: false
-
       - android/save-gradle-cache:
           cache-prefix: v1
       - store_artifacts:
