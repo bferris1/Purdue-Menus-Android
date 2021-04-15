@@ -1,112 +1,78 @@
-package com.moufee.purduemenus.repository;
+package com.moufee.purduemenus.repository
 
-import android.content.SharedPreferences;
-
-import androidx.annotation.Nullable;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Transformations;
-
-import com.moufee.purduemenus.api.AuthenticatedAPITask;
-import com.moufee.purduemenus.api.UpdateFavoritesTask;
-import com.moufee.purduemenus.api.Webservice;
-import com.moufee.purduemenus.db.FavoriteDao;
-import com.moufee.purduemenus.repository.data.menus.Favorite;
-import com.moufee.purduemenus.repository.data.menus.MenuItem;
-import com.moufee.purduemenus.util.AppExecutors;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.inject.Inject;
-
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Response;
-import timber.log.Timber;
+import android.content.SharedPreferences
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
+import com.moufee.purduemenus.api.AuthenticatedAPITask
+import com.moufee.purduemenus.api.UpdateFavoritesTask
+import com.moufee.purduemenus.api.Webservice
+import com.moufee.purduemenus.db.FavoriteDao
+import com.moufee.purduemenus.repository.data.menus.Favorite
+import com.moufee.purduemenus.repository.data.menus.MenuItem
+import com.moufee.purduemenus.util.AppExecutors
+import okhttp3.ResponseBody
+import retrofit2.Call
+import retrofit2.Response
+import timber.log.Timber
+import java.util.*
+import javax.inject.Inject
 
 /**
  * Created by Ben on 13/08/2017.
  * Repository for Favorites
  */
+class FavoritesRepository @Inject constructor(private val mFavoriteDao: FavoriteDao,
+                                              private val mAppExecutors: AppExecutors,
+                                              private val mWebservice: Webservice,
+                                              private val authDataSource: AuthDataSource,
+                                              private val mSharedPreferences: SharedPreferences) {
+    val favorites: LiveData<List<Favorite>>
+        get() = mFavoriteDao.loadAllFavorites()
+    val favoriteIDSet: LiveData<Set<String>>
+        get() = Transformations.map(mFavoriteDao.getFavoriteIDs()) { favoriteIDs: List<String>? ->
+            if (favoriteIDs != null) return@map HashSet(favoriteIDs)
+            HashSet()
+        }
 
-public class FavoritesRepository {
-
-    private FavoriteDao mFavoriteDao;
-    private AppExecutors mAppExecutors;
-    private Webservice mWebservice;
-    private SharedPreferences mSharedPreferences;
-    private static final String TAG = "FAVORITES_REPOSITORY";
-
-    @Inject
-    public FavoritesRepository(FavoriteDao favoriteDao, AppExecutors appExecutors, Webservice webservice, SharedPreferences sharedPreferences) {
-        mFavoriteDao = favoriteDao;
-        mAppExecutors = appExecutors;
-        mWebservice = webservice;
-        mSharedPreferences = sharedPreferences;
+    fun updateFavoritesFromWeb(ticket: String?) {
+        mAppExecutors.networkIO().execute(UpdateFavoritesTask(mSharedPreferences, mWebservice, mFavoriteDao).setTicket(ticket))
     }
 
+    fun addFavorite(item: MenuItem) {
+        val favorite = Favorite(item.name, UUID.randomUUID().toString(), item.id, item.isVegetarian)
+        mAppExecutors.diskIO().execute { mFavoriteDao.insertFavorites(favorite) }
+        if (authDataSource.isLoggedIn()) mAppExecutors.networkIO()
+                .execute(object : AuthenticatedAPITask<ResponseBody>(mSharedPreferences) {
+                    override val call: Call<ResponseBody>
+                        get() = mWebservice.addFavorite(favorite)
 
-    public LiveData<List<Favorite>> getFavorites() {
-        return mFavoriteDao.loadAllFavorites();
-    }
-
-    public LiveData<Set<String>> getFavoriteIDSet() {
-        return Transformations.map(mFavoriteDao.getFavoriteIDs(), favoriteIDs -> {
-            if (favoriteIDs != null)
-                return new HashSet<>(favoriteIDs);
-            return new HashSet<>();
-
-        });
-    }
-
-    public void updateFavoritesFromWeb(@Nullable String ticket) {
-        mAppExecutors.networkIO().execute(new UpdateFavoritesTask(mSharedPreferences, mWebservice, mFavoriteDao).setTicket(ticket));
-    }
-
-    public void addFavorite(MenuItem item) {
-        Favorite favorite = new Favorite(item.getName(), UUID.randomUUID().toString(), item.getId(), item.isVegetarian());
-        mAppExecutors.diskIO().execute(() -> mFavoriteDao.insertFavorites(favorite));
-        if (mSharedPreferences.getBoolean("logged_in", false))
-            mAppExecutors.networkIO().execute(new AuthenticatedAPITask<ResponseBody>(mSharedPreferences) {
-                @Override
-                public Call<ResponseBody> getCall() {
-                    return mWebservice.addFavorite(favorite);
-                }
-
-                @Override
-                public void onSuccess(Response<ResponseBody> response) {
-                    Timber.d("onSuccess: %s", response);
-                    updateFavoritesFromWeb(null);
-                }
-            });
-    }
-
-    public void removeFavorite(MenuItem item) {
-        if (mSharedPreferences.getBoolean("logged_in", false))
-            mAppExecutors.diskIO().execute(() -> {
-                Favorite favorite = mFavoriteDao.getFavoriteByItemId(item.getId());
-                Timber.d("removeFavorite: deleting favorite" + favorite + " " + favorite.favoriteId);
-                mAppExecutors.networkIO().execute(new AuthenticatedAPITask<ResponseBody>(mSharedPreferences) {
-                    @Override
-                    public Call<ResponseBody> getCall() {
-                        return mWebservice.deleteFavorite(favorite.favoriteId);
+                    override fun onSuccess(response: Response<ResponseBody>) {
+                        Timber.d("onSuccess: %s", response)
+                        updateFavoritesFromWeb(null)
                     }
-
-                    @Override
-                    public void onSuccess(Response<ResponseBody> response) {
-                        Timber.d("onSuccess: %s", response);
-                    }
-                });
-                mFavoriteDao.deleteByItemID(item.getId());
-            });
-        else
-            mAppExecutors.diskIO().execute(() -> mFavoriteDao.deleteByItemID(item.getId()));
-
+                })
     }
 
-    public void clearLocalFavorites() {
-        mAppExecutors.diskIO().execute(() -> mFavoriteDao.deleteAll());
+    fun removeFavorite(item: MenuItem) {
+        if (authDataSource.isLoggedIn()) mAppExecutors.diskIO().execute {
+            val favorite = mFavoriteDao.getFavoriteByItemId(item.id)
+            if (favorite != null) {
+                mAppExecutors.networkIO().execute(object : AuthenticatedAPITask<ResponseBody>(mSharedPreferences) {
+                    override val call: Call<ResponseBody>
+                        get() = mWebservice.deleteFavorite(favorite.favoriteId)
+
+                    override fun onSuccess(response: Response<ResponseBody>) {
+                        Timber.d("onSuccess: %s", response)
+                    }
+                })
+            }
+            mFavoriteDao.deleteByItemID(item.id)
+        } else {
+            mAppExecutors.diskIO().execute { mFavoriteDao.deleteByItemID(item.id) }
+        }
+    }
+
+    fun clearLocalFavorites() {
+        mAppExecutors.diskIO().execute { mFavoriteDao.deleteAll() }
     }
 }

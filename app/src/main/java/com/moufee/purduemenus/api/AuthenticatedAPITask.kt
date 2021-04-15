@@ -1,48 +1,36 @@
-package com.moufee.purduemenus.api;
+package com.moufee.purduemenus.api
 
-import android.content.SharedPreferences;
-
-import retrofit2.Call;
-import retrofit2.Response;
-import timber.log.Timber;
+import android.content.SharedPreferences
+import retrofit2.Call
+import retrofit2.Response
+import timber.log.Timber
 
 // todo: unnecessary generic?
-public abstract class AuthenticatedAPITask<T> implements Runnable {
-
-
-    private SharedPreferences mSharedPreferences;
-    private static final String TAG = "FavoriteTransaction";
-
-    public AuthenticatedAPITask(SharedPreferences sharedPreferences) {
-        mSharedPreferences = sharedPreferences;
-    }
-
-    public void run() {
-
-        if (!isLoggedIn()) return;
+abstract class AuthenticatedAPITask<T>(private val mSharedPreferences: SharedPreferences) : Runnable {
+    override fun run() {
+        if (!isLoggedIn) return
         try {
-            Call<T> initialCall = getCall();
-            Response<T> response = initialCall.execute();
-            Timber.d("run: %s", response);
-            if (response.isSuccessful()) {
-                onSuccess(response);
+            val initialCall = call
+            val response = initialCall.execute()
+            Timber.d("run: %s", response)
+            if (response.isSuccessful) {
+                onSuccess(response)
             } else {
                 //logout or something
-                mSharedPreferences.edit().putBoolean("logged_in", false).apply();
-                Timber.d("unsuccessful response %s", response.message());
+                mSharedPreferences.edit().putBoolean("logged_in", false).apply()
+                Timber.d("unsuccessful response %s", response.message())
             }
-        } catch (Exception e) {
-            Timber.e(e, "Exception while running task");
+        } catch (e: Exception) {
+            Timber.e(e, "Exception while running task")
         }
-
     }
 
+    abstract val call: Call<T>
+    abstract fun onSuccess(response: Response<T>)
+    private val isLoggedIn: Boolean
+        get() = mSharedPreferences.getBoolean("logged_in", false)
 
-    public abstract Call<T> getCall();
-
-    public abstract void onSuccess(Response<T> response);
-
-    private boolean isLoggedIn() {
-        return mSharedPreferences.getBoolean("logged_in", false);
+    companion object {
+        private const val TAG = "FavoriteTransaction"
     }
 }

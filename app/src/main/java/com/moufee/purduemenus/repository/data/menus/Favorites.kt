@@ -1,20 +1,13 @@
-package com.moufee.purduemenus.repository.data.menus;
+package com.moufee.purduemenus.repository.data.menus
 
-import androidx.annotation.Keep;
-
-import com.squareup.moshi.Json;
-
-import java.util.List;
+import androidx.annotation.Keep
+import com.squareup.moshi.Json
 
 /**
  * A container for a list of favorites
  */
 @Keep
-public class Favorites {
+class Favorites {
     @Json(name = "Favorite")
-    private List<Favorite> mFavorites;
-
-    public List<Favorite> getFavorites() {
-        return mFavorites;
-    }
+    val favorites: List<Favorite>? = null
 }
