@@ -6,6 +6,7 @@ import androidx.lifecycle.Transformations
 import com.moufee.purduemenus.api.AuthenticatedAPITask
 import com.moufee.purduemenus.api.UpdateFavoritesTask
 import com.moufee.purduemenus.api.Webservice
+import com.moufee.purduemenus.api.models.ApiFavorite
 import com.moufee.purduemenus.db.FavoriteDao
 import com.moufee.purduemenus.repository.data.menus.Favorite
 import com.moufee.purduemenus.repository.data.menus.MenuItem
@@ -44,7 +45,7 @@ class FavoritesRepository @Inject constructor(private val mFavoriteDao: Favorite
         if (authDataSource.isLoggedIn()) mAppExecutors.networkIO()
                 .execute(object : AuthenticatedAPITask<ResponseBody>(mSharedPreferences) {
                     override val call: Call<ResponseBody>
-                        get() = mWebservice.addFavorite(favorite)
+                        get() = mWebservice.addFavorite(favorite.toApiFavorite())
 
                     override fun onSuccess(response: Response<ResponseBody>) {
                         Timber.d("onSuccess: %s", response)
@@ -76,3 +77,8 @@ class FavoritesRepository @Inject constructor(private val mFavoriteDao: Favorite
         mAppExecutors.diskIO().execute { mFavoriteDao.deleteAll() }
     }
 }
+
+
+fun Favorite.toApiFavorite() = ApiFavorite(itemName, favoriteId, itemId, isVegetarian)
+
+fun ApiFavorite.toFavorite() = Favorite(ItemName, FavoriteId, ItemId, IsVegetarian)

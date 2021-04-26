@@ -1,8 +1,8 @@
 package com.moufee.purduemenus.api
 
 import com.moufee.purduemenus.api.models.ApiDiningCourtMenu
-import com.moufee.purduemenus.repository.data.menus.Favorite
-import com.moufee.purduemenus.repository.data.menus.Favorites
+import com.moufee.purduemenus.api.models.ApiFavorite
+import com.moufee.purduemenus.api.models.ApiFavoritesResponse
 import com.moufee.purduemenus.repository.data.menus.LocationsResponse
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -25,10 +25,10 @@ interface Webservice {
 
     @Headers("Accept: text/json")
     @GET("/menus/v2/favorites")
-    fun getFavorites(@Query("ticket") ticket: String?): Call<Favorites>
+    fun getFavorites(@Query("ticket") ticket: String?): Call<ApiFavoritesResponse>
 
     @POST("/menus/v2/favorites")
-    fun addFavorite(@Body favorite: Favorite): Call<ResponseBody>
+    fun addFavorite(@Body favorite: ApiFavorite): Call<ResponseBody>
 
     @DELETE("/menus/v2/favorites/{favoriteID}")
     fun deleteFavorite(@Path("favoriteID") favoriteID: String): Call<ResponseBody>
