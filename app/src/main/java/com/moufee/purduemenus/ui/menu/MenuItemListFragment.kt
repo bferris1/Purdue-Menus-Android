@@ -14,14 +14,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.moufee.purduemenus.R
 import com.moufee.purduemenus.databinding.FragmentMenuitemListBinding
-import com.moufee.purduemenus.repository.FavoritesRepository
 import com.moufee.purduemenus.repository.data.menus.DiningCourtMeal
-import com.moufee.purduemenus.repository.data.menus.MenuItem
 import dagger.hilt.android.AndroidEntryPoint
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
-import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * A Fragment that contains a list of menu items for one meal at one Dining Court
@@ -29,22 +25,14 @@ import javax.inject.Inject
  *
  */
 @AndroidEntryPoint
-class MenuItemListFragment
-/**
- * Mandatory empty constructor for the fragment manager to instantiate the
- * fragment (e.g. upon screen orientation changes).
- */
-    : Fragment(), OnToggleFavoriteListener {
+class MenuItemListFragment : Fragment() {
     private var mTimeFormatter: DateTimeFormatter = DateTimeFormat.shortTime()
 
     // TODO: restructure so that all data stays in ViewModel (data binding?)
     var mDiningCourtName: String? = null
-    private var mDataBoundAdapter: MenuRecyclerViewAdapter = MenuRecyclerViewAdapter((this))
+    private lateinit var mDataBoundAdapter: MenuRecyclerViewAdapter
     private lateinit var mViewModel: DailyMenuViewModel
     private lateinit var binding: FragmentMenuitemListBinding
-
-    @Inject
-    lateinit var mFavoritesRepository: FavoritesRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,23 +41,17 @@ class MenuItemListFragment
         }
     }
 
-    override fun toggleFavorite(item: MenuItem): Boolean {
-        if (mViewModel.favoriteSet.value == null) return true
-        Timber.d("toggleFavorite: Adding Favorite: ${item.name} ${item.id}")
-        if (!mViewModel.favoriteSet.value!!.contains(item.id)) mFavoritesRepository.addFavorite(item) else mFavoritesRepository.removeFavorite(item)
-        return true
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+                              savedInstanceState: Bundle?): View {
         binding = FragmentMenuitemListBinding.inflate(inflater)
         binding.lifecycleOwner = this
         binding.viewModel = mViewModel
         return binding.root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        mDataBoundAdapter = MenuRecyclerViewAdapter(mViewModel)
         binding.menuItemRecyclerView.adapter = mDataBoundAdapter
         val layoutManager: RecyclerView.LayoutManager =
                 if (context?.resources?.configuration?.screenWidthDp ?: 0 > 500) {

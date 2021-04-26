@@ -11,6 +11,7 @@ import com.moufee.purduemenus.repository.MenuRepository
 import com.moufee.purduemenus.repository.data.menus.DayMenu
 import com.moufee.purduemenus.repository.data.menus.DiningCourtMeal
 import com.moufee.purduemenus.repository.data.menus.Location
+import com.moufee.purduemenus.repository.data.menus.MenuItem
 import com.moufee.purduemenus.util.DateTimeHelper
 import com.moufee.purduemenus.util.Resource
 import com.moufee.purduemenus.util.combineLatest
@@ -24,12 +25,12 @@ import javax.inject.Inject
 @HiltViewModel
 class DailyMenuViewModel @Inject constructor(private val mMenuRepository: MenuRepository,
                                              private val preferenceManager: AppPreferenceManager,
-                                             mFavoritesRepository: FavoritesRepository) : ViewModel() {
+                                             private val favoritesRepository: FavoritesRepository) : ViewModel(), OnToggleFavoriteListener {
 
     private val mCurrentDate = MutableLiveData<LocalDate>()
     private val mSelectedMeal = MutableLiveData<String>()
 
-    val favoriteSet: LiveData<Set<String>> = mFavoritesRepository.favoriteIDSet
+    val favoriteSet: LiveData<Set<String>> = favoritesRepository.favoriteIDSet
     val locations: LiveData<List<Location>>
     val dayMenu: LiveData<Resource<DayMenu>>
     val selectedMenus: LiveData<Map<String, DiningCourtMeal>>
@@ -91,5 +92,10 @@ class DailyMenuViewModel @Inject constructor(private val mMenuRepository: MenuRe
 
     fun reloadData() {
         mCurrentDate.value?.let { mCurrentDate.postValue(it) }
+    }
+
+    override fun toggleFavorite(item: MenuItem): Boolean {
+        if (favoriteSet.value?.contains(item.id) == true) favoritesRepository.removeFavorite(item) else favoritesRepository.addFavorite(item)
+        return true
     }
 }
