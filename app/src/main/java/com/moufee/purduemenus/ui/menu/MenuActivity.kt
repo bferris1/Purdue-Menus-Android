@@ -13,6 +13,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.work.*
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
@@ -34,6 +35,7 @@ import com.moufee.purduemenus.util.Resource
 import com.moufee.purduemenus.util.UPDATE_MESSAGE_KEY
 import com.moufee.purduemenus.workers.DownloadWorker
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
 import org.joda.time.LocalDate
 import timber.log.Timber
 import java.util.*
@@ -41,6 +43,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 private const val IN_APP_UPDATE_REQUEST_CODE = 1
+
 @AndroidEntryPoint
 class MenuActivity : AppCompatActivity() {
     private lateinit var mBinding: ActivityMenuDatePickerTimeBinding
@@ -49,17 +52,20 @@ class MenuActivity : AppCompatActivity() {
     private lateinit var networkListener: NetworkAvailabilityListener
 
 
-    @Inject lateinit var appUpdateManager: AppUpdateManager
+    @Inject
+    lateinit var appUpdateManager: AppUpdateManager
 
     @Inject
     lateinit var mSharedPreferences: SharedPreferences
 
     private fun setListeners() {
         mViewModel.currentDate.observe(this,
-                { dateTime: LocalDate ->
-                    mBinding.dateTextView.text = DateTimeHelper.getFriendlyDateFormat(dateTime, Locale.getDefault(), applicationContext)
-                })
-        mViewModel.favoriteSet.observe(this, { strings: Set<String> -> mMenuPagerAdapter.setFavoritesSet(strings) })
+            { dateTime: LocalDate ->
+                mBinding.dateTextView.text = DateTimeHelper.getFriendlyDateFormat(dateTime, Locale.getDefault(), applicationContext)
+            })
+        lifecycleScope.launchWhenStarted {
+            mViewModel.favoriteSet.collect { strings: Set<String> -> mMenuPagerAdapter.setFavoritesSet(strings) }
+        }
         mViewModel.appPreferences.observe(this, { (_, showFavoriteCounts) -> mMenuPagerAdapter.setShowFavoriteCount(showFavoriteCounts) })
         mViewModel.sortedLocations.observe(this, { sorted: List<DiningCourtMeal> ->
             mMenuPagerAdapter.setMenus(sorted)
@@ -67,7 +73,8 @@ class MenuActivity : AppCompatActivity() {
         })
         mViewModel.dayMenu.observe(this, { result: Resource<DayMenu> ->
             if (result is Resource.Error) {
-                Snackbar.make(mBinding.activityMenuCoordinatorLayout, getString(R.string.network_error_message), Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(mBinding.activityMenuCoordinatorLayout, getString(R.string.network_error_message), Snackbar.LENGTH_SHORT)
+                    .show()
             }
         })
     }
@@ -89,7 +96,9 @@ class MenuActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         mMenuPagerAdapter.setShowFavoriteCount(mSharedPreferences.getBoolean(KEY_PREF_SHOW_FAVORITE_COUNT, true))
         mBinding.menuViewPager.adapter = mMenuPagerAdapter
-        TabLayoutMediator(tabLayout, mBinding.menuViewPager) { tab, position -> tab.text = mMenuPagerAdapter.getPageTitle(position) }.attach()
+        TabLayoutMediator(tabLayout, mBinding.menuViewPager) { tab, position ->
+            tab.text = mMenuPagerAdapter.getPageTitle(position)
+        }.attach()
         setListeners()
         networkListener = NetworkAvailabilityListener(this, lifecycle) {
             mViewModel.reloadData()
@@ -98,8 +107,8 @@ class MenuActivity : AppCompatActivity() {
         val workManager = WorkManager.getInstance(this)
         val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).setRequiresBatteryNotLow(true).build()
         val request = PeriodicWorkRequest.Builder(DownloadWorker::class.java, 1, TimeUnit.DAYS)
-                .setConstraints(constraints)
-                .build()
+            .setConstraints(constraints)
+            .build()
         workManager.enqueueUniquePeriodicWork("downloader", ExistingPeriodicWorkPolicy.KEEP, request)
         checkForUpdate()
     }
@@ -117,14 +126,14 @@ class MenuActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         appUpdateManager
-                .appUpdateInfo
-                .addOnSuccessListener { appUpdateInfo ->
-                    // If the update is downloaded but not installed,
-                    // notify the user to complete the update.
-                    if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
-                        popupSnackbarForCompleteUpdate()
-                    }
+            .appUpdateInfo
+            .addOnSuccessListener { appUpdateInfo ->
+                // If the update is downloaded but not installed,
+                // notify the user to complete the update.
+                if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
+                    popupSnackbarForCompleteUpdate()
                 }
+            }
     }
 
     private fun checkForUpdate() {
@@ -144,7 +153,7 @@ class MenuActivity : AppCompatActivity() {
 
         appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
             if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
-                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)
+                && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)
             ) {
                 // Request the update.
                 appUpdateManager.registerListener(listener)
@@ -165,9 +174,9 @@ class MenuActivity : AppCompatActivity() {
 
     private fun popupSnackbarForCompleteUpdate() {
         Snackbar.make(
-                mBinding.activityMenuCoordinatorLayout,
-                getString(R.string.update_downloaded_alert),
-                Snackbar.LENGTH_INDEFINITE
+            mBinding.activityMenuCoordinatorLayout,
+            getString(R.string.update_downloaded_alert),
+            Snackbar.LENGTH_INDEFINITE
         ).apply {
             setAction(getString(R.string.update_downloaded_install)) { appUpdateManager.completeUpdate() }
             setActionTextColor(ResourcesCompat.getColor(resources, R.color.snackbarButtonColor, context.theme))

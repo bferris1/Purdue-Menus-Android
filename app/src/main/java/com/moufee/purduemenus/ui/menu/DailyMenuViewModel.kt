@@ -1,9 +1,6 @@
 package com.moufee.purduemenus.ui.menu
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.moufee.purduemenus.preferences.AppPreferenceManager
 import com.moufee.purduemenus.preferences.AppPreferences
 import com.moufee.purduemenus.repository.FavoritesRepository
@@ -16,21 +13,29 @@ import com.moufee.purduemenus.util.DateTimeHelper
 import com.moufee.purduemenus.util.Resource
 import com.moufee.purduemenus.util.combineLatest
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import org.joda.time.LocalDate
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
  * A ViewModel representing all the dining menus for one day.
  */
 @HiltViewModel
-class DailyMenuViewModel @Inject constructor(private val mMenuRepository: MenuRepository,
-                                             private val preferenceManager: AppPreferenceManager,
-                                             private val favoritesRepository: FavoritesRepository) : ViewModel(), OnToggleFavoriteListener {
+class DailyMenuViewModel @Inject constructor(
+    private val mMenuRepository: MenuRepository,
+    private val preferenceManager: AppPreferenceManager,
+    private val favoritesRepository: FavoritesRepository
+) : ViewModel(), OnToggleFavoriteListener {
 
     private val mCurrentDate = MutableLiveData<LocalDate>()
     private val mSelectedMeal = MutableLiveData<String>()
 
-    val favoriteSet: LiveData<Set<String>> = favoritesRepository.favoriteIDSet
+    private val _favoriteSet = MutableStateFlow<Set<String>>(emptySet())
+    val favoriteSet: StateFlow<Set<String>> = _favoriteSet
     val locations: LiveData<List<Location>>
     val dayMenu: LiveData<Resource<DayMenu>>
     val selectedMenus: LiveData<Map<String, DiningCourtMeal>>
@@ -67,6 +72,12 @@ class DailyMenuViewModel @Inject constructor(private val mMenuRepository: MenuRe
         sortedLocations = Transformations.map(combineLatest(selectedMenus, locations)) { (menus, locations) ->
             locations.mapNotNull { menus[it.Name] }
         }
+        viewModelScope.launch {
+            favoritesRepository.favoriteIDSet.collect {
+                Timber.d(it.toString())
+                _favoriteSet.value = it
+            }
+        }
     }
 
 
@@ -95,7 +106,9 @@ class DailyMenuViewModel @Inject constructor(private val mMenuRepository: MenuRe
     }
 
     override fun toggleFavorite(item: MenuItem): Boolean {
-        if (favoriteSet.value?.contains(item.id) == true) favoritesRepository.removeFavorite(item) else favoritesRepository.addFavorite(item)
+        viewModelScope.launch {
+            if (favoriteSet.value.contains(item.id)) favoritesRepository.removeFavorite(item) else favoritesRepository.addFavorite(item)
+        }
         return true
     }
 }

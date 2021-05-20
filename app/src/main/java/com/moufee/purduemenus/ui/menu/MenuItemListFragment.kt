@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,6 +17,7 @@ import com.moufee.purduemenus.R
 import com.moufee.purduemenus.databinding.FragmentMenuitemListBinding
 import com.moufee.purduemenus.repository.data.menus.DiningCourtMeal
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 
@@ -41,8 +43,10 @@ class MenuItemListFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         binding = FragmentMenuitemListBinding.inflate(inflater)
         binding.lifecycleOwner = this
         binding.viewModel = mViewModel
@@ -54,15 +58,15 @@ class MenuItemListFragment : Fragment() {
         mDataBoundAdapter = MenuRecyclerViewAdapter(mViewModel)
         binding.menuItemRecyclerView.adapter = mDataBoundAdapter
         val layoutManager: RecyclerView.LayoutManager =
-                if (context?.resources?.configuration?.screenWidthDp ?: 0 > 500) {
-                    GridLayoutManager(context, 2).apply {
-                        spanSizeLookup = object : SpanSizeLookup() {
-                            override fun getSpanSize(position: Int): Int {
-                                return if (mDataBoundAdapter.isHeader(position)) 2 else 1
-                            }
+            if (context?.resources?.configuration?.screenWidthDp ?: 0 > 500) {
+                GridLayoutManager(context, 2).apply {
+                    spanSizeLookup = object : SpanSizeLookup() {
+                        override fun getSpanSize(position: Int): Int {
+                            return if (mDataBoundAdapter.isHeader(position)) 2 else 1
                         }
                     }
-                } else LinearLayoutManager(context)
+                }
+            } else LinearLayoutManager(context)
         binding.menuItemRecyclerView.layoutManager = layoutManager
     }
 
@@ -72,7 +76,8 @@ class MenuItemListFragment : Fragment() {
             val stations = menu?.stations ?: emptyList()
             mDataBoundAdapter.setStations(stations)
             binding.dataAvailable = stations.isNotEmpty()
-            binding.notServingTextview.text = if (menu?.status != null && menu.status != "Open") menu.status else getString(R.string.no_data)
+            binding.notServingTextview.text =
+                if (menu?.status != null && menu.status != "Open") menu.status else getString(R.string.no_data)
             menu?.let {
                 if (it.startTime != null && it.endTime != null)
                     "${mTimeFormatter.print(it.startTime)} - ${mTimeFormatter.print(it.endTime)}"
@@ -80,7 +85,9 @@ class MenuItemListFragment : Fragment() {
             }?.let { text -> binding.servingTimeTextView.text = text }
 
         })
-        mViewModel.favoriteSet.observe(this, { favoriteIDs: Set<String> -> mDataBoundAdapter.setFavoriteSet(favoriteIDs) })
+        lifecycleScope.launchWhenStarted {
+            mViewModel.favoriteSet.collect { favoriteIDs: Set<String> -> mDataBoundAdapter.setFavoriteSet(favoriteIDs) }
+        }
     }
 
     override fun onAttach(context: Context) {

@@ -1,6 +1,5 @@
 package com.moufee.purduemenus.ui.login
 
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
@@ -13,9 +12,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.moufee.purduemenus.R
 import com.moufee.purduemenus.analytics.EventNames
 import com.moufee.purduemenus.databinding.ActivityLoginBinding
-import com.moufee.purduemenus.repository.FavoritesRepository
 import dagger.hilt.android.AndroidEntryPoint
-import okhttp3.OkHttpClient
 import javax.inject.Inject
 
 /**
@@ -25,15 +22,6 @@ import javax.inject.Inject
 class LoginActivity : AppCompatActivity() {
     private lateinit var viewModel: LoginViewModel
     private lateinit var binding: ActivityLoginBinding
-
-    @Inject
-    lateinit var mHTTPClient: OkHttpClient
-
-    @Inject
-    lateinit var mSharedPreferences: SharedPreferences
-
-    @Inject
-    lateinit var mFavoritesRepository: FavoritesRepository
 
     @Inject
     lateinit var mFirebaseAnalytics: FirebaseAnalytics

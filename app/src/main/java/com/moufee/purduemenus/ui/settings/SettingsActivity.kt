@@ -8,7 +8,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import com.moufee.purduemenus.preferences.KEY_PREF_USE_NIGHT_MODE
-import com.moufee.purduemenus.repository.FavoritesRepository
 import com.moufee.purduemenus.util.SingleFragmentActivity
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -20,9 +19,6 @@ import javax.inject.Inject
 class SettingsActivity : SingleFragmentActivity(), OnSharedPreferenceChangeListener {
     @Inject
     lateinit var sharedPreferences: SharedPreferences
-
-    @Inject
-    lateinit var mFavoritesRepository: FavoritesRepository
 
 
     override fun recreate() {
