@@ -10,7 +10,7 @@ import javax.inject.Inject
 class RemoteFavoritesDataSource @Inject constructor(private val webservice: Webservice) : FavoritesDataSource {
     override fun observeFavorites(): Flow<List<Favorite>> {
         return flow {
-            emit(emptyList())
+            emit(getFavorites())
         }
     }
 
