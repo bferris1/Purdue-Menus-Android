@@ -3,7 +3,7 @@ package com.moufee.purduemenus.api
 import com.moufee.purduemenus.api.models.ApiDiningCourtMenu
 import com.moufee.purduemenus.api.models.ApiFavorite
 import com.moufee.purduemenus.api.models.ApiFavoritesResponse
-import com.moufee.purduemenus.repository.data.menus.LocationsResponse
+import com.moufee.purduemenus.api.models.LocationsResponse
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*

@@ -7,6 +7,7 @@ import com.moufee.purduemenus.api.MenuCache
 import com.moufee.purduemenus.api.MenuDownloader
 import com.moufee.purduemenus.api.Webservice
 import com.moufee.purduemenus.api.models.ApiDiningCourtMenu
+import com.moufee.purduemenus.api.models.ApiLocation
 import com.moufee.purduemenus.api.models.ApiMenuItem
 import com.moufee.purduemenus.api.models.ApiStation
 import com.moufee.purduemenus.db.LocationDao
@@ -44,7 +45,6 @@ constructor(private val mWebservice: Webservice,
         }
 
     // the first time this is called when the app is first installed (has no data) it will emit an empty list
-    // this empty list gets sent
     val visibleLocations: LiveData<List<Location>>
         get() {
             updateLocationsFromNetwork()
@@ -95,15 +95,15 @@ constructor(private val mWebservice: Webservice,
         CoroutineScope(EmptyCoroutineContext + Dispatchers.IO).launch {
             try {
                 val response = mWebservice.getLocations()
-                val body = response.body()
-                if (response.isSuccessful && body != null) {
-                    for (location in body.Location) {
+                val locations = response.body()?.Location?.map { it.toLocation() }
+                if (response.isSuccessful && locations != null) {
+                    for (location in locations) {
                         location.displayOrder = locationsDefaultOrder[location.Name] ?: 100
                     }
                     Timber.d("getLocations: ${response.body()?.Location}")
-                    mLocationDao.insertAll(body.Location)
+                    mLocationDao.insertAll(locations)
                     val currentLocations = mLocationDao.getAllList()
-                    currentLocations.forEach { current -> if (body.Location.find { it.LocationId == current.LocationId } == null) mLocationDao.delete(current) }
+                    currentLocations.forEach { current -> if (locations.find { it.LocationId == current.LocationId } == null) mLocationDao.delete(current) }
                 } else {
                     Timber.e("Locations request failed. ${response.message()}")
                 }
@@ -137,3 +137,5 @@ fun List<ApiDiningCourtMenu>.toDayMenu(dateTime: LocalDate): DayMenu {
 fun List<ApiStation>.toEntity() = map { Station(it.Name, it.Items.map { item -> item.toEntity() }) }
 
 fun ApiMenuItem.toEntity() = MenuItem(Name, IsVegetarian, ID)
+
+fun ApiLocation.toLocation() = Location(this.Name, this.LocationId, this.FormalName)
