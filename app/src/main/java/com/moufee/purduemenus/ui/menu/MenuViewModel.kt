@@ -25,7 +25,7 @@ import javax.inject.Inject
  * A ViewModel representing all the dining menus for one day.
  */
 @HiltViewModel
-class DailyMenuViewModel @Inject constructor(
+class MenuViewModel @Inject constructor(
     private val mMenuRepository: MenuRepository,
     private val preferenceManager: AppPreferenceManager,
     private val favoritesRepository: FavoritesRepository

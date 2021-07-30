@@ -48,7 +48,7 @@ private const val IN_APP_UPDATE_REQUEST_CODE = 1
 class MenuActivity : AppCompatActivity() {
     private lateinit var mBinding: ActivityMenuDatePickerTimeBinding
     private val mMenuPagerAdapter: MenuPagerAdapter = MenuPagerAdapter(this)
-    private lateinit var mViewModel: DailyMenuViewModel
+    private lateinit var mViewModel: MenuViewModel
     private lateinit var networkListener: NetworkAvailabilityListener
 
 
@@ -89,7 +89,7 @@ class MenuActivity : AppCompatActivity() {
         title = getString(R.string.app_name)
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_menu_date_picker_time)
         mBinding.lifecycleOwner = this
-        mViewModel = ViewModelProvider(this).get(DailyMenuViewModel::class.java)
+        mViewModel = ViewModelProvider(this).get(MenuViewModel::class.java)
         mBinding.viewModel = mViewModel
         val tabLayout = mBinding.menuTabLayout
         val toolbar = mBinding.mainToolbar

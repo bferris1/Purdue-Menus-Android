@@ -8,7 +8,7 @@
 
         <variable
             name="viewModel"
-            type="com.moufee.purduemenus.ui.menu.DailyMenuViewModel" />
+            type="com.moufee.purduemenus.ui.menu.MenuViewModel" />
 
         <variable
             name="showServingTimes"

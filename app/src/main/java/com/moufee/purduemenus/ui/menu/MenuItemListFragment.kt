@@ -33,7 +33,7 @@ class MenuItemListFragment : Fragment() {
     // TODO: restructure so that all data stays in ViewModel (data binding?)
     var mDiningCourtName: String? = null
     private lateinit var mDataBoundAdapter: MenuRecyclerViewAdapter
-    private lateinit var mViewModel: DailyMenuViewModel
+    private lateinit var mViewModel: MenuViewModel
     private lateinit var binding: FragmentMenuitemListBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,7 +93,7 @@ class MenuItemListFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is AppCompatActivity) {
-            mViewModel = ViewModelProvider(context).get(DailyMenuViewModel::class.java)
+            mViewModel = ViewModelProvider(context).get(MenuViewModel::class.java)
             setListener()
         }
     }
