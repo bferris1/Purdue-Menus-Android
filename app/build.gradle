@@ -83,7 +83,8 @@ dependencies {
     def lifecycle_version = "2.4.0-alpha02"
     def room_version = "2.3.0"
     def work_version = "2.5.0"
-    def hilt_version = "2.37"
+    def hilt_version = "2.38.1"
+    def epoxyVersion = "4.6.2"
 
     implementation fileTree(include: ["*.jar"], dir: "libs")
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
@@ -98,6 +99,10 @@ dependencies {
     implementation "androidx.preference:preference-ktx:1.1.1"
     implementation "androidx.fragment:fragment-ktx:1.3.4"
     implementation "androidx.core:core-ktx:1.3.2"
+
+    implementation "com.airbnb.android:epoxy:$epoxyVersion"
+    implementation "com.airbnb.android:epoxy-databinding:$epoxyVersion"
+    kapt "com.airbnb.android:epoxy-processor:$epoxyVersion"
 
     //Play Core
     implementation 'com.google.android.play:core:1.10.0'
