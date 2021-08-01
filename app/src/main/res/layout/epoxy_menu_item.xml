@@ -9,15 +9,11 @@
 
         <variable
             name="menuItem"
-            type="com.moufee.purduemenus.repository.data.menus.MenuItem" />
+            type="com.moufee.purduemenus.ui.menu.MenuItemViewObject" />
 
         <variable
             name="listener"
-            type="com.moufee.purduemenus.ui.menu.OnToggleFavoriteListener" />
-
-        <variable
-            name="isFavorite"
-            type="boolean" />
+            type="com.moufee.purduemenus.ui.menu.MenuItemController.AdapterCallbacks" />
     </data>
 
     <RelativeLayout
@@ -26,7 +22,7 @@
         android:layout_height="48dp"
         android:longClickable="true"
         android:background="?attr/selectableItemBackground"
-        android:onLongClick="@{() -> listener.toggleFavorite(menuItem)}"
+        android:onLongClick="@{() -> listener.onItemLongPressed(menuItem)}"
         android:orientation="horizontal">
 
         <TextView
@@ -74,7 +70,7 @@
             android:maxHeight="14sp"
             android:maxWidth="14sp"
             android:src="@drawable/ic_favorite_24dp"
-            app:visibleIfTrue="@{isFavorite}"
+            app:visibleIfTrue="@{menuItem.favorite}"
             tools:visibility="visible" />
 
 

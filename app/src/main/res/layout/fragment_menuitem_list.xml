@@ -56,7 +56,7 @@
             app:layout_constraintTop_toBottomOf="@+id/serving_time_layout"
             tools:context="com.moufee.purduemenus.ui.menu.MenuItemListFragment"
             tools:layoutManager="LinearLayoutManager"
-            tools:listitem="@layout/fragment_menuitem"
+            tools:listitem="@layout/epoxy_menu_item"
             tools:visibility="visible">
 
 
