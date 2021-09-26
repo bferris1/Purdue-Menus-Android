@@ -190,7 +190,7 @@ class MenuActivity : AppCompatActivity() {
             R.id.action_feedback -> {
                 val emailIntent = Intent(Intent.ACTION_SENDTO)
                 emailIntent.data = Uri.parse("mailto:") // only email apps should handle this
-                emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf("support@benferris.tech")) // recipients
+                emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf("support@benferris.dev")) // recipients
                 emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Purdue Menus Feedback (version ${BuildConfig.VERSION_NAME})")
                 try {
                     startActivity(emailIntent)
