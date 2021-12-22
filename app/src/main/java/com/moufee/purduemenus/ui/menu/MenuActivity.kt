@@ -3,7 +3,6 @@ package com.moufee.purduemenus.ui.menu
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
@@ -12,8 +11,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.work.*
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
@@ -36,6 +37,7 @@ import com.moufee.purduemenus.util.UPDATE_MESSAGE_KEY
 import com.moufee.purduemenus.workers.DownloadWorker
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import org.joda.time.LocalDate
 import timber.log.Timber
 import java.util.*
@@ -59,29 +61,52 @@ class MenuActivity : AppCompatActivity() {
     lateinit var mSharedPreferences: SharedPreferences
 
     private fun setListeners() {
-        mViewModel.currentDate.observe(this,
-            { dateTime: LocalDate ->
-                mBinding.dateTextView.text = DateTimeHelper.getFriendlyDateFormat(dateTime, Locale.getDefault(), applicationContext)
-            })
-        lifecycleScope.launchWhenStarted {
-            mViewModel.favoriteSet.collect { strings: Set<String> -> mMenuPagerAdapter.setFavoritesSet(strings) }
-        }
-        mViewModel.appPreferences.observe(this, { (_, showFavoriteCounts) -> mMenuPagerAdapter.setShowFavoriteCount(showFavoriteCounts) })
-        mViewModel.sortedLocations.observe(this, { sorted: List<DiningCourtMeal> ->
-            mMenuPagerAdapter.setMenus(sorted)
-            Timber.d(sorted.toString())
-        })
-        mViewModel.dayMenu.observe(this, { result: Resource<DayMenu> ->
-            if (result is Resource.Error) {
-                Snackbar.make(mBinding.activityMenuCoordinatorLayout, getString(R.string.network_error_message), Snackbar.LENGTH_SHORT)
-                    .show()
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mViewModel.currentDate.collect { dateTime: LocalDate ->
+                    mBinding.dateTextView.text = DateTimeHelper.getFriendlyDateFormat(dateTime, Locale.getDefault(), applicationContext)
+                }
             }
-        })
-    }
+        }
 
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        Timber.d("onConfigurationChanged ")
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mViewModel.favoriteSet.collect { strings: Set<String> ->
+                    mMenuPagerAdapter.setFavoritesSet(strings)
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mViewModel.appPreferences.collect { prefs ->
+                    mMenuPagerAdapter.setShowFavoriteCount(prefs.showFavoriteCounts)
+                }
+            }
+
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mViewModel.sortedLocations.collect { sorted: List<DiningCourtMeal> ->
+                    mMenuPagerAdapter.setMenus(sorted)
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mViewModel.dayMenu.collect { result: Resource<DayMenu> ->
+                    if (result is Resource.Error) {
+                        Snackbar.make(mBinding.activityMenuCoordinatorLayout,
+                            getString(R.string.network_error_message),
+                            Snackbar.LENGTH_SHORT)
+                            .show()
+                    }
+                }
+            }
+        }
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

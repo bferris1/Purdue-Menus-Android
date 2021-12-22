@@ -1,8 +1,6 @@
 package com.moufee.purduemenus.repository
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.liveData
 import com.moufee.purduemenus.api.MenuCache
 import com.moufee.purduemenus.api.MenuDownloader
 import com.moufee.purduemenus.api.Webservice
@@ -16,6 +14,7 @@ import com.moufee.purduemenus.util.AppExecutors
 import com.moufee.purduemenus.util.Resource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.joda.time.LocalDate
 import timber.log.Timber
@@ -45,42 +44,43 @@ constructor(private val mWebservice: Webservice,
         }
 
     // the first time this is called when the app is first installed (has no data) it will emit an empty list
-    val visibleLocations: LiveData<List<Location>>
+    val visibleLocations: Flow<List<Location>>
         get() {
             updateLocationsFromNetwork()
             return mLocationDao.getVisible()
         }
 
-    fun getMenus(dateTime: LocalDate, locations: List<Location>?): LiveData<Resource<DayMenu>> {
-        if (locations == null)
-            return MutableLiveData()
-        return liveData(EmptyCoroutineContext + Dispatchers.IO) {
-            var fullMenu: DayMenu? = null
-            try {
-                fullMenu = menuCache.get(dateTime)
-                if (fullMenu != null) {
-                    emit(Resource.Success(fullMenu))
-                    Timber.d("getFullMenu: Read from file!")
-                } else {
-                    Timber.d("Could not read from file")
-                    emit(Resource.Loading)
-                }
-            } catch (t: Throwable) {
-                emit(Resource.Loading)
-                Timber.e(t)
-            }
-            try {
-                fullMenu = menuDownloader.getMenus(dateTime, locations).toDayMenu(dateTime)
-                emit(Resource.Success(fullMenu))
-                menuCache.put(fullMenu)
-            } catch (t: Throwable) {
-                Timber.e(t)
-                if (fullMenu == null)
-                    emit(Resource.Error(t as Exception))
-            }
-
-        }
+    fun observeVisibleMenus(dateTime: LocalDate) = mLocationDao.getVisible().flatMapLatest {
+        observeMenus(dateTime, it)
     }
+
+
+    fun observeMenus(dateTime: LocalDate, locations: List<Location>?): Flow<Resource<DayMenu>> = flow {
+        if (locations == null) return@flow
+        var fullMenu: DayMenu? = null
+        try {
+            fullMenu = menuCache.get(dateTime)
+            if (fullMenu != null) {
+                emit(Resource.Success(fullMenu))
+                Timber.d("getFullMenu: Read from file!")
+            } else {
+                Timber.d("Could not read from file")
+                emit(Resource.Loading)
+            }
+        } catch (t: Throwable) {
+            emit(Resource.Loading)
+            Timber.e(t)
+        }
+        try {
+            fullMenu = menuDownloader.getMenus(dateTime, locations).toDayMenu(dateTime)
+            emit(Resource.Success(fullMenu))
+            menuCache.put(fullMenu)
+        } catch (t: Throwable) {
+            Timber.e(t)
+            if (fullMenu == null)
+                emit(Resource.Error(t as Exception))
+        }
+    }.flowOn(Dispatchers.IO)
 
     fun updateLocations(vararg locations: Location) {
         mAppExecutors.diskIO().execute { mLocationDao.updateLocations(*locations) }

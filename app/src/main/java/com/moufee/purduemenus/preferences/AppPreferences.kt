@@ -1,7 +1,9 @@
 package com.moufee.purduemenus.preferences
 
-import android.content.SharedPreferences
-import androidx.lifecycle.LiveData
+import androidx.datastore.core.DataStore
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,38 +19,43 @@ const val PREF_LOG_IN = "log_in"
 const val KEY_PREF_PRIVACY_POLICY = "privacy_policy"
 
 data class AppPreferences(
-        val showServingTimes: Boolean,
-        val showFavoriteCounts: Boolean,
-        val showVegetarianIcons: Boolean,
-        val hideClosedDiningCourts: Boolean
+    val showServingTimes: Boolean,
+    val showFavoriteCounts: Boolean,
+    val showVegetarianIcons: Boolean,
+    val hideClosedDiningCourts: Boolean,
 )
 
 
 @Singleton
-class AppPreferenceManager @Inject constructor(sharedPreferences: SharedPreferences) {
-    val preferences: LiveData<AppPreferences> = AppPreferenceLiveData(sharedPreferences)
+class AppPreferenceManager @Inject constructor(
+    private val dataStore: DataStore<com.moufee.purduemenus.AppPreferences>,
+) {
+    val preferencesFlow = dataStore.data
+
+    suspend fun setShowServingTimes(showServingTimes: Boolean) {
+        Timber.d("Setting showServingTimes to $showServingTimes")
+        dataStore.updateData { preferences ->
+            preferences.toBuilder().setShowServingTimes(showServingTimes).build()
+        }.also { Timber.d(it.toString()) }
+    }
+
+    suspend fun setShowFavoriteCounts(showFavoriteCounts: Boolean) {
+        dataStore.updateData { preferences ->
+            preferences.toBuilder().setShowFavoriteCounts(showFavoriteCounts).build()
+        }
+    }
+
+    suspend fun setHideClosedDiningCourts(hideClosedDiningCourts: Boolean) {
+        dataStore.updateData { preferences ->
+            preferences.toBuilder().setHideClosedDiningCourts(hideClosedDiningCourts).build()
+        }
+    }
+
+    suspend fun setNightMode(nightMode: com.moufee.purduemenus.AppPreferences.NightMode) {
+        dataStore.updateData {
+            it.toBuilder().setNightMode(nightMode).build()
+        }
+    }
+
+    fun getCurrentPreferences() = runBlocking { dataStore.data.first() }
 }
-
-
-private class AppPreferenceLiveData(private val sharedPreferences: SharedPreferences) : LiveData<AppPreferences>() {
-
-    private val listener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, _ ->
-        value = sharedPreferences.toAppPreferences()
-    }
-
-    override fun onActive() {
-        value = sharedPreferences.toAppPreferences()
-        sharedPreferences.registerOnSharedPreferenceChangeListener(listener)
-    }
-
-    override fun onInactive() {
-        sharedPreferences.unregisterOnSharedPreferenceChangeListener(listener)
-    }
-}
-
-private fun SharedPreferences.toAppPreferences() = AppPreferences(
-        showServingTimes = getBoolean(KEY_PREF_SHOW_SERVING_TIMES, true),
-        showFavoriteCounts = getBoolean(KEY_PREF_SHOW_FAVORITE_COUNT, true),
-        showVegetarianIcons = true,
-        hideClosedDiningCourts = getBoolean(KEY_PREF_HIDE_CLOSED_LOCATIONS, true)
-)

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option java_package = "com.moufee.purduemenus";
+option java_multiple_files = true;
+
+message AppPreferences{
+  bool show_serving_times = 1;
+  bool show_favorite_counts = 2;
+  bool show_vegetarian_icons = 3;
+  bool hide_closed_dining_courts = 4;
+  enum NightMode {
+    FOLLOW_SYSTEM = 0;
+    OFF = 1;
+    ON = 2;
+  }
+  NightMode night_mode = 5;
+}

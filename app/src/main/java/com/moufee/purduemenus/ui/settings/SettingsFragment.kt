@@ -31,6 +31,11 @@ class SettingsFragment : PreferenceFragmentCompat(), OnSharedPreferenceChangeLis
     @Inject
     lateinit var mFavoritesRepository: FavoritesRepository
 
+    @Inject
+    lateinit var appPreferenceManager: AppPreferenceManager
+
+    private val dataStore: AppPreferenceDataStore by lazy { AppPreferenceDataStore(lifecycleScope, appPreferenceManager) }
+
     private var mLoginPref: Preference? = null
     private var mPrivacyPolicyPref: Preference? = null
 
@@ -41,6 +46,7 @@ class SettingsFragment : PreferenceFragmentCompat(), OnSharedPreferenceChangeLis
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        preferenceManager.preferenceDataStore = dataStore
         addPreferencesFromResource(R.xml.pref_general)
     }
 
@@ -113,7 +119,7 @@ class SettingsFragment : PreferenceFragmentCompat(), OnSharedPreferenceChangeLis
         }
     }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
         if (key == KEY_PREF_LOGGED_IN) updateLoginPreference()
     }
 }

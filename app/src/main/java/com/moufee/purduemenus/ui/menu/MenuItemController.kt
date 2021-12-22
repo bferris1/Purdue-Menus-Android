@@ -2,6 +2,7 @@ package com.moufee.purduemenus.ui.menu
 
 import com.airbnb.epoxy.TypedEpoxyController
 import com.moufee.purduemenus.menuItem
+import com.moufee.purduemenus.repository.data.menus.MenuItem
 import com.moufee.purduemenus.stationHeader
 
 class MenuItemController(private val callbacks: AdapterCallbacks) : TypedEpoxyController<List<MenuListViewObject>>() {
@@ -31,6 +32,6 @@ class MenuItemController(private val callbacks: AdapterCallbacks) : TypedEpoxyCo
 
 sealed class MenuListViewObject
 
-data class MenuItemViewObject(val id: String, val name: String, val isVegetarian: Boolean, val isFavorite: Boolean) : MenuListViewObject()
+data class MenuItemViewObject(val menuItem: MenuItem, val id: String, val name: String, val isVegetarian: Boolean, val isFavorite: Boolean) : MenuListViewObject()
 
 data class HeaderItemViewObject(val stationName: String) : MenuListViewObject()

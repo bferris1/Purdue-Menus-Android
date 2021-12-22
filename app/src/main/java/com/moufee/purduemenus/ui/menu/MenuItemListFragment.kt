@@ -7,14 +7,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.moufee.purduemenus.R
 import com.moufee.purduemenus.databinding.FragmentMenuitemListBinding
-import com.moufee.purduemenus.repository.data.menus.DiningCourtMeal
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 
@@ -42,10 +47,10 @@ class MenuItemListFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentMenuitemListBinding.inflate(inflater)
-        binding.lifecycleOwner = this
+        binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = mViewModel
         return binding.root
     }
@@ -54,6 +59,7 @@ class MenuItemListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         itemController = MenuItemController(object : MenuItemController.AdapterCallbacks {
             override fun onItemLongPressed(item: MenuItemViewObject): Boolean {
+                mViewModel.toggleFavorite(item.menuItem)
                 return true
             }
         })
@@ -67,43 +73,48 @@ class MenuItemListFragment : Fragment() {
                 }
             } else LinearLayoutManager(context)
         binding.menuItemRecyclerView.layoutManager = layoutManager
+        setListener()
     }
 
     private fun setListener() {
-        mViewModel.selectedMenus.observe(this, { menus: Map<String, DiningCourtMeal> ->
-            val menu = menus[mDiningCourtName]
-            val stations = menu?.stations ?: emptyList()
-            val items = stations.flatMap { station ->
-                listOf(HeaderItemViewObject(station.name)).plus(station.items.map {
-                    MenuItemViewObject(
-                        it.id,
-                        it.name,
-                        it.isVegetarian,
-                        false
-                    )
-                })
-            }
-            itemController.setData(items)
-            binding.dataAvailable = stations.isNotEmpty()
-            binding.notServingTextview.text =
-                if (menu?.status != null && menu.status != "Open") menu.status else getString(R.string.no_data)
-            menu?.let {
-                if (it.startTime != null && it.endTime != null)
-                    "${mTimeFormatter.print(it.startTime)} - ${mTimeFormatter.print(it.endTime)}"
-                else ""
-            }?.let { text -> binding.servingTimeTextView.text = text }
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                //TODO: move transformation to ViewModel
+                mViewModel.selectedMenus.combine(mViewModel.favoriteSet) { menus, favorites -> Pair(menus, favorites) }
+                    .collect { (menus, favorites) ->
+                        val menu = menus[mDiningCourtName]
+                        val stations = menu?.stations ?: emptyList()
+                        val items = stations.flatMap { station ->
+                            listOf(HeaderItemViewObject(station.name)).plus(station.items.map {
+                                MenuItemViewObject(
+                                    menuItem = it,
+                                    id = it.id,
+                                    name = it.name,
+                                    isVegetarian = it.isVegetarian,
+                                    isFavorite = it.id in favorites
+                                )
+                            })
+                        }
+                        itemController.setData(items)
+                        binding.dataAvailable = stations.isNotEmpty()
+                        binding.notServingTextview.text =
+                            if (menu?.status != null && menu.status != "Open") menu.status else getString(R.string.no_data)
+                        menu?.let {
+                            if (it.startTime != null && it.endTime != null)
+                                "${mTimeFormatter.print(it.startTime)} - ${mTimeFormatter.print(it.endTime)}"
+                            else ""
+                        }?.let { text -> binding.servingTimeTextView.text = text }
 
-        })
-//        lifecycleScope.launchWhenStarted {
-//            mViewModel.favoriteSet.collect { favoriteIDs: Set<String> -> mDataBoundAdapter.setFavoriteSet(favoriteIDs) }
-//        }
+                    }
+
+            }
+        }
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is AppCompatActivity) {
             mViewModel = ViewModelProvider(context).get(MenuViewModel::class.java)
-            setListener()
         }
     }
 

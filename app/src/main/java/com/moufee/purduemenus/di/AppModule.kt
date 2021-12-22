@@ -3,6 +3,9 @@ package com.moufee.purduemenus.di
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.datastore.core.DataStore
+import androidx.datastore.core.DataStoreFactory
+import androidx.datastore.dataStoreFile
 import androidx.preference.PreferenceManager
 import androidx.room.Room
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
@@ -12,6 +15,7 @@ import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.moufee.purduemenus.AppPreferences
 import com.moufee.purduemenus.BuildConfig
 import com.moufee.purduemenus.api.DateTimeTypeAdapter
 import com.moufee.purduemenus.api.LocalDateAdapter
@@ -20,6 +24,8 @@ import com.moufee.purduemenus.api.Webservice
 import com.moufee.purduemenus.db.AppDatabase
 import com.moufee.purduemenus.db.FavoriteDao
 import com.moufee.purduemenus.db.LocationDao
+import com.moufee.purduemenus.preferences.AppPreferencesSerializer
+import com.moufee.purduemenus.preferences.getAppPreferencesMigration
 import com.moufee.purduemenus.util.AppExecutors
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -43,22 +49,24 @@ internal class AppModule {
     @Singleton
     @Provides
     fun provideWebService(executors: AppExecutors, moshi: Moshi, client: OkHttpClient): Webservice {
-        return Retrofit.Builder().baseUrl("https://api.hfs.purdue.edu")
-                .client(client)
-                .addConverterFactory(MoshiConverterFactory.create(moshi))
-                .callbackExecutor(executors.diskIO())
-                .build()
-                .create(Webservice::class.java)
+        return Retrofit.Builder()
+            .baseUrl("https://api.hfs.purdue.edu")
+            .client(client)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .callbackExecutor(executors.diskIO())
+            .build()
+            .create(Webservice::class.java)
     }
 
     @Singleton
     @Provides
     fun provideMoshi(): Moshi {
-        return Moshi.Builder().add(LocalTimeTypeAdapter())
-                .add(DateTimeTypeAdapter())
-                .add(LocalDateAdapter())
-                .add(KotlinJsonAdapterFactory())
-                .build()
+        return Moshi.Builder()
+            .add(LocalTimeTypeAdapter())
+            .add(DateTimeTypeAdapter())
+            .add(LocalDateAdapter())
+            .add(KotlinJsonAdapterFactory())
+            .build()
     }
 
     @Singleton
@@ -93,9 +101,9 @@ internal class AppModule {
     @Provides
     fun provideAppDatabase(applicationContext: Context): AppDatabase {
         return Room.databaseBuilder(applicationContext, AppDatabase::class.java, "menus-database")
-                .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3)
-                .fallbackToDestructiveMigration()
-                .build()
+            .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3)
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides
@@ -107,4 +115,12 @@ internal class AppModule {
     @Singleton
     @Provides
     fun provideUpdateManager(context: Context): AppUpdateManager = AppUpdateManagerFactory.create(context)
+
+    @Singleton
+    @Provides
+    fun providePreferencesDataStore(context: Context): DataStore<AppPreferences> = DataStoreFactory.create(
+        serializer = AppPreferencesSerializer,
+        migrations = listOf(getAppPreferencesMigration(context)),
+        produceFile = { context.dataStoreFile("app_prefs.pb") }
+    )
 }
