@@ -9,6 +9,7 @@ import com.moufee.purduemenus.db.FavoriteDao
 import com.moufee.purduemenus.db.LocationDao
 import com.moufee.purduemenus.repository.data.menus.Favorite
 import com.moufee.purduemenus.repository.data.menus.Location
+import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
@@ -27,7 +28,8 @@ class DatabaseTest {
     fun createDb() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         db = Room.inMemoryDatabaseBuilder(
-                context, AppDatabase::class.java).build()
+            context, AppDatabase::class.java
+        ).build()
         favoriteDao = db.favoriteDao()
         locationDao = db.locationDao()
     }
@@ -40,7 +42,7 @@ class DatabaseTest {
 
     @Test
     @Throws(Exception::class)
-    fun writeFavoriteAndQuery() {
+    fun writeFavoriteAndQuery() = runBlocking {
         val favorite = Favorite("Salad", "12345", "54321", true)
         favoriteDao.insertFavorites(favorite)
         val byId = favoriteDao.getFavoriteByItemId("54321")!!

@@ -1,25 +1,26 @@
 package com.moufee.purduemenus.db
 
-import androidx.lifecycle.LiveData
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 import com.moufee.purduemenus.repository.data.menus.Favorite
+import kotlinx.coroutines.flow.Flow
 
 @Dao interface FavoriteDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE) fun insertFavorites(favorites: List<Favorite>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insertFavorites(vararg favorites: Favorite)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun insertFavorites(vararg favorites: Favorite)
 
-    @Query("SELECT * FROM favorite") fun loadAllFavorites(): LiveData<List<Favorite>>
+    @Query("SELECT * FROM favorite") fun getFavoritesFlow(): Flow<List<Favorite>>
 
-    @Query("SELECT * FROM favorite") fun getAllFavorites(): List<Favorite>
+    @Query("SELECT * FROM favorite") suspend fun getAllFavorites(): List<Favorite>
 
-    @Query("SELECT itemId FROM favorite") fun getFavoriteIDs(): LiveData<List<String>>
+    @Query("SELECT itemId FROM favorite") fun getFavoriteIDs(): Flow<List<String>>
 
-    @Query("SELECT * FROM favorite WHERE itemId = :itemID LIMIT 1") fun getFavoriteByItemId(itemID: String): Favorite?
+    @Query("SELECT * FROM favorite WHERE itemId = :itemID LIMIT 1") suspend fun getFavoriteByItemId(itemID: String): Favorite?
 
-    @Query("DELETE FROM favorite WHERE itemId = :itemID") fun deleteByItemID(itemID: String)
+    @Query("DELETE FROM favorite WHERE itemId = :itemID") suspend fun deleteByItemID(itemID: String)
 
-    @Delete fun deleteFavorites(vararg favorites: Favorite)
-
-    @Query("DELETE FROM favorite") fun deleteAll()
+    @Query("DELETE FROM favorite") suspend fun deleteAll()
 }

@@ -3,6 +3,7 @@ package com.moufee.purduemenus.db
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.moufee.purduemenus.repository.data.menus.Location
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LocationDao {
@@ -13,7 +14,7 @@ interface LocationDao {
     fun getAllList(): List<Location>
 
     @Query("SELECT * from location WHERE isHidden = 0 ORDER BY displayOrder")
-    fun getVisible(): LiveData<List<Location>>
+    fun getVisible(): Flow<List<Location>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertAll(locations: List<Location>)

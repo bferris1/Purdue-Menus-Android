@@ -2,27 +2,27 @@ package com.moufee.purduemenus.ui.settings
 
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
-import com.moufee.purduemenus.preferences.KEY_PREF_USE_NIGHT_MODE
-import com.moufee.purduemenus.repository.FavoritesRepository
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.moufee.purduemenus.AppPreferences
+import com.moufee.purduemenus.preferences.AppPreferenceManager
 import com.moufee.purduemenus.util.SingleFragmentActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
  * Settings Activity
  */
 @AndroidEntryPoint
-class SettingsActivity : SingleFragmentActivity(), OnSharedPreferenceChangeListener {
+class SettingsActivity : SingleFragmentActivity() {
     @Inject
-    lateinit var sharedPreferences: SharedPreferences
-
-    @Inject
-    lateinit var mFavoritesRepository: FavoritesRepository
+    lateinit var appPreferenceManager: AppPreferenceManager
 
 
     override fun recreate() {
@@ -34,30 +34,30 @@ class SettingsActivity : SingleFragmentActivity(), OnSharedPreferenceChangeListe
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                appPreferenceManager.preferencesFlow.collect {
+                    when (it.nightMode) {
+                        AppPreferences.NightMode.OFF -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                        AppPreferences.NightMode.ON -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                        AppPreferences.NightMode.FOLLOW_SYSTEM -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                        else -> { }
+                    }
+                }
+            }
+        }
     }
 
     override fun onPause() {
-        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
         super.onPause()
     }
 
     override fun onResume() {
-        sharedPreferences.registerOnSharedPreferenceChangeListener(this)
         super.onResume()
     }
 
     override fun createFragment(): Fragment {
         return SettingsFragment()
-    }
-
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
-        if (key == KEY_PREF_USE_NIGHT_MODE) {
-            when (sharedPreferences.getString(key, "")) {
-                "mode_off" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                "mode_on" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                "mode_auto" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-            }
-        }
     }
 
     companion object {
