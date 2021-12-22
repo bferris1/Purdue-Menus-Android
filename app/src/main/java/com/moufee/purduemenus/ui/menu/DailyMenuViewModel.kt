@@ -14,12 +14,14 @@ import com.moufee.purduemenus.repository.data.menus.Location
 import com.moufee.purduemenus.util.DateTimeHelper
 import com.moufee.purduemenus.util.Resource
 import com.moufee.purduemenus.util.combineLatest
+import dagger.hilt.android.lifecycle.HiltViewModel
 import org.joda.time.LocalDate
 import javax.inject.Inject
 
 /**
  * A ViewModel representing all the dining menus for one day.
  */
+@HiltViewModel
 class DailyMenuViewModel @Inject constructor(private val mMenuRepository: MenuRepository,
                                              private val preferenceManager: AppPreferenceManager,
                                              mFavoritesRepository: FavoritesRepository) : ViewModel() {
@@ -50,10 +52,12 @@ class DailyMenuViewModel @Inject constructor(private val mMenuRepository: MenuRe
             mMenuRepository.getMenus(date, locations)
         }
         selectedMenus = Transformations.map(combineLatest(dayMenu, selectedMeal)) { (menu, mealName) ->
-            if (mealName == "Late Lunch" && menu.data?.hasLateLunch == false) {
-                setSelectedMeal("Dinner")
-            }
-            menu.data?.meals?.get(mealName)
+            if (menu is Resource.Success) {
+                if (mealName == "Late Lunch" && menu.data.hasLateLunch.not()) {
+                    setSelectedMeal("Dinner")
+                }
+                menu.data.meals[mealName]
+            } else null
         }.let {
             Transformations.map(combineLatest(it, appPreferences)) { (meal, prefs) ->
                 if (prefs.hideClosedDiningCourts) meal?.openLocations ?: emptyMap() else meal?.locations ?: emptyMap()

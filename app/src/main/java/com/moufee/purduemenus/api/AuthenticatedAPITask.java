@@ -1,10 +1,10 @@
 package com.moufee.purduemenus.api;
 
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import retrofit2.Call;
 import retrofit2.Response;
+import timber.log.Timber;
 
 // todo: unnecessary generic?
 public abstract class AuthenticatedAPITask<T> implements Runnable {
@@ -23,16 +23,16 @@ public abstract class AuthenticatedAPITask<T> implements Runnable {
         try {
             Call<T> initialCall = getCall();
             Response<T> response = initialCall.execute();
-            Log.d(TAG, "run: " + response);
+            Timber.d("run: %s", response);
             if (response.isSuccessful()) {
                 onSuccess(response);
             } else {
                 //logout or something
                 mSharedPreferences.edit().putBoolean("logged_in", false).apply();
-                Log.d(TAG, "run: unsuccessful response" + response.message());
+                Timber.d("unsuccessful response %s", response.message());
             }
         } catch (Exception e) {
-            Log.e(TAG, "run: ", e);
+            Timber.e(e, "Exception while running task");
         }
 
     }

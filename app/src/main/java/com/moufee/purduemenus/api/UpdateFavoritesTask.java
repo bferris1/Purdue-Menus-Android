@@ -1,7 +1,6 @@
 package com.moufee.purduemenus.api;
 
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -17,6 +16,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 public class UpdateFavoritesTask extends AuthenticatedAPITask<Favorites> {
 
@@ -58,16 +58,16 @@ public class UpdateFavoritesTask extends AuthenticatedAPITask<Favorites> {
         for (Favorite favorite :
                 localFavorites) {
             if (!remoteFavoritesSet.contains(favorite)) {
-                Log.d(TAG, "uploadFavorites: " + favorite);
+                Timber.d("uploadFavorites: %s", favorite);
                 mWebservice.addFavorite(favorite).enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                        Log.d(TAG, "onResponse: " + response);
+                        Timber.d("onResponse: %s", response);
                     }
 
                     @Override
                     public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                        Log.e(TAG, "onFailure: ", t);
+                        Timber.e(t);
                     }
                 });
             }
@@ -77,7 +77,7 @@ public class UpdateFavoritesTask extends AuthenticatedAPITask<Favorites> {
 
     private void saveFavorites(Favorites favorites) {
         if (favorites == null || favorites.getFavorites() == null)
-            Log.d(TAG, "addFavorites: favorites were null!");
+            Timber.d("favorites were null!");
         else {
             mFavoriteDao.insertFavorites(favorites.getFavorites());
         }

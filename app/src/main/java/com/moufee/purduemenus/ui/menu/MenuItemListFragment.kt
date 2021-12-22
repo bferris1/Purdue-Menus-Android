@@ -17,8 +17,7 @@ import com.moufee.purduemenus.databinding.FragmentMenuitemListBinding
 import com.moufee.purduemenus.repository.FavoritesRepository
 import com.moufee.purduemenus.repository.data.menus.DiningCourtMeal
 import com.moufee.purduemenus.repository.data.menus.MenuItem
-import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.fragment_menuitem_list.*
+import dagger.hilt.android.AndroidEntryPoint
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import timber.log.Timber
@@ -29,6 +28,7 @@ import javax.inject.Inject
  *
  *
  */
+@AndroidEntryPoint
 class MenuItemListFragment
 /**
  * Mandatory empty constructor for the fragment manager to instantiate the
@@ -42,9 +42,6 @@ class MenuItemListFragment
     private var mDataBoundAdapter: MenuRecyclerViewAdapter = MenuRecyclerViewAdapter((this))
     private lateinit var mViewModel: DailyMenuViewModel
     private lateinit var binding: FragmentMenuitemListBinding
-
-    @Inject
-    lateinit var mViewModelFactory: ViewModelProvider.Factory
 
     @Inject
     lateinit var mFavoritesRepository: FavoritesRepository
@@ -73,7 +70,7 @@ class MenuItemListFragment
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        menuItemRecyclerView.adapter = mDataBoundAdapter
+        binding.menuItemRecyclerView.adapter = mDataBoundAdapter
         val layoutManager: RecyclerView.LayoutManager =
                 if (context?.resources?.configuration?.screenWidthDp ?: 0 > 500) {
                     GridLayoutManager(context, 2).apply {
@@ -84,7 +81,7 @@ class MenuItemListFragment
                         }
                     }
                 } else LinearLayoutManager(context)
-        menuItemRecyclerView.layoutManager = layoutManager
+        binding.menuItemRecyclerView.layoutManager = layoutManager
     }
 
     private fun setListener() {
@@ -98,17 +95,16 @@ class MenuItemListFragment
                 if (it.startTime != null && it.endTime != null)
                     "${mTimeFormatter.print(it.startTime)} - ${mTimeFormatter.print(it.endTime)}"
                 else ""
-            }?.let { text -> servingTimeTextView.text = text }
+            }?.let { text -> binding.servingTimeTextView.text = text }
 
         })
         mViewModel.favoriteSet.observe(this, { favoriteIDs: Set<String> -> mDataBoundAdapter.setFavoriteSet(favoriteIDs) })
     }
 
     override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
         super.onAttach(context)
         if (context is AppCompatActivity) {
-            mViewModel = ViewModelProvider(context, mViewModelFactory).get(DailyMenuViewModel::class.java)
+            mViewModel = ViewModelProvider(context).get(DailyMenuViewModel::class.java)
             setListener()
         }
     }

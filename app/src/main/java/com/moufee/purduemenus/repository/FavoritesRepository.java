@@ -1,7 +1,6 @@
 package com.moufee.purduemenus.repository;
 
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
@@ -25,6 +24,7 @@ import javax.inject.Inject;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
+import timber.log.Timber;
 
 /**
  * Created by Ben on 13/08/2017.
@@ -77,7 +77,7 @@ public class FavoritesRepository {
 
                 @Override
                 public void onSuccess(Response<ResponseBody> response) {
-                    Log.d(TAG, "onSuccess: " + response);
+                    Timber.d("onSuccess: %s", response);
                     updateFavoritesFromWeb(null);
                 }
             });
@@ -87,7 +87,7 @@ public class FavoritesRepository {
         if (mSharedPreferences.getBoolean("logged_in", false))
             mAppExecutors.diskIO().execute(() -> {
                 Favorite favorite = mFavoriteDao.getFavoriteByItemId(item.getId());
-                Log.d(TAG, "removeFavorite: deleting favorite" + favorite + " " + favorite.favoriteId);
+                Timber.d("removeFavorite: deleting favorite" + favorite + " " + favorite.favoriteId);
                 mAppExecutors.networkIO().execute(new AuthenticatedAPITask<ResponseBody>(mSharedPreferences) {
                     @Override
                     public Call<ResponseBody> getCall() {
@@ -96,7 +96,7 @@ public class FavoritesRepository {
 
                     @Override
                     public void onSuccess(Response<ResponseBody> response) {
-                        Log.d(TAG, "onSuccess: " + response);
+                        Timber.d("onSuccess: %s", response);
                     }
                 });
                 mFavoriteDao.deleteByItemID(item.getId());

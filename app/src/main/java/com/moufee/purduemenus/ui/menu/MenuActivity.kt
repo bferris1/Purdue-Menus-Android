@@ -3,13 +3,13 @@ package com.moufee.purduemenus.ui.menu
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
@@ -23,18 +23,17 @@ import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.moufee.purduemenus.BuildConfig
 import com.moufee.purduemenus.R
-import com.moufee.purduemenus.api.DownloadWorker
 import com.moufee.purduemenus.databinding.ActivityMenuDatePickerTimeBinding
-import com.moufee.purduemenus.preferences.KEY_PREF_DINING_COURT_ORDER
 import com.moufee.purduemenus.preferences.KEY_PREF_SHOW_FAVORITE_COUNT
 import com.moufee.purduemenus.repository.data.menus.DayMenu
 import com.moufee.purduemenus.repository.data.menus.DiningCourtMeal
 import com.moufee.purduemenus.ui.settings.SettingsActivity
-import com.moufee.purduemenus.util.*
-import dagger.android.AndroidInjection
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasAndroidInjector
+import com.moufee.purduemenus.util.DateTimeHelper
+import com.moufee.purduemenus.util.NetworkAvailabilityListener
+import com.moufee.purduemenus.util.Resource
+import com.moufee.purduemenus.util.UPDATE_MESSAGE_KEY
+import com.moufee.purduemenus.workers.DownloadWorker
+import dagger.hilt.android.AndroidEntryPoint
 import org.joda.time.LocalDate
 import timber.log.Timber
 import java.util.*
@@ -42,8 +41,8 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 private const val IN_APP_UPDATE_REQUEST_CODE = 1
-
-class MenuActivity : AppCompatActivity(), HasAndroidInjector {
+@AndroidEntryPoint
+class MenuActivity : AppCompatActivity() {
     private lateinit var mBinding: ActivityMenuDatePickerTimeBinding
     private val mMenuPagerAdapter: MenuPagerAdapter = MenuPagerAdapter(this)
     private lateinit var mViewModel: DailyMenuViewModel
@@ -54,21 +53,6 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
 
     @Inject
     lateinit var mSharedPreferences: SharedPreferences
-
-    @Inject
-    lateinit var mDispatchingAndroidInjector: DispatchingAndroidInjector<Any>
-
-    @Inject
-    lateinit var mViewModelFactory: ViewModelProvider.Factory
-    private val mSharedPreferenceChangeListener = OnSharedPreferenceChangeListener { _, key ->
-        when (key) {
-            KEY_PREF_DINING_COURT_ORDER -> mViewModel.setDate(mViewModel.currentDate.value!!)
-        }
-    }
-
-    override fun androidInjector(): AndroidInjector<Any> {
-        return mDispatchingAndroidInjector
-    }
 
     private fun setListeners() {
         mViewModel.currentDate.observe(this,
@@ -81,9 +65,8 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
             mMenuPagerAdapter.setMenus(sorted)
             Timber.d(sorted.toString())
         })
-        mViewModel.dayMenu.observe(this, { resource: Resource<DayMenu> ->
-            mBinding.menusResource = resource
-            if (resource.status == Status.ERROR && resource.data == null) {
+        mViewModel.dayMenu.observe(this, { result: Resource<DayMenu> ->
+            if (result is Resource.Error) {
                 Snackbar.make(mBinding.activityMenuCoordinatorLayout, getString(R.string.network_error_message), Snackbar.LENGTH_SHORT).show()
             }
         })
@@ -95,14 +78,12 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         title = getString(R.string.app_name)
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_menu_date_picker_time)
         mBinding.lifecycleOwner = this
-        mViewModel = ViewModelProvider(this, mViewModelFactory).get(DailyMenuViewModel::class.java)
+        mViewModel = ViewModelProvider(this).get(DailyMenuViewModel::class.java)
         mBinding.viewModel = mViewModel
-        mSharedPreferences.registerOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener)
         val tabLayout = mBinding.menuTabLayout
         val toolbar = mBinding.mainToolbar
         setSupportActionBar(toolbar)
@@ -189,7 +170,7 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
                 Snackbar.LENGTH_INDEFINITE
         ).apply {
             setAction(getString(R.string.update_downloaded_install)) { appUpdateManager.completeUpdate() }
-            setActionTextColor(resources.getColor(R.color.snackbarButtonColor))
+            setActionTextColor(ResourcesCompat.getColor(resources, R.color.snackbarButtonColor, context.theme))
             show()
         }
     }
@@ -209,7 +190,7 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
             R.id.action_feedback -> {
                 val emailIntent = Intent(Intent.ACTION_SENDTO)
                 emailIntent.data = Uri.parse("mailto:") // only email apps should handle this
-                emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf("support@benferris.tech")) // recipients
+                emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf("support@benferris.dev")) // recipients
                 emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Purdue Menus Feedback (version ${BuildConfig.VERSION_NAME})")
                 try {
                     startActivity(emailIntent)
@@ -222,8 +203,4 @@ class MenuActivity : AppCompatActivity(), HasAndroidInjector {
         }
     }
 
-    override fun onDestroy() {
-        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener)
-        super.onDestroy()
-    }
 }
