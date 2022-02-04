@@ -6,12 +6,12 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.LifecycleOwner
 import timber.log.Timber
 
-class NetworkAvailabilityListener(context: Context, lifecycle: Lifecycle, onActiveCallback: () -> Unit) : LifecycleObserver {
+class NetworkAvailabilityListener(context: Context, lifecycle: Lifecycle, onActiveCallback: () -> Unit) : DefaultLifecycleObserver {
     private val connectivityManager: ConnectivityManager = context.getSystemService(Service.CONNECTIVITY_SERVICE) as ConnectivityManager
     private val request = NetworkRequest.Builder().addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET).build()
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
@@ -25,13 +25,11 @@ class NetworkAvailabilityListener(context: Context, lifecycle: Lifecycle, onActi
         lifecycle.addObserver(this)
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    private fun start() {
+    override fun onStart(owner: LifecycleOwner) {
         connectivityManager.registerNetworkCallback(request, networkCallback)
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    private fun stop() {
+    override fun onStop(owner: LifecycleOwner) {
         connectivityManager.unregisterNetworkCallback(networkCallback)
     }
 }

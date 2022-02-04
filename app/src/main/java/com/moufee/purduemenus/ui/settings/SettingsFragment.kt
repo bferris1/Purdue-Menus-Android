@@ -59,7 +59,7 @@ class SettingsFragment : PreferenceFragmentCompat(), OnSharedPreferenceChangeLis
             startActivity(Intent(activity, CustomOrderActivity::class.java))
             true
         }
-        mSharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(activity)
+        mSharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext())
         updateLoginPreference()
         mLoginPref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             val isLoggedIn = mSharedPreferences.getBoolean(KEY_PREF_LOGGED_IN, false)
