@@ -13,9 +13,19 @@ import com.moufee.purduemenus.repository.data.menus.MenuItem
 import com.moufee.purduemenus.util.DateTimeHelper
 import com.moufee.purduemenus.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.joda.time.LocalDate
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.format.DateTimeFormatter
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -28,6 +38,8 @@ class MenuViewModel @Inject constructor(
     private val preferenceManager: AppPreferenceManager,
     private val favoritesRepository: FavoritesRepository,
 ) : ViewModel() {
+
+    private val timeFormatter: DateTimeFormatter = DateTimeFormat.shortTime()
 
     private val mCurrentDate = MutableStateFlow<LocalDate>(LocalDate.now())
     private val mSelectedMeal = MutableStateFlow<String?>(null)
@@ -98,6 +110,30 @@ class MenuViewModel @Inject constructor(
             }
         }
     }
+
+    fun getMenuDetailsUiState(locationName: String) = selectedMenus.combine(favoriteSet, ::Pair).map { (meals, favoriteIds) ->
+        val menu = meals[locationName]
+        val stations = menu?.stations ?: emptyList()
+        val items = stations.flatMap { station ->
+            listOf(HeaderItemViewObject(station.name)).plus(station.items.map {
+                MenuItemViewObject(
+                    menuItem = it,
+                    id = it.id,
+                    name = it.name,
+                    isVegetarian = it.isVegetarian,
+                    isFavorite = it.id in favoriteIds
+                )
+            })
+        }
+        val servingTimeText = if (menu?.startTime != null && menu.endTime != null) {
+            "${timeFormatter.print(menu.startTime)} - ${timeFormatter.print(menu.endTime)}"
+        } else {
+            ""
+        }
+        MealDetailUiState(items, servingTimeText, menu?.status)
+    }
+
+    data class MealDetailUiState(val items: List<MenuListViewObject>, val servingTimeText: String, val status: String?)
 
 
     fun setSelectedMeal(meal: String) {

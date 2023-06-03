@@ -18,10 +18,7 @@ import com.moufee.purduemenus.R
 import com.moufee.purduemenus.databinding.FragmentMenuitemListBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import org.joda.time.format.DateTimeFormat
-import org.joda.time.format.DateTimeFormatter
 
 /**
  * A Fragment that contains a list of menu items for one meal at one Dining Court
@@ -30,10 +27,9 @@ import org.joda.time.format.DateTimeFormatter
  */
 @AndroidEntryPoint
 class MenuItemListFragment : Fragment() {
-    private var mTimeFormatter: DateTimeFormatter = DateTimeFormat.shortTime()
 
     // TODO: restructure so that all data stays in ViewModel (data binding?)
-    var mDiningCourtName: String? = null
+    lateinit var mDiningCourtName: String
     private lateinit var mViewModel: MenuViewModel
     private lateinit var binding: FragmentMenuitemListBinding
     private lateinit var itemController: MenuItemController
@@ -41,7 +37,7 @@ class MenuItemListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (arguments != null) {
-            mDiningCourtName = requireArguments().getString(ARG_DINING_COURT_NAME)
+            mDiningCourtName = requireArguments().getString(ARG_DINING_COURT_NAME, "")
         }
     }
 
@@ -79,34 +75,13 @@ class MenuItemListFragment : Fragment() {
     private fun setListener() {
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                //TODO: move transformation to ViewModel
-                mViewModel.selectedMenus.combine(mViewModel.favoriteSet) { menus, favorites -> Pair(menus, favorites) }
-                    .collect { (menus, favorites) ->
-                        val menu = menus[mDiningCourtName]
-                        val stations = menu?.stations ?: emptyList()
-                        val items = stations.flatMap { station ->
-                            listOf(HeaderItemViewObject(station.name)).plus(station.items.map {
-                                MenuItemViewObject(
-                                    menuItem = it,
-                                    id = it.id,
-                                    name = it.name,
-                                    isVegetarian = it.isVegetarian,
-                                    isFavorite = it.id in favorites
-                                )
-                            })
-                        }
-                        itemController.setData(items)
-                        binding.dataAvailable = stations.isNotEmpty()
-                        binding.notServingTextview.text =
-                            if (menu?.status != null && menu.status != "Open") menu.status else getString(R.string.no_data)
-                        menu?.let {
-                            if (it.startTime != null && it.endTime != null)
-                                "${mTimeFormatter.print(it.startTime)} - ${mTimeFormatter.print(it.endTime)}"
-                            else ""
-                        }?.let { text -> binding.servingTimeTextView.text = text }
-
-                    }
-
+                mViewModel.getMenuDetailsUiState(mDiningCourtName).collect { state ->
+                    itemController.setData(state.items)
+                    binding.dataAvailable = state.items.isNotEmpty()
+                    binding.notServingTextview.text =
+                        if (state.status != null && state.status != "Open") state.status else getString(R.string.no_data)
+                    binding.servingTimeTextView.text = state.servingTimeText
+                }
             }
         }
     }

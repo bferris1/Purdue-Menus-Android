@@ -6,6 +6,6 @@ data class ApiMeal(
         val Order: Int,
         val Status: String,
         val Type: String,
-        val Hours: ApiHours?,
-        val Stations: List<ApiStation>
+        val Hours: RemoteHours?,
+        val Stations: List<RemoteStation>
 )

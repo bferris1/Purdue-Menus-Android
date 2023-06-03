@@ -47,7 +47,7 @@ class MenuPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(activi
 
     override fun getItemCount(): Int = diningCourtMeals.size
 
-    fun getPageTitle(position: Int): CharSequence? {
+    fun getPageTitle(position: Int): CharSequence {
 
         val diningCourtName = diningCourtMeals[position].diningCourtName
         if (!showFavoriteCount || favoritesSet.isEmpty())

@@ -4,17 +4,25 @@ import androidx.lifecycle.LiveData
 import com.moufee.purduemenus.api.MenuCache
 import com.moufee.purduemenus.api.MenuDownloader
 import com.moufee.purduemenus.api.Webservice
-import com.moufee.purduemenus.api.models.ApiDiningCourtMenu
-import com.moufee.purduemenus.api.models.ApiLocation
-import com.moufee.purduemenus.api.models.ApiMenuItem
-import com.moufee.purduemenus.api.models.ApiStation
+import com.moufee.purduemenus.api.models.RemoteDiningCourtMenu
+import com.moufee.purduemenus.api.models.RemoteLocation
+import com.moufee.purduemenus.api.models.RemoteMenuItem
+import com.moufee.purduemenus.api.models.RemoteStation
 import com.moufee.purduemenus.db.LocationDao
-import com.moufee.purduemenus.repository.data.menus.*
+import com.moufee.purduemenus.repository.data.menus.DayMenu
+import com.moufee.purduemenus.repository.data.menus.DiningCourtMeal
+import com.moufee.purduemenus.repository.data.menus.Location
+import com.moufee.purduemenus.repository.data.menus.Meal
+import com.moufee.purduemenus.repository.data.menus.MenuItem
+import com.moufee.purduemenus.repository.data.menus.Station
 import com.moufee.purduemenus.util.AppExecutors
 import com.moufee.purduemenus.util.Resource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import org.joda.time.LocalDate
 import timber.log.Timber
@@ -55,7 +63,7 @@ constructor(private val mWebservice: Webservice,
     }
 
 
-    fun observeMenus(dateTime: LocalDate, locations: List<Location>?): Flow<Resource<DayMenu>> = flow {
+    private fun observeMenus(dateTime: LocalDate, locations: List<Location>?): Flow<Resource<DayMenu>> = flow {
         if (locations == null) return@flow
         var fullMenu: DayMenu? = null
         try {
@@ -116,7 +124,7 @@ constructor(private val mWebservice: Webservice,
 
 }
 
-fun List<ApiDiningCourtMenu>.toDayMenu(dateTime: LocalDate): DayMenu {
+fun List<RemoteDiningCourtMenu>.toDayMenu(dateTime: LocalDate): DayMenu {
     val mealNameToMealListMap: MutableMap<String, MutableList<DiningCourtMeal>> = HashMap()
     for (apiDiningCourtMenu in this) {
         for (apiMeal in apiDiningCourtMenu.Meals) {
@@ -134,8 +142,8 @@ fun List<ApiDiningCourtMenu>.toDayMenu(dateTime: LocalDate): DayMenu {
     return DayMenu(dateTime, mealNameToMealListMap.mapValues { (name, mealList) -> Meal(name, mealList.map { Pair(it.diningCourtName, it) }.toMap()) })
 }
 
-fun List<ApiStation>.toEntity() = map { Station(it.Name, it.Items.map { item -> item.toEntity() }) }
+fun List<RemoteStation>.toEntity() = map { Station(it.Name, it.Items.map { item -> item.toEntity() }) }
 
-fun ApiMenuItem.toEntity() = MenuItem(Name, IsVegetarian, ID)
+fun RemoteMenuItem.toEntity() = MenuItem(Name, IsVegetarian, ID)
 
-fun ApiLocation.toLocation() = Location(this.Name, this.LocationId, this.FormalName)
+fun RemoteLocation.toLocation() = Location(this.Name, this.LocationId, this.FormalName)

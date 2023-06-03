@@ -3,7 +3,11 @@ package com.moufee.purduemenus
 import com.google.common.truth.Truth.assertThat
 import com.moufee.purduemenus.api.MenuDownloader
 import com.moufee.purduemenus.api.Webservice
-import com.moufee.purduemenus.api.models.*
+import com.moufee.purduemenus.api.models.ApiMeal
+import com.moufee.purduemenus.api.models.RemoteDiningCourtMenu
+import com.moufee.purduemenus.api.models.RemoteHours
+import com.moufee.purduemenus.api.models.RemoteMenuItem
+import com.moufee.purduemenus.api.models.RemoteStation
 import com.moufee.purduemenus.repository.data.menus.Location
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -17,12 +21,12 @@ import org.joda.time.format.DateTimeFormat
 import org.junit.Before
 import org.junit.Test
 
-val station = ApiStation("PB Road", listOf(ApiMenuItem("132", "Some Food", true, emptyList())))
-val apiMenu = ApiDiningCourtMenu(
+val station = RemoteStation("PB Road", listOf(RemoteMenuItem("132", "Some Food", true, emptyList())))
+val apiMenu = RemoteDiningCourtMenu(
         Location = "Ford",
         Date = LocalDate.now(),
         Notes = "",
-        Meals = listOf(ApiMeal("123abc", "Breakfast", 1, "DiningCourt", "Open", ApiHours(LocalTime.now(), LocalTime.now()), listOf(station)))
+        Meals = listOf(ApiMeal("123abc", "Breakfast", 1, "DiningCourt", "Open", RemoteHours(LocalTime.now(), LocalTime.now()), listOf(station)))
 )
 
 @ExperimentalCoroutinesApi

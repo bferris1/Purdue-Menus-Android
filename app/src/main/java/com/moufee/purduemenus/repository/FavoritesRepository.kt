@@ -1,6 +1,6 @@
 package com.moufee.purduemenus.repository
 
-import com.moufee.purduemenus.api.models.ApiFavorite
+import com.moufee.purduemenus.api.models.RemoteFavorite
 import com.moufee.purduemenus.repository.data.menus.Favorite
 import com.moufee.purduemenus.repository.data.menus.MenuItem
 import kotlinx.coroutines.flow.Flow
@@ -68,6 +68,6 @@ class FavoritesRepository @Inject constructor(
 }
 
 
-fun Favorite.toApiFavorite() = ApiFavorite(itemName, favoriteId, itemId, isVegetarian)
+fun Favorite.toApiFavorite() = RemoteFavorite(itemName, favoriteId, itemId, isVegetarian)
 
-fun ApiFavorite.toFavorite() = Favorite(ItemName, FavoriteId, ItemId, IsVegetarian)
+fun RemoteFavorite.toFavorite() = Favorite(ItemName, FavoriteId, ItemId, IsVegetarian)

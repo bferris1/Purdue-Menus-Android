@@ -1,6 +1,6 @@
 package com.moufee.purduemenus.api
 
-import com.moufee.purduemenus.api.models.ApiDiningCourtMenu
+import com.moufee.purduemenus.api.models.RemoteDiningCourtMenu
 import com.moufee.purduemenus.repository.data.menus.Location
 import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
@@ -15,7 +15,7 @@ class MenuDownloader @Inject constructor(val webservice: Webservice) {
 
     private val formatter = DateTimeFormat.forPattern("yyyy-MM-dd")
 
-    suspend fun getMenus(date: LocalDate, locations: List<Location>): List<ApiDiningCourtMenu> = supervisorScope {
+    suspend fun getMenus(date: LocalDate, locations: List<Location>): List<RemoteDiningCourtMenu> = supervisorScope {
         val locationNames = locations.map { it.Name }
         var lastException: Throwable? = null
         val deferredResponses = locationNames.map {

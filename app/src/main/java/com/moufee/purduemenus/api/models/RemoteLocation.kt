@@ -1,6 +1,6 @@
 package com.moufee.purduemenus.api.models
 
-data class ApiLocation(
+data class RemoteLocation(
         val LocationId: String,
         val Name: String,
         val FormalName: String,

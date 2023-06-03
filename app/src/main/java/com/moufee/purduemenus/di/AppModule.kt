@@ -74,6 +74,7 @@ internal class AppModule {
     fun provideHttpClient(context: Context): OkHttpClient {
         //todo: maybe don't use shared prefs, possibly use custom implementation
         val builder = OkHttpClient.Builder()
+            .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
         if (BuildConfig.DEBUG) {
             builder.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
         }
