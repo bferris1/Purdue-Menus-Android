@@ -27,11 +27,12 @@ class MenusApp : Application(), Configuration.Provider {
     @Inject
     lateinit var mWorkerFactory: MenusWorkerFactory
 
-    @Inject lateinit var preferenceManager: AppPreferenceManager
+    @Inject
+    lateinit var preferenceManager: AppPreferenceManager
 
-    override fun getWorkManagerConfiguration(): Configuration {
-        return Configuration.Builder().setWorkerFactory(mWorkerFactory).build()
-    }
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder().setWorkerFactory(mWorkerFactory).build()
+
 
     override fun onCreate() {
         super.onCreate()
@@ -44,7 +45,7 @@ class MenusApp : Application(), Configuration.Provider {
                 AppPreferences.NightMode.OFF -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                 AppPreferences.NightMode.ON -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                 AppPreferences.NightMode.FOLLOW_SYSTEM -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-                else -> { }
+                else -> {}
             }
         }
     }
