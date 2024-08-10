@@ -74,7 +74,7 @@ class SettingsFragment : PreferenceFragmentCompat(), OnSharedPreferenceChangeLis
         }
 
         mPrivacyPolicyPref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://android.menus.purdue.tools/privacy"))
+            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://android.menus.benferris.dev/privacy"))
             startActivity(browserIntent)
             true
         }
