@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moufee.purduemenus.AppPreferences
 import com.moufee.purduemenus.preferences.AppPreferenceManager
+import com.moufee.purduemenus.preferences.AppPreferencesSerializer
 import com.moufee.purduemenus.repository.FavoritesRepository
 import com.moufee.purduemenus.repository.MenuRepository
 import com.moufee.purduemenus.repository.data.menus.DayMenu
