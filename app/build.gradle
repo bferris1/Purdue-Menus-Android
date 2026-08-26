@@ -55,6 +55,12 @@ android {
             applicationIdSuffix ".debug"
             minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules-debug.pro", "proguard-rules.pro", "moshi.pro"
+            FirebasePerformance {
+                // Disable HTTP instrumentation in debug builds; the injected
+                // FirebasePerfOkHttpClient calls android.os.SystemClock, which
+                // is not available in local unit tests
+                instrumentationEnabled false
+            }
         }
     }
     productFlavors {}
