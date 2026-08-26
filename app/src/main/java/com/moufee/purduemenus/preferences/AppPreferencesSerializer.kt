@@ -40,3 +40,9 @@ fun getAppPreferencesMigration(context: Context) =
             .setNightMode(nightModeFromPrefString(prefs.getString(KEY_PREF_USE_NIGHT_MODE, "")))
             .build().also { Timber.d("Migration Result: $it") }
     }
+
+fun nightModeFromPrefString(pref: String?) = when (pref) {
+    "mode_off" -> AppPreferences.NightMode.OFF
+    "mode_on" -> AppPreferences.NightMode.ON
+    else -> AppPreferences.NightMode.FOLLOW_SYSTEM
+}

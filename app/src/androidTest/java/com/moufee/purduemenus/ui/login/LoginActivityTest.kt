@@ -1,27 +1,22 @@
 package com.moufee.purduemenus.ui.login
 
 import android.app.Activity
-import androidx.test.core.app.ActivityScenario
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.ViewInteraction
-import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
-import com.moufee.purduemenus.R
 import com.moufee.purduemenus.repository.AuthenticationRepository
 import com.moufee.purduemenus.repository.FavoritesRepository
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import io.mockk.Called
-import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.impl.annotations.MockK
-import org.junit.Before
+import io.mockk.mockk
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,39 +25,29 @@ import org.junit.runner.RunWith
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class LoginActivityTest {
-    @get:Rule
+    @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
 
-    @BindValue
-    @MockK
-    lateinit var authenticationRepository: AuthenticationRepository
+    @get:Rule(order = 1)
+    val composeRule = createAndroidComposeRule<LoginActivity>()
 
     @BindValue
-    @MockK
-    lateinit var favoritesRepository: FavoritesRepository
+    val authenticationRepository: AuthenticationRepository = mockk(relaxed = true, relaxUnitFun = true)
 
-    lateinit var scenario: ActivityScenario<LoginActivity>
-
-    @Before
-    fun setUp() {
-        MockKAnnotations.init(this, relaxed = true, relaxUnitFun = true)
-        scenario = ActivityScenario.launch(LoginActivity::class.java)
-    }
+    @BindValue
+    val favoritesRepository: FavoritesRepository = mockk(relaxed = true, relaxUnitFun = true)
 
     @Test
     fun testLoginFailure() {
         coEvery { authenticationRepository.loginAndGetTicket("email@example.com", "pass") } returns null
 
-        onView(withId(R.id.login_description)).assertCompletelyDisplayed()
+        composeRule.onNodeWithTag("loginDescription").assertIsDisplayed()
 
-        onView(withId(R.id.username)).perform(ViewActions.typeText("email@example.com"))
-        onView(withId(R.id.password)).perform(ViewActions.typeText("pass"))
-        onView(withId(R.id.email_sign_in_button))
-            .check(matches(isCompletelyDisplayed()))
-            .check(matches(withText(R.string.action_sign_in_short)))
-            .perform(click())
+        composeRule.onNodeWithTag("username").performTextInput("email@example.com")
+        composeRule.onNodeWithTag("password").performTextInput("pass")
+        composeRule.onNodeWithTag("signInButton").assertIsDisplayed().performClick()
 
-        onView(withId(R.id.password)).check(matches(hasErrorText("This password is incorrect")))
+        composeRule.onNodeWithTag("passwordError").assertIsDisplayed()
 
         coVerify { authenticationRepository.loginAndGetTicket("email@example.com", "pass") }
         coVerify { favoritesRepository wasNot Called }
@@ -72,42 +57,30 @@ class LoginActivityTest {
     fun testLoginSuccess() {
         coEvery { authenticationRepository.loginAndGetTicket("email@example.com", "pass") } returns "ticket"
 
-        onView(withId(R.id.login_description)).assertCompletelyDisplayed()
+        composeRule.onNodeWithTag("loginDescription").assertIsDisplayed()
 
-        onView(withId(R.id.username)).perform(ViewActions.typeText("email@example.com"))
-        onView(withId(R.id.password)).perform(ViewActions.typeText("pass"))
-        onView(withId(R.id.email_sign_in_button))
-            .check(matches(isCompletelyDisplayed()))
-            .check(matches(withText(R.string.action_sign_in_short)))
-            .perform(click())
+        composeRule.onNodeWithTag("username").performTextInput("email@example.com")
+        composeRule.onNodeWithTag("password").performTextInput("pass")
+        composeRule.onNodeWithTag("signInButton").assertIsDisplayed().performClick()
 
         coVerify { authenticationRepository.loginAndGetTicket("email@example.com", "pass") }
         coVerify { favoritesRepository.updateFavoritesFromWeb("ticket") }
 
-        Truth.assertThat(scenario.result.resultCode).isEqualTo(Activity.RESULT_CANCELED)
+        Truth.assertThat(composeRule.activityRule.scenario.result.resultCode).isEqualTo(Activity.RESULT_CANCELED)
     }
 
     @Test
     fun testLoginInvalidInfo() {
+        composeRule.onNodeWithTag("loginDescription").assertIsDisplayed()
 
-        onView(withId(R.id.login_description)).assertCompletelyDisplayed()
+        composeRule.onNodeWithTag("signInButton").assertIsDisplayed().performClick()
+        composeRule.onNodeWithTag("usernameError").assertIsDisplayed()
 
-        onView(withId(R.id.email_sign_in_button))
-            .check(matches(isCompletelyDisplayed()))
-            .check(matches(withText(R.string.action_sign_in_short)))
-            .perform(click())
-
-        onView(withId(R.id.username)).perform(click()).check(matches(hasErrorText("This field is required")))
-        onView(withId(R.id.username)).perform(ViewActions.typeText("email@example.com"))
-        onView(withId(R.id.email_sign_in_button)).perform(click())
-        onView(withId(R.id.password)).perform(click()).check(matches(hasErrorText("This field is required")))
+        composeRule.onNodeWithTag("username").performTextInput("email@example.com")
+        composeRule.onNodeWithTag("signInButton").performClick()
+        composeRule.onNodeWithTag("passwordError").assertIsDisplayed()
 
         coVerify { authenticationRepository wasNot Called }
         coVerify { favoritesRepository wasNot Called }
     }
-
 }
-
-
-fun ViewInteraction.assertCompletelyDisplayed(): ViewInteraction = this.check(matches(isCompletelyDisplayed()))
-fun ViewInteraction.isCompletelyDisplayedWithText(textResId: Int): ViewInteraction = this.check(matches(isCompletelyDisplayed())).check(matches(withText(textResId)))

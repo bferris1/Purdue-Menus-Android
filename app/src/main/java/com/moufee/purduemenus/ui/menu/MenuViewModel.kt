@@ -61,7 +61,7 @@ class MenuViewModel @Inject constructor(
         preferenceManager.preferencesFlow.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = AppPreferences.getDefaultInstance()
+            initialValue = AppPreferencesSerializer.defaultValue
         )
     }
 

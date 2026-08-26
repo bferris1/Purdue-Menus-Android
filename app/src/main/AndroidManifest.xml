@@ -66,21 +66,18 @@
             android:name=".ui.settings.SettingsActivity"
             android:label="@string/title_settings"
             android:launchMode="singleTop"
-            android:parentActivityName=".ui.menu.MenuActivity"
-            android:theme="@style/AppTheme.ActionBar" />
+            android:parentActivityName=".ui.menu.MenuActivity" />
 
         <activity
             android:name=".ui.login.LoginActivity"
             android:label="@string/title_activity_login"
             android:launchMode="singleTop"
-            android:parentActivityName=".ui.settings.SettingsActivity"
-            android:theme="@style/AppTheme.ActionBar" />
+            android:parentActivityName=".ui.settings.SettingsActivity" />
 
         <activity
             android:name=".ui.settings.CustomOrderActivity"
-            android:label="Dining Court Display Order"
-            android:parentActivityName=".ui.settings.SettingsActivity"
-            android:theme="@style/AppTheme.ActionBar" />
+            android:label="@string/title_activity_custom_order"
+            android:parentActivityName=".ui.settings.SettingsActivity" />
 
         <meta-data
             android:name="google_analytics_adid_collection_enabled"
