@@ -19,7 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.CircularProgressIndicator
@@ -313,21 +313,21 @@ fun MenuItemListPage(viewModel: MenuViewModel, diningCourtName: String) {
                 columns = GridCells.Fixed(columns),
                 modifier = Modifier.fillMaxSize(),
             ) {
-                items(
+                itemsIndexed(
                     items = uiState.items,
-                    key = {
-                        when (it) {
-                            is HeaderItemViewObject -> "header-${it.stationName}"
-                            is MenuItemViewObject -> it.id
+                    key = { index, item ->
+                        when (item) {
+                            is HeaderItemViewObject -> "header-$index-${item.stationName}"
+                            is MenuItemViewObject -> "item-$index-${item.id}"
                         }
                     },
-                    span = {
-                        if (it is HeaderItemViewObject) GridItemSpan(maxLineSpan) else GridItemSpan(1)
+                    span = { _, item ->
+                        if (item is HeaderItemViewObject) GridItemSpan(maxLineSpan) else GridItemSpan(1)
                     },
-                ) { item ->
+                ) { _, item ->
                     when (item) {
                         is HeaderItemViewObject -> StationHeader(item.stationName)
-                        is MenuItemViewObject -> MenuItemRow(item) { viewModel.toggleFavorite(it.menuItem) }
+                        is MenuItemViewObject -> MenuItemRow(item) { viewModel.toggleFavorite(item.menuItem) }
                     }
                 }
             }
